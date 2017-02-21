@@ -31,7 +31,7 @@ class BjorneparkappenApi(remote.Service):
         http_method='GET',
         name='animals.list')
     def list_animals(self, request):
-        return AnimalResponse(content=request.content)
+        return AnimalResponse(content="Success!")
 # [END api]
 
 # [START api_server]
