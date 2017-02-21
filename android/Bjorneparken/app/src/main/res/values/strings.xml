@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Bjorneparken</string>
+    <string name="edit_message">Enter some text…</string>
+    <string name="button_send">Send</string>
+</resources>
