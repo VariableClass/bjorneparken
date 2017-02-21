@@ -1,0 +1,18 @@
+runtime: python27
+api_version: 1
+threadsafe: true
+
+handlers:
+  - url: /_ah/api/.*
+    script: main.api
+    secure: always
+
+libraries:
+ - name: pycrypto
+   version: 2.6
+ - name: ssl
+   version: 2.7.11
+
+env_variables:
+   ENDPOINTS_SERVICE_NAME: bjorneparkappen.appspot.com
+   ENDPOINTS_SERVICE_VERSION: 2017-02-21r0
