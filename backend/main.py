@@ -21,7 +21,7 @@ ANIMALS_RESOURCE = endpoints.ResourceContainer(
 
 
 # [START api]
-@endpoints.api(name='bjorneparkappen', version='v1')
+@endpoints.api(name='bjorneparkappen', version='v1', api_key_required=True)
 class BjorneparkappenApi(remote.Service):
 
     @endpoints.method(
