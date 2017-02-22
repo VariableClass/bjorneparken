@@ -12,6 +12,12 @@ class Area(ndb.Model):
     visitor_destination = ndb.GeoPtProperty()
     coordinates = ndb.GeoPtProperty(repeated=True)
 
+    # Constructors
+    def __init__(self, label, visitor_destination, coordinates):
+        self.label = label
+        self.visitor_destination = visitor_destination
+        self.coordinates = coordinates
+
     # Methods
     def get_area():
         area = 0
@@ -26,3 +32,8 @@ class Area(ndb.Model):
             previous_point = current_point
 
         return area/2
+
+    # Class Methods
+    @classmethod
+    def get_all(cls):
+        return cls.query().order(cls.name)

@@ -6,3 +6,8 @@ class Species(ndb.Model):
     common_name = ndb.StringProperty()
     latin = ndb.StringProperty()
     description = ndb.StringProperty()
+
+    # Class Methods
+    @classmethod
+    def get_all(cls):
+        return cls.query().order(cls.common_name)

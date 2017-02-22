@@ -9,3 +9,8 @@ class Event(ndb.Model):
     end_time = ndb.DateProperty()
     location = ndb.StructuredProperty(Area)
     is_active = ndb.BooleanProperty()
+
+    # Class Methods
+    @classmethod
+    def get_all(cls):
+        return cls.query().order(cls.name)
