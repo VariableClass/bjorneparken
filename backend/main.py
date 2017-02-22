@@ -1,4 +1,5 @@
 # [START imports]
+from models.animal import Animal
 import endpoints
 from protorpc import message_types
 from protorpc import messages
@@ -7,16 +8,15 @@ from protorpc import remote
 
 
 # [START messages]
-class AnimalRequest(messages.Message):
-    content = messages.StringField(1)
+class AnimalMessage(messages.Message):
+    name = messages.StringField(1)
+    species = messages.StringField(2)
+    description = messages.StringField(3)
 
 
-class AnimalResponse(messages.Message):
-    content = messages.StringField(1)
+class ListResponse(messages.Message):
+    list_content = messages.MessageField(AnimalMessage, 1, repeated=True)
 
-
-ANIMALS_RESOURCE = endpoints.ResourceContainer(
-    AnimalRequest)
 # [END messages]
 
 
@@ -25,13 +25,20 @@ ANIMALS_RESOURCE = endpoints.ResourceContainer(
 class BjorneparkappenApi(remote.Service):
 
     @endpoints.method(
-        ANIMALS_RESOURCE,
-        AnimalResponse,
+        message_types.VoidMessage,
+        ListResponse,
         path='animals',
         http_method='GET',
         name='animals.list')
-    def list_animals(self, request):
-        return AnimalResponse(content="Success!")
+    def list_animals(self, response):
+        animals = Animal.get_all_animals()
+
+        animal_messages = []
+
+        for animal in animals:
+            animal_messages.append(AnimalMessage(name=animal.name, species=animal.species.common_name, description=animal.description))
+
+        return ListResponse(list_content=animal_messages)
 # [END api]
 
 # [START api_server]
