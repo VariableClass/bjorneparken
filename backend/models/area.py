@@ -1,7 +1,9 @@
-import InternationalText
+from event import Event
 from google.appengine.ext import ndb
+from google.appengine.ext.ndb import polymodel
+from i18n import InternationalText
 
-class Area(ndb.Model):
+class Area(polymodel.PolyModel):
 
     # Static Methods
     @staticmethod
@@ -13,23 +15,16 @@ class Area(ndb.Model):
     visitor_destination = ndb.GeoPtProperty()
     coordinates = ndb.GeoPtProperty(repeated=True)
 
-    # Constructors
-    def __init__(self, label, visitor_destination, coordinates):
-        self.label = label
-        self.visitor_destination = visitor_destination
-        self.coordinates = coordinates
-
     # Methods
+    def get_events(self):
+        return Event.query(ancestor=self.key).fetch()
+
     def get_area():
         area = 0
         previous_point = len(coordinates) - 1
 
         for current_point in range(0, len(coordinates) - 1):
-            area = area +
-                    (coordinates[previous_point].lat +
-                        coordinates[current_point].lat) *
-                    (coordinates[previous_point].lon -
-                        coordinates[current_point].lon)
+            area = area + (coordinates[previous_point].lat + coordinates[current_point].lat) * (coordinates[previous_point].lon - coordinates[current_point].lon)
             previous_point = current_point
 
         return area/2
@@ -37,4 +32,4 @@ class Area(ndb.Model):
     # Class Methods
     @classmethod
     def get_all(cls):
-        return cls.query().order(cls.name)
+        return cls.query()

@@ -4,7 +4,7 @@ from google.appengine.ext import ndb
 class Amenity(Area):
 
     # Properties
-    description = ndb.StructuredProperty(InternationalText, repeated=True)
+    description = ndb.LocalStructuredProperty(InternationalText, repeated=True)
     amenity_type = ndb.StringProperty()
 
     # Constructors

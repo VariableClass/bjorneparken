@@ -5,9 +5,9 @@ from google.appengine.ext import ndb
 class Species(ndb.Model):
 
     # Properties
-    common_name = ndb.StructuredProperty(InternationalText, repeated=True)
+    common_name = ndb.LocalStructuredProperty(InternationalText, repeated=True)
     latin = ndb.StringProperty()
-    description = ndb.StructuredProperty(InternationalText, repeated=True)
+    description = ndb.LocalStructuredProperty(InternationalText, repeated=True)
 
     # Methods
     def get_animals(self):

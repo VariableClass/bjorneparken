@@ -5,4 +5,4 @@ class Keeper(ndb.Model):
 
     # Properties
     name = ndb.StringProperty()
-    bio = ndb.StructuredProperty(InternationalText, repeated=true)
+    bio = ndb.LocalStructuredProperty(InternationalText, repeated=true)

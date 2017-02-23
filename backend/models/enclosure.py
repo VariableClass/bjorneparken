@@ -1,19 +1,11 @@
-import Animal
+from animal import Animal
+from area import Area
 from google.appengine.ext import ndb
 
 class Enclosure(Area):
 
-    # Static Methods
-    @staticmethod
-    def move_animal(animal, enclosure):
-
     # Properties
-    animals = ndb.StructuredProperty(Animal, repeated=True)
-
-    # Constructors
-    def __init__(self, label, visitor_destination, coordinates, animals):
-        Area.__init__(self, label, visitor_destination, coordinates)
-        self.animals = animals
+    animals = ndb.StructuredProperty(Animal.AnimalLookup, repeated=True)
 
     # Methods
     def get_species():
@@ -30,7 +22,7 @@ class Enclosure(Area):
     # Class Methods
     @classmethod
     def get_all(cls):
-        return cls.query().order(cls.name)
+        return cls.query()
 
     @classmethod
     def get_all_containing_species(cls, species):
@@ -44,7 +36,7 @@ class Enclosure(Area):
         for enclosure in enclosures:
 
             # If the desired species exists within an enclosure
-            if species in enclosure.get_species()
+            if species in enclosure.get_species():
 
                 # Add the enclosure to the list of compatible enclosures
                 species_enclosures.append(enclosure)
