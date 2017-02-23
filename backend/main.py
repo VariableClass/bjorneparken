@@ -1,6 +1,7 @@
 # [START imports]
 import endpoints
 from google.appengine.ext import ndb
+from models.amenity import Amenity
 from models.animal import Animal
 from models.area import Area
 from models.enclosure import Enclosure
@@ -53,24 +54,39 @@ class AnimalResponse(messages.Message):
 class AnimalListResponse(messages.Message):
     animals = messages.MessageField(AnimalResponse, 1, repeated=True)
 
-
-class AreaRequest(messages.Message):
+# All Enclosure and Amenity messages appear to duplicate unnecessarily.
+# This has been done because ProtoRPC messages do not support inheritance
+class EnclosureRequest(messages.Message):
     label = messages.MessageField(InternationalMessage, 1, repeated=True)
     visitor_destination = messages.StringField(2, required=True)
     coordinates = messages.StringField(3, repeated=True)
     animals = messages.MessageField(AnimalReference, 4, repeated=True)
 
-class AreaResponse(messages.Message):
+class AmenityRequest(messages.Message):
+    label = messages.MessageField(InternationalMessage, 1, repeated=True)
+    visitor_destination = messages.StringField(2, required=True)
+    coordinates = messages.StringField(3, repeated=True)
+    description = messages.MessageField(InternationalMessage, 4, repeated=True)
+    amenity_type = messages.StringField(5)
+
+class EnclosureResponse(messages.Message):
     id = messages.IntegerField(1, required=True)
     label = messages.StringField(2, required=True)
-    area_type = messages.StringField(3, required=True)
-    visitor_destination = messages.StringField(4, required=True)
-    coordinates = messages.StringField(5, repeated=True)
-    animals = messages.MessageField(AnimalResponse, 6, repeated=True)
+    visitor_destination = messages.StringField(3, required=True)
+    coordinates = messages.StringField(4, repeated=True)
+    animals = messages.MessageField(AnimalResponse, 5, repeated=True)
+
+class AmenityResponse(messages.Message):
+    id = messages.IntegerField(1, required=True)
+    label = messages.StringField(2, required=True)
+    visitor_destination = messages.StringField(3, required=True)
+    coordinates = messages.StringField(4, repeated=True)
+    description = messages.StringField(5)
+    amenity_type = messages.StringField(6)
 
 class AreaListResponse(messages.Message):
-    areas = messages.MessageField(AreaResponse, 1, repeated=True)
-
+    enclosures = messages.MessageField(EnclosureResponse, 1, repeated=True)
+    amenities = messages.MessageField(AmenityResponse, 2, repeated=True)
 # [END messages]
 
 # [START resources]
@@ -78,22 +94,24 @@ LANGUAGE_RESOURCE = endpoints.ResourceContainer(
     message_types.VoidMessage,
     language_code=messages.StringField(1, required=True))
 
-
 UPDATE_SPECIES_RESOURCE = endpoints.ResourceContainer(
     SpeciesRequest,
     species_id=messages.IntegerField(1, required=True))
-
 SPECIES_RESOURCE = endpoints.ResourceContainer(
     species_id=messages.IntegerField(1, required=True))
-
 
 ANIMAL_RESOURCE = endpoints.ResourceContainer(
     animal_id=messages.IntegerField(1, required=True),
     species_id=messages.IntegerField(2, required=True))
 
-
 AREA_RESOURCE = endpoints.ResourceContainer(
     area_id=messages.IntegerField(1, required=True))
+UPDATE_ENCLOSURE_RESOURCE = endpoints.ResourceContainer(
+    EnclosureRequest,
+    enclosure_id=messages.IntegerField(1, required=True))
+UPDATE_AMENITY_RESOURCE = endpoints.ResourceContainer(
+    AmenityRequest,
+    amenity_id=messages.IntegerField(1, required=True))
 # [END resources]
 
 
@@ -348,104 +366,117 @@ class BjorneparkappenApi(remote.Service):
         # Validate language code
         self.check_language(language_code=request.language_code)
 
-        # Retrieve all area
+        # Retrieve all areas
         areas = Area.get_all()
 
         response = AreaListResponse()
 
-        # Build up response of all areas
+        # Build up response of all enclosures
         for area in areas:
 
-            # Translate translatable area resources
-            area_label_translation = InternationalText.get_translation(
-                    request.language_code,
-                    area.label)
+            # If area is an Enclosure
+            if type(area) is Enclosure:
 
-            coordinates = []
-
-            # Convert co-ordinate pairs to strings
-            for coordinate in area.coordinates:
-                coordinates.append(str(coordinate.lon) + ", " + str(coordinate.lat))
-
-            # If area is an Area
-            if type(area) is Area:
+                # Retrieve an Enclosure response
+                area_response = self.get_enclosure_response(area, request.language_code)
 
                 # Add area to return list
-                response.areas.append(AreaResponse(
-                    id=area.key.id(),
-                    area_type=type(area)._class_name(),
-                    label=area_label_translation,
-                    visitor_destination=str(area.visitor_destination.lon) + ", " + str(area.visitor_destination.lat),
-                    coordinates=coordinates))
+                response.enclosures.append(area_response)
 
-            # Else if area is an Enclosure
-            elif type(area) is Enclosure:
+            # Else if area is an Amenity
+            elif type(area) is Amenity:
 
-                animals = []
+                # Retrieve an Amenity response
+                area_response = self.get_amenity_response(area, request.language_code)
 
-                # For each animal/species key set
-                for animal_reference in area.animals:
+                # Add area to return list
+                response.amenities.append(area_response)
 
-                    # Retrieve animal
-                    animal = Animal.get_by_id(animal_reference.animal_id, parent=ndb.Key(Species, animal_reference.species_id))
-
-                    # Retrieve species
-                    species = animal.key.parent().get()
-
-                    # Translate translatable species resources
-                    species_common_name_translation = InternationalText.get_translation(
-                            request.language_code,
-                            species.common_name)
-                    species_description_translation = InternationalText.get_translation(
-                            request.language_code,
-                            species.description)
-
-                    # Create species response to include in animal response
-                    species_response = SpeciesResponse(
-                        id=species.key.id(),
-                        common_name=species_common_name_translation,
-                        latin=species.latin,
-                        description=species_description_translation)
-
-                    # Translate translatable animal resources
-                    animal_description_translation = InternationalText.get_translation(
-                            request.language_code,
-                            animal.description)
-
-                    # Add animal to return list
-                    animals.append(AnimalResponse(
-                        id=animal.key.id(),
-                        name=animal.name,
-                        species=species_response,
-                        description=animal_description_translation,
-                        is_available=animal.is_available))
-
-                # Add enclosure to return list
-                response.areas.append(AreaResponse(
-                    id=area.key.id(),
-                    area_type=type(area)._class_name(),
-                    label=area_label_translation,
-                    visitor_destination=str(area.visitor_destination.lon) + ", " + str(area.visitor_destination.lat),
-                    coordinates=coordinates,
-                    animals=animals))
+            else:
+                raise endpoints.UnexpectedException("Area found which is neither Enclosure or Amenity, consult developer.")
 
         return response
 
     @endpoints.method(
-        AreaRequest,
+        LANGUAGE_RESOURCE,
+        AreaListResponse,
+        path='areas/enclosures',
+        http_method='GET',
+        name='enclosures.list')
+    def list_enclosures(self, request):
+
+        # Validate language code
+        self.check_language(language_code=request.language_code)
+
+        # Retrieve all areas
+        areas = Area.get_all()
+
+        response = AreaListResponse()
+
+        # Build up response of all enclosures
+        for area in areas:
+
+            # If area is an Enclosure
+            if type(area) is Enclosure:
+
+                # Retrieve an enclosure response
+                area_response = self.get_enclosure_response(area, request.language_code)
+
+                # Add area to return list
+                response.enclosures.append(area_response)
+
+        return response
+
+    @endpoints.method(
+        LANGUAGE_RESOURCE,
+        AreaListResponse,
+        path='areas/amenities',
+        http_method='GET',
+        name='amenities.list')
+    def list_amenities(self, request):
+
+        # Validate language code
+        self.check_language(language_code=request.language_code)
+
+        # Retrieve all areas
+        areas = Area.get_all()
+
+        response = AreaListResponse()
+
+        # Build up response of all enclosures
+        for area in areas:
+
+            # If area is an Amenity
+            if type(area) is Amenity:
+
+                # Retrieve an amenity response
+                area_response = self.get_amenity_response(area, request.language_code)
+
+                # Add area to return list
+                response.amenities.append(area_response)
+
+        return response
+
+    @endpoints.method(
+        EnclosureRequest,
         message_types.VoidMessage,
-        path='areas',
+        path='areas/enclosures',
         http_method='POST',
-        name='areas.create')
-    def create_area(self, request):
+        name='enclosures.create')
+    def create_enclosure(self, request):
 
         # TODO Check for intersection of any existing areas
 
         # Convert InternationalMessage formats to InternationalText
         label = self.convert_i18n_messages_to_i18n_texts(international_messages=request.label)
 
-        visitor_destination_array = request.visitor_destination.split(", ")
-        visitor_destination = ndb.GeoPt(visitor_destination_array[0], visitor_destination_array[1])
+        try:
+            # Convert visitor destination from string to GeoPt
+            visitor_destination_array = request.visitor_destination.split(", ")
+            visitor_destination = ndb.GeoPt(visitor_destination_array[0], visitor_destination_array[1])
+
+        except:
+            raise endpoints.BadRequestException("Co-ordinates must be in the form 'X-value, Y-value'")
 
         coordinates = []
 
@@ -454,11 +485,134 @@ class BjorneparkappenApi(remote.Service):
             coordinate_array = coordinate_string.split(", ")
             coordinates.append(ndb.GeoPt(coordinate_array[0], coordinate_array[1]))
 
-        # If animals are included in the creation, create an enclosure
+        animals = []
+
+        # For each animal/species key set
+        for animal_reference in request.animals:
+
+            # Retrieve animal
+            animal = Animal.get_by_id(animal_reference.animal_id, parent=ndb.Key(Species, animal_reference.species_id))
+
+            if not animal:
+                # If not found, raise BadRequestException
+                raise endpoints.BadRequestException("No animal found with ID '" +
+                                                    str(animal_reference.animal_id) +
+                                                    "' and species ID '" +
+                                                    str(animal_reference.species_id) +
+                                                    "'.")
+
+            # Add animal reference to list
+            animals.append(Animal.AnimalLookup(animal_id=animal_reference.animal_id,
+                                                species_id=animal_reference.species_id))
+
+        # Create new enclosure
+        Enclosure(label=label,
+                visitor_destination=visitor_destination,
+                coordinates=coordinates,
+                animals=animals).put()
+
+        return message_types.VoidMessage()
+
+    @endpoints.method(
+        AmenityRequest,
+        message_types.VoidMessage,
+        path='areas/amenities',
+        http_method='POST',
+        name='amenities.create')
+    def create_amenity(self, request):
+
+        # TODO Check for intersection of any existing areas
+
+        # Convert InternationalMessage formats to InternationalText
+        label = self.convert_i18n_messages_to_i18n_texts(international_messages=request.label)
+        description = self.convert_i18n_messages_to_i18n_texts(international_messages=request.description)
+
+        try:
+            # Convert visitor destination from string to GeoPt
+            visitor_destination_array = request.visitor_destination.split(", ")
+            visitor_destination = ndb.GeoPt(visitor_destination_array[0], visitor_destination_array[1])
+
+        except:
+            raise endpoints.BadRequestException("Co-ordinates must be in the form 'X-value, Y-value'")
+
+        coordinates = []
+
+        # Convert coordinates into usable format
+        for coordinate_string in request.coordinates:
+            coordinate_array = coordinate_string.split(", ")
+            coordinates.append(ndb.GeoPt(coordinate_array[0], coordinate_array[1]))
+
+        # Validate AmenityType is existing AmenityType
+        if not Amenity.AmenityType.validate(request.amenity_type):
+            raise endpoints.BadRequestException("No AmenityType found by the name'" + request.amenity_type + "'.")
+
+        # Set amenity type
+        amenity_type = Amenity.AmenityType[request.amenity_type]
+
+        # Create new amenity
+        Amenity(label=label,
+                visitor_destination=visitor_destination,
+                coordinates=coordinates,
+                description=description,
+                amenity_type=amenity_type.name).put()
+
+        return message_types.VoidMessage()
+
+    @endpoints.method(
+        UPDATE_ENCLOSURE_RESOURCE,
+        message_types.VoidMessage,
+        path='areas/enclosures/{enclosure_id}',
+        http_method='POST',
+        name='enclosures.update')
+    def update_enclosure(self, request):
+
+        # Attempt to retrieve enclosure
+        enclosure = Enclosure.get_by_id(request.enclosure_id)
+
+        # If enclosure does not exist, raise BadRequestException
+        if not enclosure:
+            raise endpoints.BadRequestException("No enclosure found with ID '" +
+                                                str(request.enclosure_id) + "'.")
+
+        # If values for label provided
+        if request.label:
+
+            # Convert InternationalMessage formats to InternationalText
+            label = self.convert_i18n_messages_to_i18n_texts(international_messages=request.label)
+
+            # Update common name values
+            enclosure.label=label
+
+        # If value for visitor destination provided
+        if request.visitor_destination:
+
+            try:
+                # Convert visitor destination from string to GeoPt
+                visitor_destination_array = request.visitor_destination.split(", ")
+
+                # Update visitor destination value
+                enclosure.visitor_destination = ndb.GeoPt(visitor_destination_array[0], visitor_destination_array[1])
+
+            except:
+                raise endpoints.BadRequestException("Co-ordinates must be in the form 'X-value, Y-value'")
+
+
+        # If values for co-ordinates provided
+        if request.coordinates:
+
+            coordinates = []
+
+            # Convert coordinates into usable format
+            for coordinate_string in request.coordinates:
+                coordinate_array = coordinate_string.split(", ")
+                coordinates.append(ndb.GeoPt(coordinate_array[0], coordinate_array[1]))
+
+        # If values for animals provided
         if request.animals:
 
             animals = []
 
+            # For each animal/species key set
             for animal_reference in request.animals:
 
                 # Retrieve animal
@@ -476,19 +630,81 @@ class BjorneparkappenApi(remote.Service):
                 animals.append(Animal.AnimalLookup(animal_id=animal_reference.animal_id,
                                                     species_id=animal_reference.species_id))
 
-            Enclosure(label=label,
-                    visitor_destination=visitor_destination,
-                    coordinates=coordinates,
-                    animals=animals).put()
+                enclosure.animals = animals
 
-            return message_types.VoidMessage()
-
-        # Create new area
-        Area(label=label,
-            visitor_destination=visitor_destination,
-            coordinates=coordinates).put()
+        # Write changes
+        enclosure.put()
 
         return message_types.VoidMessage()
+
+    @endpoints.method(
+        UPDATE_AMENITY_RESOURCE,
+        message_types.VoidMessage,
+        path='areas/amenities/{amenity_id}',
+        http_method='POST',
+        name='amenities.update')
+    def update_amenity(self, request):
+
+        # Attempt to retrieve amenity
+        amenity = Amenity.get_by_id(request.amenity_id)
+
+        # If amenity does not exist, raise BadRequestException
+        if not amenity:
+            raise endpoints.BadRequestException("No amenity found with ID '" +
+                                                str(request.amenity_id) + "'.")
+
+        # If values for label provided
+        if request.label:
+
+            try:
+                # Convert visitor destination from string to GeoPt
+                visitor_destination_array = request.visitor_destination.split(", ")
+
+                # Update visitor destination value
+                amenity.visitor_destination = ndb.GeoPt(visitor_destination_array[0], visitor_destination_array[1])
+
+            except:
+                raise endpoints.BadRequestException("Co-ordinates must be in the form 'X-value, Y-value'")
+
+        # If value for visitor destination provided
+        if request.visitor_destination:
+
+            # Convert visitor destination from string to GeoPt
+            visitor_destination_array = request.visitor_destination.split(", ")
+
+            # Update visitor destination value
+            amenity.visitor_destination = ndb.GeoPt(visitor_destination_array[0], visitor_destination_array[1])
+
+        # If values for co-ordinates provided
+        if request.coordinates:
+
+            coordinates = []
+
+            # Convert coordinates into usable format
+            for coordinate_string in request.coordinates:
+                coordinate_array = coordinate_string.split(", ")
+                coordinates.append(ndb.GeoPt(coordinate_array[0], coordinate_array[1]))
+
+        # If values for description provided
+        if request.description:
+
+            # Convert InternationalMessage formats to InternationalText
+            description = self.convert_i18n_messages_to_i18n_texts(international_messages=request.description)
+
+            # Update common name values
+            amenity.description=description
+
+        # If values for amenity type provided
+        if request.amenity_type:
+
+            if not Amenity.AmenityType.validate(request.amenity_type):
+                raise endpoints.BadRequestException("No AmenityType found by the name'" + request.amenity_type + "'.")
+
+        # Write changes
+        amenity.put()
+
+        return message_types.VoidMessage()
+
 
     @endpoints.method(
         AREA_RESOURCE,
@@ -539,6 +755,93 @@ class BjorneparkappenApi(remote.Service):
                 language_code=message.language_code))
 
         return international_texts
+
+    @staticmethod
+    def get_enclosure_response(area, language_code):
+
+        # Translate translatable area resources
+        area_label_translation = InternationalText.get_translation(
+                language_code,
+                area.label)
+
+        coordinates = []
+
+        # Convert co-ordinate pairs to strings
+        for coordinate in area.coordinates:
+            coordinates.append(str(coordinate.lon) + ", " + str(coordinate.lat))
+
+        animals = []
+
+        # For each animal/species key set
+        for animal_reference in area.animals:
+
+            # Retrieve animal
+            animal = Animal.get_by_id(animal_reference.animal_id, parent=ndb.Key(Species, animal_reference.species_id))
+
+            # Retrieve species
+            species = animal.key.parent().get()
+
+            # Translate translatable species resources
+            species_common_name_translation = InternationalText.get_translation(
+                    language_code,
+                    species.common_name)
+            species_description_translation = InternationalText.get_translation(
+                    language_code,
+                    species.description)
+
+            # Create species response to include in animal response
+            species_response = SpeciesResponse(
+                id=species.key.id(),
+                common_name=species_common_name_translation,
+                latin=species.latin,
+                description=species_description_translation)
+
+            # Translate translatable animal resources
+            animal_description_translation = InternationalText.get_translation(
+                    language_code,
+                    animal.description)
+
+            # Add animal to return list
+            animals.append(AnimalResponse(
+                id=animal.key.id(),
+                name=animal.name,
+                species=species_response,
+                description=animal_description_translation,
+                is_available=animal.is_available))
+
+        return EnclosureResponse(
+            id=area.key.id(),
+            label=area_label_translation,
+            visitor_destination=str(area.visitor_destination.lon) + ", " + str(area.visitor_destination.lat),
+            coordinates=coordinates,
+            animals=animals)
+
+    @staticmethod
+    def get_amenity_response(area, language_code):
+
+        # Translate translatable area resources
+        area_label_translation = InternationalText.get_translation(
+                language_code,
+                area.label)
+
+        amenity_description_translation = InternationalText.get_translation(
+                language_code,
+                area.description)
+
+        coordinates = []
+
+        # Convert co-ordinate pairs to strings
+        for coordinate in area.coordinates:
+            coordinates.append(str(coordinate.lon) + ", " + str(coordinate.lat))
+
+        return AmenityResponse(
+            id=area.key.id(),
+            label=area_label_translation,
+            visitor_destination=str(area.visitor_destination.lon) + ", " + str(area.visitor_destination.lat),
+            coordinates=coordinates,
+            description=amenity_description_translation,
+            amenity_type=area.amenity_type)
+
 
 # [END api]
 
