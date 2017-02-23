@@ -1,3 +1,4 @@
+# coding=utf-8
 # [START imports]
 import endpoints
 from google.appengine.ext import ndb
@@ -5,6 +6,7 @@ from models.amenity import Amenity
 from models.animal import Animal
 from models.area import Area
 from models.enclosure import Enclosure
+from models.event import Event
 from models.i18n import InternationalText
 from models.species import Species
 from protorpc import message_types
@@ -18,7 +20,7 @@ class InternationalMessage(messages.Message):
     text = messages.StringField(1, required=True)
     language_code = messages.StringField(2, required=True)
 
-
+### Species ###
 class SpeciesRequest(messages.Message):
     common_name = messages.MessageField(InternationalMessage, 1, repeated=True)
     latin = messages.StringField(2, required=True)
@@ -33,7 +35,7 @@ class SpeciesResponse(messages.Message):
 class SpeciesListResponse(messages.Message):
     species = messages.MessageField(SpeciesResponse, 1, repeated=True)
 
-
+### Animals ###
 class AnimalReference(messages.Message):
     animal_id = messages.IntegerField(1, required=True)
     species_id = messages.IntegerField(2, required=True)
@@ -54,6 +56,7 @@ class AnimalResponse(messages.Message):
 class AnimalListResponse(messages.Message):
     animals = messages.MessageField(AnimalResponse, 1, repeated=True)
 
+### Areas (inc. Enclosures & Amenities) ###
 # All Enclosure and Amenity messages appear to duplicate unnecessarily.
 # This has been done because ProtoRPC messages do not support inheritance
 class EnclosureRequest(messages.Message):
@@ -87,6 +90,29 @@ class AmenityResponse(messages.Message):
 class AreaListResponse(messages.Message):
     enclosures = messages.MessageField(EnclosureResponse, 1, repeated=True)
     amenities = messages.MessageField(AmenityResponse, 2, repeated=True)
+
+### Events (inc. Feedings) ###
+# All Event and Feeding messages appear to duplicate unnecessarily.
+# This has been done because ProtoRPC messages do not support inheritance
+class EventRequest(messages.Message):
+    label = messages.MessageField(InternationalMessage, 1, repeated=True)
+    description = messages.MessageField(InternationalMessage, 2, repeated=True)
+    location_id = messages.IntegerField(3, required=True)
+    start_time = messages.StringField(4, required=True)
+    end_time = messages.StringField(5, required=True)
+    is_active = messages.BooleanField(6, required=True)
+
+class EventResponse(messages.Message):
+    id = messages.IntegerField(1, required=True)
+    label = messages.StringField(2, required=True)
+    description = messages.StringField(3, required=True)
+    location = messages.MessageField(AmenityResponse, 4, required=True)
+    start_time = messages.StringField(5, required=True)
+    end_time = messages.StringField(6, required=True)
+    is_active = messages.BooleanField(7, required=True)
+
+class EventListResponse(messages.Message):
+    events = messages.MessageField(EventResponse, 1, repeated=True)
 # [END messages]
 
 # [START resources]
@@ -112,12 +138,21 @@ UPDATE_ENCLOSURE_RESOURCE = endpoints.ResourceContainer(
 UPDATE_AMENITY_RESOURCE = endpoints.ResourceContainer(
     AmenityRequest,
     amenity_id=messages.IntegerField(1, required=True))
+
+EVENT_RESOURCE = endpoints.ResourceContainer(
+    event_id=messages.IntegerField(1, required=True),
+    location_id=messages.IntegerField(2, required=True))
+UPDATE_EVENT_RESOURCE = endpoints.ResourceContainer(
+    EventRequest,
+    event_id=messages.IntegerField(1, required=True))
 # [END resources]
 
 
 # [START api]
 @endpoints.api(name='bjorneparkappen', version='v1', api_key_required=True)
 class BjorneparkappenApi(remote.Service):
+
+    ### Species ###
 
     @endpoints.method(
         LANGUAGE_RESOURCE,
@@ -252,6 +287,8 @@ class BjorneparkappenApi(remote.Service):
         return message_types.VoidMessage()
 
 
+    ### Animals ###
+
     @endpoints.method(
         LANGUAGE_RESOURCE,
         AnimalListResponse,
@@ -355,6 +392,8 @@ class BjorneparkappenApi(remote.Service):
         return message_types.VoidMessage()
 
 
+    ### Areas (inc. Enclosures & Amenities) ###
+
     @endpoints.method(
         LANGUAGE_RESOURCE,
         AreaListResponse,
@@ -393,7 +432,7 @@ class BjorneparkappenApi(remote.Service):
                 response.amenities.append(area_response)
 
             else:
-                raise endpoints.UnexpectedException("Area found which is neither Enclosure or Amenity, consult developer.")
+                raise endpoints.UnexpectedException("Area found which is neither Enclosure nor Amenity, consult developer.")
 
         return response
 
@@ -705,7 +744,6 @@ class BjorneparkappenApi(remote.Service):
 
         return message_types.VoidMessage()
 
-
     @endpoints.method(
         AREA_RESOURCE,
         message_types.VoidMessage,
@@ -733,6 +771,100 @@ class BjorneparkappenApi(remote.Service):
 
         return message_types.VoidMessage()
 
+
+    ### Events (inc. Feedings) ###
+
+    @endpoints.method(
+        LANGUAGE_RESOURCE,
+        EventListResponse,
+        path='events',
+        http_method='GET',
+        name='events.list')
+    def list_events(self, request):
+
+        # Validate language code
+        self.check_language(language_code=request.language_code)
+
+        # Retrieve all events
+        events = Event.get_all()
+
+        response = EventListResponse()
+
+        # Build up response of all events
+        for event in events:
+
+            # If event is an Event
+            if type(event) is Event:
+
+                # Retrieve an Event response
+                event_response = self.get_event_response(event, request.language_code)
+
+                # Add event to return list
+                response.events.append(event_response)
+
+        return response
+
+    @endpoints.method(
+        EventRequest,
+        message_types.VoidMessage,
+        path='events',
+        http_method='POST',
+        name='events.create')
+    def create_event(self, request):
+
+        # TODO Check for clashes at a location
+
+        # Retrieve location from provided ID
+        location = ndb.Key(Amenity, request.location_id).get()
+
+        # If location not found, raise exception
+        if not location:
+            raise endpoints.BadRequestException("Location of ID '" + str(request.location_id) + "' not found")
+
+        # Convert InternationalMessage formats to InternationalText
+        label = self.convert_i18n_messages_to_i18n_texts(international_messages=request.label)
+        description = self.convert_i18n_messages_to_i18n_texts(international_messages=request.description)
+
+        # Validate times
+        if not Event.validate_times(request.start_time, request.end_time):
+            raise endpoints.BadRequestException("Time must be in the format 'HH:MM' and end time must not exceed start time.")
+
+        # Create new event
+        Event(parent=location.key,
+            label=label,
+            description=description,
+            start_time=request.start_time,
+            end_time=request.end_time,
+            is_active=request.is_active).put()
+
+        return message_types.VoidMessage()
+
+    @endpoints.method(
+        EVENT_RESOURCE,
+        message_types.VoidMessage,
+        path='events',
+        http_method='DELETE',
+        name='events.delete')
+    def delete_event(self, request):
+
+        # Retrieve event
+        event = Event.get_by_id(request.event_id, parent=ndb.Key(Amenity, request.location_id))
+
+        if not event:
+            # If not found, raise BadRequestException
+            raise endpoints.BadRequestException("No event found with ID '" +
+                                                str(request.animal_id) +
+                                                "' and location ID '" +
+                                                str(request.species_id) +
+                                                "'.")
+
+        # Delete area
+        event.key.delete()
+
+        return message_types.VoidMessage()
+
+
+    ### Static Methods ###
 
     @staticmethod
     def check_language(language_code):
@@ -842,6 +974,28 @@ class BjorneparkappenApi(remote.Service):
             description=amenity_description_translation,
             amenity_type=area.amenity_type)
 
+    @classmethod
+    def get_event_response(cls, event, language_code):
+
+        # Translate translatable event resources
+        event_label_translation = InternationalText.get_translation(
+                language_code,
+                event.label)
+
+        event_description_translation = InternationalText.get_translation(
+                language_code,
+                event.description)
+
+        location = cls.get_amenity_response(event.key.parent().get(), language_code)
+
+        return EventResponse(
+            id=event.key.id(),
+            label=event_label_translation,
+            description=event_description_translation,
+            location=location,
+            start_time=event.start_time,
+            end_time=event.end_time,
+            is_active=event.is_active)
 
 # [END api]
 

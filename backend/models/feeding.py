@@ -8,12 +8,6 @@ class Feeding(Event):
     # Properties
     keeper = ndb.LocalStructuredProperty(Keeper)
 
-    # Constructors
-    def __init__(self, label, description, start_time, end_time, location, active, keeper):
-
-        Event.__init__(self, label, description, start_time, end_time, location, active)
-        self.keeper = keeper
-
     # Class Methods
     @classmethod
     def get_all_for_species(species):
