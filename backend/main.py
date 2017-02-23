@@ -8,6 +8,7 @@ from models.area import Area
 from models.enclosure import Enclosure
 from models.event import Event
 from models.i18n import InternationalText
+from models.keeper import Keeper
 from models.species import Species
 from protorpc import message_types
 from protorpc import messages
@@ -113,6 +114,19 @@ class EventResponse(messages.Message):
 
 class EventListResponse(messages.Message):
     events = messages.MessageField(EventResponse, 1, repeated=True)
+
+### Keepers ###
+class KeeperRequest(messages.Message):
+    name = messages.StringField(1, required=True)
+    bio = messages.MessageField(InternationalMessage, 2, repeated=True)
+
+class KeeperResponse(messages.Message):
+    id = messages.IntegerField(1, required=True)
+    name = messages.StringField(2, required=True)
+    bio = messages.StringField(3, required=True)
+
+class KeeperListResponse(messages.Message):
+    keepers = messages.MessageField(KeeperResponse, 1, repeated=True)
 # [END messages]
 
 # [START resources]
@@ -145,6 +159,12 @@ EVENT_RESOURCE = endpoints.ResourceContainer(
 UPDATE_EVENT_RESOURCE = endpoints.ResourceContainer(
     EventRequest,
     event_id=messages.IntegerField(1, required=True))
+
+UPDATE_KEEPER_RESOURCE = endpoints.ResourceContainer(
+    KeeperRequest,
+    keeper_id=messages.IntegerField(1, required=True))
+KEEPER_RESOURCE = endpoints.ResourceContainer(
+    keeper_id=messages.IntegerField(1, required=True))
 # [END resources]
 
 
@@ -173,7 +193,7 @@ class BjorneparkappenApi(remote.Service):
         # Build up response of all species
         for species in all_species:
 
-            # Translate translatable species esources
+            # Translate translatable species resources
             species_common_name_translation = InternationalText.get_translation(
                     request.language_code,
                     species.common_name)
@@ -862,6 +882,113 @@ class BjorneparkappenApi(remote.Service):
         event.key.delete()
 
         return message_types.VoidMessage()
+
+
+    ### Keeper ###
+
+    @endpoints.method(
+        LANGUAGE_RESOURCE,
+        KeeperListResponse,
+        path='keepers',
+        http_method='GET',
+        name='keepers.list')
+    def list_keepers(self, request):
+
+        # Validate language code
+        self.check_language(language_code=request.language_code)
+
+        # Retrieve all keepers
+        keepers = Keeper.get_all()
+
+        response = KeeperListResponse()
+
+        # Build up response of all keepers
+        for keeper in keepers:
+
+            # Translate translatable keeper resources
+            keeper_bio_translation = InternationalText.get_translation(
+                    request.language_code,
+                    keeper.bio)
+
+            # Add keeper to return list
+            response.keepers.append(KeeperResponse(
+                id=keeper.key.id(),
+                name=keeper.name,
+                bio=keeper_bio_translation))
+
+        return response
+
+    @endpoints.method(
+        KeeperRequest,
+        message_types.VoidMessage,
+        path='keepers',
+        http_method='POST',
+        name='keepers.create')
+    def create_keeper(self, request):
+
+        # Convert InternationalMessage formats to InternationalText
+        bio = self.convert_i18n_messages_to_i18n_texts(international_messages=request.bio)
+
+        # Create new keeper
+        Keeper(name=request.name,
+            bio=bio).put()
+
+        return message_types.VoidMessage()
+
+    @endpoints.method(
+        UPDATE_KEEPER_RESOURCE,
+        message_types.VoidMessage,
+        path='keepers/{keeper_id}',
+        http_method='POST',
+        name='keepers.update')
+    def update_keeper(self, request):
+
+        # Attempt to retrieve keeper
+        keeper = Keeper.get_by_id(request.keeper_id)
+
+        # If keeper does not exist, raise BadRequestException
+        if not keeper:
+            raise endpoints.BadRequestException("No keeper found with ID '" +
+                                                str(request.keeper_id) + "'.")
+
+        # If value for name provided
+        if request.name:
+            # Update name value
+            keeper.name=request.name
+
+        # If values for bio provided
+        if request.bio:
+            # Convert InternationalMessage formats to InternationalText
+            bio = self.convert_i18n_messages_to_i18n_texts(international_messages=request.bio)
+
+            # Update bio values
+            keeper.bio=bio
+
+        # Write changes
+        keeper.put()
+
+        return message_types.VoidMessage()
+
+    @endpoints.method(
+        KEEPER_RESOURCE,
+        message_types.VoidMessage,
+        path='keepers/{keeper_id}',
+        http_method='DELETE',
+        name='keepers.delete')
+    def delete_keeper(self, request):
+
+        # Retrieve keeper from ID
+        keeper = Keeper.get_by_id(request.keeper_id)
+
+        # If not found, raise BadRequestException
+        if not keeper:
+            raise endpoints.BadRequestException("No keeper found with ID '" + str(request.keeper_id) + "'.")
+
+        # Delete species
+        keeper.key.delete()
+
+        return message_types.VoidMessage()
+
 
 
     ### Static Methods ###
