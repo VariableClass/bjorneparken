@@ -1,12 +1,12 @@
-import Event
-import Enclosure
-import Keeper
+from event import Event
+from enclosure import Enclosure
+from keeper import Keeper
 from google.appengine.ext import ndb
 
 class Feeding(Event):
 
     # Properties
-    keeper = ndb.LocalStructuredProperty(Keeper)
+    keeper_id = ndb.IntegerProperty()
 
     # Class Methods
     @classmethod

@@ -7,6 +7,7 @@ from models.animal import Animal
 from models.area import Area
 from models.enclosure import Enclosure
 from models.event import Event
+from models.feeding import Feeding
 from models.i18n import InternationalText
 from models.keeper import Keeper
 from models.species import Species
@@ -20,6 +21,20 @@ from protorpc import remote
 class InternationalMessage(messages.Message):
     text = messages.StringField(1, required=True)
     language_code = messages.StringField(2, required=True)
+
+### Keepers ###
+class KeeperRequest(messages.Message):
+    name = messages.StringField(1, required=True)
+    bio = messages.MessageField(InternationalMessage, 2, repeated=True)
+
+class KeeperResponse(messages.Message):
+    id = messages.IntegerField(1, required=True)
+    name = messages.StringField(2, required=True)
+    bio = messages.StringField(3, required=True)
+
+class KeeperListResponse(messages.Message):
+    keepers = messages.MessageField(KeeperResponse, 1, repeated=True)
+
 
 ### Species ###
 class SpeciesRequest(messages.Message):
@@ -62,7 +77,7 @@ class AnimalListResponse(messages.Message):
 # This has been done because ProtoRPC messages do not support inheritance
 class EnclosureRequest(messages.Message):
     label = messages.MessageField(InternationalMessage, 1, repeated=True)
-    visitor_destination = messages.StringField(2, required=True)
+    visitor_destination = messages.StringField(2)
     coordinates = messages.StringField(3, repeated=True)
     animals = messages.MessageField(AnimalReference, 4, repeated=True)
 
@@ -103,6 +118,15 @@ class EventRequest(messages.Message):
     end_time = messages.StringField(5, required=True)
     is_active = messages.BooleanField(6, required=True)
 
+class FeedingRequest(messages.Message):
+    label = messages.MessageField(InternationalMessage, 1, repeated=True)
+    description = messages.MessageField(InternationalMessage, 2, repeated=True)
+    location_id = messages.IntegerField(3, required=True)
+    start_time = messages.StringField(4, required=True)
+    end_time = messages.StringField(5, required=True)
+    is_active = messages.BooleanField(6, required=True)
+    keeper_id = messages.IntegerField(7)
+
 class EventResponse(messages.Message):
     id = messages.IntegerField(1, required=True)
     label = messages.StringField(2, required=True)
@@ -112,21 +136,19 @@ class EventResponse(messages.Message):
     end_time = messages.StringField(6, required=True)
     is_active = messages.BooleanField(7, required=True)
 
+class FeedingResponse(messages.Message):
+    id = messages.IntegerField(1, required=True)
+    label = messages.StringField(2, required=True)
+    description = messages.StringField(3, required=True)
+    location = messages.MessageField(EnclosureResponse, 4, required=True)
+    start_time = messages.StringField(5, required=True)
+    end_time = messages.StringField(6, required=True)
+    is_active = messages.BooleanField(7, required=True)
+    keeper = messages.MessageField(KeeperResponse, 8)
+
 class EventListResponse(messages.Message):
     events = messages.MessageField(EventResponse, 1, repeated=True)
-
-### Keepers ###
-class KeeperRequest(messages.Message):
-    name = messages.StringField(1, required=True)
-    bio = messages.MessageField(InternationalMessage, 2, repeated=True)
-
-class KeeperResponse(messages.Message):
-    id = messages.IntegerField(1, required=True)
-    name = messages.StringField(2, required=True)
-    bio = messages.StringField(3, required=True)
-
-class KeeperListResponse(messages.Message):
-    keepers = messages.MessageField(KeeperResponse, 1, repeated=True)
+    feedings = messages.MessageField(FeedingResponse, 2, repeated=True)
 # [END messages]
 
 # [START resources]
@@ -158,6 +180,13 @@ EVENT_RESOURCE = endpoints.ResourceContainer(
     location_id=messages.IntegerField(2, required=True))
 UPDATE_EVENT_RESOURCE = endpoints.ResourceContainer(
     EventRequest,
+    event_id=messages.IntegerField(1, required=True))
+
+FEEDING_RESOURCE = endpoints.ResourceContainer(
+    feeding_id=messages.IntegerField(1, required=True),
+    location_id=messages.IntegerField(2, required=True))
+UPDATE_FEEDING_RESOURCE = endpoints.ResourceContainer(
+    FeedingRequest,
     event_id=messages.IntegerField(1, required=True))
 
 UPDATE_KEEPER_RESOURCE = endpoints.ResourceContainer(
@@ -797,6 +826,48 @@ class BjorneparkappenApi(remote.Service):
     @endpoints.method(
         LANGUAGE_RESOURCE,
         EventListResponse,
+        path='events/all',
+        http_method='GET',
+        name='events.list_all')
+    def list_all_events(self, request):
+
+        # Validate language code
+        self.check_language(language_code=request.language_code)
+
+        # Retrieve all events
+        events = Event.get_all()
+
+        response = EventListResponse()
+
+        # Build up response of all events
+        for event in events:
+
+            # If event is an Event
+            if type(event) is Event:
+
+                # Retrieve an Event response
+                event_response = self.get_event_response(event, request.language_code)
+
+                # Add event to return list
+                response.events.append(event_response)
+
+            # Else if event is a Feeding
+            elif type(event) is Feeding:
+
+                # Retrieve a Feeding response
+                feeding_response = self.get_feeding_response(event, request.language_code)
+
+                # Add feeding to return list
+                response.feedings.append(feeding_response)
+
+            else:
+                raise endpoints.UnexpectedException("Event found which is neither Event nor Feeding, consult developer.")
+
+        return response
+
+    @endpoints.method(
+        LANGUAGE_RESOURCE,
+        EventListResponse,
         path='events',
         http_method='GET',
         name='events.list')
@@ -821,6 +892,36 @@ class BjorneparkappenApi(remote.Service):
 
                 # Add event to return list
                 response.events.append(event_response)
+
+        return response
+
+    @endpoints.method(
+        LANGUAGE_RESOURCE,
+        EventListResponse,
+        path='events/feedings',
+        http_method='GET',
+        name='feedings.list')
+    def list_feedings(self, request):
+
+        # Validate language code
+        self.check_language(language_code=request.language_code)
+
+        # Retrieve all events
+        events = Event.get_all()
+
+        response = EventListResponse()
+
+        # Build up response of all events
+        for event in events:
+
+            # If event is an Feeding
+            if type(event) is Feeding:
+
+                # Retrieve an Feeding response
+                feeding_response = self.get_feeding_response(event, request.language_code)
+
+                # Add event to return list
+                response.feedings.append(feeding_response)
 
         return response
 
@@ -856,6 +957,49 @@ class BjorneparkappenApi(remote.Service):
             start_time=request.start_time,
             end_time=request.end_time,
             is_active=request.is_active).put()
+
+        return message_types.VoidMessage()
+
+    @endpoints.method(
+        FeedingRequest,
+        message_types.VoidMessage,
+        path='events/feedings',
+        http_method='POST',
+        name='feedings.create')
+    def create_feeding(self, request):
+
+        # TODO Check for clashes at a location
+
+        # Retrieve location from provided ID
+        location = ndb.Key(Enclosure, request.location_id).get()
+
+        # If location not found, raise exception
+        if not location:
+            raise endpoints.BadRequestException("Location of ID '" + str(request.location_id) + "' not found")
+
+        # Convert InternationalMessage formats to InternationalText
+        label = self.convert_i18n_messages_to_i18n_texts(international_messages=request.label)
+        description = self.convert_i18n_messages_to_i18n_texts(international_messages=request.description)
+
+        # Validate times
+        if not Event.validate_times(request.start_time, request.end_time):
+            raise endpoints.BadRequestException("Time must be in the format 'HH:MM' and end time must not exceed start time.")
+
+        # Retrieve keeper
+        keeper = ndb.Key(Keeper, request.keeper_id).get()
+
+        # If keeper not found, raise BadRequestException
+        if not keeper:
+            raise endpoints.BadRequestException("No keeper by ID '" + request.keeper_id + "' found.")
+
+        # Create new feeding
+        Feeding(parent=location.key,
+            label=label,
+            description=description,
+            start_time=request.start_time,
+            end_time=request.end_time,
+            is_active=request.is_active,
+            keeper_id=request.keeper_id).put()
 
         return message_types.VoidMessage()
 
@@ -1113,6 +1257,7 @@ class BjorneparkappenApi(remote.Service):
                 language_code,
                 event.description)
 
+        # Retrieve location
         location = cls.get_amenity_response(event.key.parent().get(), language_code)
 
         return EventResponse(
@@ -1123,6 +1268,45 @@ class BjorneparkappenApi(remote.Service):
             start_time=event.start_time,
             end_time=event.end_time,
             is_active=event.is_active)
+
+    @classmethod
+    def get_feeding_response(cls, feeding, language_code):
+
+        # Translate translatable event resources
+        feeding_label_translation = InternationalText.get_translation(
+                language_code,
+                feeding.label)
+
+        feeding_description_translation = InternationalText.get_translation(
+                language_code,
+                feeding.description)
+
+        # Retrieve location
+        location = cls.get_enclosure_response(feeding.key.parent().get(), language_code)
+
+        # Retrieve keeper
+        keeper = ndb.Key(Keeper, feeding.keeper_id).get()
+
+        # Translate translatable keeper resources
+        keeper_bio_translation = InternationalText.get_translation(
+                language_code,
+                keeper.bio)
+
+        # Create keeper response to include in feeding response
+        keeper_response = KeeperResponse(
+            id=keeper.key.id(),
+            name=keeper.name,
+            bio=keeper_bio_translation)
+
+        return FeedingResponse(
+            id=feeding.key.id(),
+            label=feeding_label_translation,
+            description=feeding_description_translation,
+            location=location,
+            start_time=feeding.start_time,
+            end_time=feeding.end_time,
+            is_active=feeding.is_active,
+            keeper=keeper_response)
 
 # [END api]
 
