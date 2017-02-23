@@ -6,7 +6,7 @@ from google.appengine.ext import ndb
 class Feeding(Event):
 
     # Properties
-    keeper = Keeper
+    keeper = ndb.StructuredProperty(Keeper)
 
     # Constructors
     def __init__(self, label, description, start_time, end_time, location, active, keeper):

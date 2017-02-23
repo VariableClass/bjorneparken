@@ -1,9 +1,10 @@
+import InternationalText
 from google.appengine.ext import ndb
 
 class Amenity(Area):
 
     # Properties
-    description = ndb.StringProperty()
+    description = ndb.StructuredProperty(InternationalText, repeated=True)
     amenity_type = ndb.StringProperty()
 
     # Constructors
@@ -18,9 +19,9 @@ class Amenity(Area):
         return cls.query().order(cls.name)
 
     class AmenityType(Enum):
-        ATTRACTION = "Attraction",
-        PLAY_AREA = "Play Area",
-        RESTAURANT = "Restaurant",
-        BBQ = "Barbeque",
-        SNACKS = "Snacks",
-        WC = "Toilets"
+        ATTRACTION = "ATTRACTION",
+        PLAY_AREA = "PLAY_AREA",
+        RESTAURANT = "RESTAURANT",
+        BBQ = "BARBEQUE",
+        SNACKS = "SNACKS",
+        WC = "TOILETS"

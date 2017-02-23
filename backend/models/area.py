@@ -1,3 +1,4 @@
+import InternationalText
 from google.appengine.ext import ndb
 
 class Area(ndb.Model):
@@ -8,7 +9,7 @@ class Area(ndb.Model):
         return ndb.GeoPt(lat, lon)
 
     # Properties
-    label = ndb.StringProperty()
+    label = ndb.StructuredProperty(InternationalText, repeated=True)
     visitor_destination = ndb.GeoPtProperty()
     coordinates = ndb.GeoPtProperty(repeated=True)
 
