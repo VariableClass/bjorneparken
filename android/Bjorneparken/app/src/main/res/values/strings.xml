@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">Bjorneparken</string>
     <string name="edit_message">Enter some text…</string>
-    <string name="button_send">Send</string>
+    <string name="button_species">Get Species</string>
+    <string name="button_amenities">Get Amenities</string>
+    <string name="button_events">Get Events</string>
+    <string name="button_feedings">Get Feedings</string>
 </resources>

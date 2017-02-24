@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        android:background="@color/primary"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+
+    <LinearLayout
+        android:id="@+id/view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:layout_weight="0.2"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:text="@string/button_species"
+            android:onClick="getSpecies"/>
+        <Button
+            android:layout_weight="0.2"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:text="@string/button_amenities"
+            android:onClick="getAmenities"/>
+        <Button
+            android:layout_weight="0.2"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:text="@string/button_events"
+            android:onClick="getEvents"/>
+        <Button
+            android:layout_weight="0.2"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:text="@string/button_feedings"
+            android:onClick="getFeedings"/>
+
+    </LinearLayout>
+
+</LinearLayout>

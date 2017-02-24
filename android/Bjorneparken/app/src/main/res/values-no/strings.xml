@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">Bjorneparken</string>
     <string name="edit_message">Skriv inn litt tekst…</string>
-    <string name="button_send">Sende</string>
+    <string name="button_species">Hent arter</string>
+    <string name="button_amenities">Hent fasiliteter</string>
+    <string name="button_events">Hent hendelser</string>
+    <string name="button_feedings">Hent fôringer</string>
 </resources>
