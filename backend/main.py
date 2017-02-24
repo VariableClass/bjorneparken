@@ -35,7 +35,6 @@ class KeeperResponse(messages.Message):
 class KeeperListResponse(messages.Message):
     keepers = messages.MessageField(KeeperResponse, 1, repeated=True)
 
-
 ### Species ###
 class SpeciesRequest(messages.Message):
     common_name = messages.MessageField(InternationalMessage, 1, repeated=True)
@@ -118,6 +117,13 @@ class EventRequest(messages.Message):
     end_time = messages.StringField(5, required=True)
     is_active = messages.BooleanField(6, required=True)
 
+class UpdateEventRequest(messages.Message):
+    label = messages.MessageField(InternationalMessage, 1, repeated=True)
+    description = messages.MessageField(InternationalMessage, 2, repeated=True)
+    start_time = messages.StringField(3)
+    end_time = messages.StringField(4)
+    is_active = messages.BooleanField(5)
+
 class FeedingRequest(messages.Message):
     label = messages.MessageField(InternationalMessage, 1, repeated=True)
     description = messages.MessageField(InternationalMessage, 2, repeated=True)
@@ -126,6 +132,13 @@ class FeedingRequest(messages.Message):
     end_time = messages.StringField(5, required=True)
     is_active = messages.BooleanField(6, required=True)
     keeper_id = messages.IntegerField(7)
+
+class UpdateFeedingRequest(messages.Message):
+    label = messages.MessageField(InternationalMessage, 1, repeated=True)
+    description = messages.MessageField(InternationalMessage, 2, repeated=True)
+    start_time = messages.StringField(3)
+    end_time = messages.StringField(4)
+    is_active = messages.BooleanField(5)
 
 class EventResponse(messages.Message):
     id = messages.IntegerField(1, required=True)
@@ -179,20 +192,22 @@ EVENT_RESOURCE = endpoints.ResourceContainer(
     event_id=messages.IntegerField(1, required=True),
     location_id=messages.IntegerField(2, required=True))
 UPDATE_EVENT_RESOURCE = endpoints.ResourceContainer(
-    EventRequest,
-    event_id=messages.IntegerField(1, required=True))
+    UpdateEventRequest,
+    event_id=messages.IntegerField(1, required=True),
+    location_id=messages.IntegerField(2, required=True))
 
 FEEDING_RESOURCE = endpoints.ResourceContainer(
     feeding_id=messages.IntegerField(1, required=True),
     location_id=messages.IntegerField(2, required=True))
 UPDATE_FEEDING_RESOURCE = endpoints.ResourceContainer(
-    FeedingRequest,
-    event_id=messages.IntegerField(1, required=True))
+    UpdateFeedingRequest,
+    feeding_id=messages.IntegerField(1, required=True),
+    location_id=messages.IntegerField(2, required=True))
 
+KEEPER_RESOURCE = endpoints.ResourceContainer(
+    keeper_id=messages.IntegerField(1, required=True))
 UPDATE_KEEPER_RESOURCE = endpoints.ResourceContainer(
     KeeperRequest,
-    keeper_id=messages.IntegerField(1, required=True))
-KEEPER_RESOURCE = endpoints.ResourceContainer(
     keeper_id=messages.IntegerField(1, required=True))
 # [END resources]
 
@@ -668,7 +683,7 @@ class BjorneparkappenApi(remote.Service):
             # Convert InternationalMessage formats to InternationalText
             label = self.convert_i18n_messages_to_i18n_texts(international_messages=request.label)
 
-            # Update common name values
+            # Update label values
             enclosure.label=label
 
         # If value for visitor destination provided
@@ -744,6 +759,16 @@ class BjorneparkappenApi(remote.Service):
         # If values for label provided
         if request.label:
 
+            # Convert InternationalMessage formats to InternationalText
+            label = self.convert_i18n_messages_to_i18n_texts(international_messages=request.label)
+
+            # Update label values
+            amenity.label=label
+
+
+        # If value for visitor destination provided
+        if request.visitor_destination:
+
             try:
                 # Convert visitor destination from string to GeoPt
                 visitor_destination_array = request.visitor_destination.split(", ")
@@ -753,15 +778,6 @@ class BjorneparkappenApi(remote.Service):
 
             except:
                 raise endpoints.BadRequestException("Co-ordinates must be in the form 'X-value, Y-value'")
-
-        # If value for visitor destination provided
-        if request.visitor_destination:
-
-            # Convert visitor destination from string to GeoPt
-            visitor_destination_array = request.visitor_destination.split(", ")
-
-            # Update visitor destination value
-            amenity.visitor_destination = ndb.GeoPt(visitor_destination_array[0], visitor_destination_array[1])
 
         # If values for co-ordinates provided
         if request.coordinates:
@@ -961,6 +977,83 @@ class BjorneparkappenApi(remote.Service):
         return message_types.VoidMessage()
 
     @endpoints.method(
+        UPDATE_EVENT_RESOURCE,
+        message_types.VoidMessage,
+        path='events/{event_id}',
+        http_method='POST',
+        name='events.update')
+    def update_event(self, request):
+
+        # Attempt to retrieve event
+        event = Event.get_by_id(request.event_id, parent=ndb.Key(Amenity, request.location_id))
+
+        # If event not found against any amenities, search against enclosures
+        if not event:
+            event = Event.get_by_id(request.event_id, parent=ndb.Key(Enclosure, request.location_id))
+
+        # If event does not exist, raise BadRequestException
+        if not event:
+            raise endpoints.BadRequestException("No event found with ID '" +
+                                                str(request.event_id) + "'.")
+
+        # If values for label provided
+        if request.label:
+
+            # Convert InternationalMessage formats to InternationalText
+            label = self.convert_i18n_messages_to_i18n_texts(international_messages=request.label)
+
+            # Update label values
+            event.label=label
+
+        # If values for description provided
+        if request.description:
+
+            # Convert InternationalMessage formats to InternationalText
+            description = self.convert_i18n_messages_to_i18n_texts(international_messages=request.description)
+
+            # Update description values
+            event.description=description
+
+        # If value for start_time provided
+        if request.start_time:
+            # Temporarily store the passed start time
+            temp_start_time = request.start_time
+
+        # If value for start_time provided
+        if request.end_time:
+            # Temporarily store the passed end time
+            temp_end_time = request.end_time
+
+        # Validate times
+        if not Event.validate_times(temp_start_time, temp_end_time):
+            raise endpoints.BadRequestException("Time must be in the format 'HH:MM' and end time must not exceed start time.")
+
+        # If value for start_time provided
+        if request.start_time:
+            event.start_time = request.start_time
+
+        # If value for end_time provided
+        if request.end_time:
+            event.start_time = request.start_time
+
+        # Check if value for is_active provided
+        try:
+            request.is_active
+
+        except NameError:
+            # Ignore if not
+            pass
+
+        else:
+            # Update is_active value
+            event.is_active=request.is_active
+
+        # Write changes
+        event.put()
+
+        return message_types.VoidMessage()
+
+    @endpoints.method(
         FeedingRequest,
         message_types.VoidMessage,
         path='events/feedings',
@@ -990,7 +1083,7 @@ class BjorneparkappenApi(remote.Service):
 
         # If keeper not found, raise BadRequestException
         if not keeper:
-            raise endpoints.BadRequestException("No keeper by ID '" + request.keeper_id + "' found.")
+            raise endpoints.BadRequestException("No keeper by ID '" + str(request.keeper_id) + "' found.")
 
         # Create new feeding
         Feeding(parent=location.key,
@@ -1002,6 +1095,93 @@ class BjorneparkappenApi(remote.Service):
             keeper_id=request.keeper_id).put()
 
         return message_types.VoidMessage()
+
+    @endpoints.method(
+        UPDATE_FEEDING_RESOURCE,
+        message_types.VoidMessage,
+        path='events/feedings/{feeding_id}',
+        http_method='POST',
+        name='feedings.update')
+    def update_feeding(self, request):
+
+        # Attempt to retrieve feeding
+        feeding = Feeding.get_by_id(request.feeding_id, parent=ndb.Key(Enclosure, request.location_id))
+
+        # If feeding does not exist, raise BadRequestException
+        if not feeding:
+            raise endpoints.BadRequestException("No feeding found with ID '" +
+                                                str(request.feeding_id) + "'.")
+
+        # If values for label provided
+        if request.label:
+
+            # Convert InternationalMessage formats to InternationalText
+            label = self.convert_i18n_messages_to_i18n_texts(international_messages=request.label)
+
+            # Update label values
+            feeding.label=label
+
+        # If values for description provided
+        if request.description:
+
+            # Convert InternationalMessage formats to InternationalText
+            description = self.convert_i18n_messages_to_i18n_texts(international_messages=request.description)
+
+            # Update description values
+            feeding.description=description
+
+        # If value for start_time provided
+        if request.start_time:
+            # Temporarily store the passed start time
+            temp_start_time = request.start_time
+
+        # If value for start_time provided
+        if request.end_time:
+            # Temporarily store the passed end time
+            temp_end_time = request.end_time
+
+        # Validate times
+        if not Event.validate_times(temp_start_time, temp_end_time):
+            raise endpoints.BadRequestException("Time must be in the format 'HH:MM' and end time must not exceed start time.")
+
+        # If value for start_time provided
+        if request.start_time:
+            feeding.start_time = request.start_time
+
+        # If value for end_time provided
+        if request.end_time:
+            feeding.start_time = request.start_time
+
+        # Check if value for is_active provided
+        try:
+            request.is_active
+
+        except NameError:
+            # Ignore if not
+            pass
+
+        else:
+            # Update is_active value
+            feeding.is_active=request.is_active
+
+        # If value for keeper_id provided
+        if request.keeper_id:
+
+            # Retrieve keeper from provided ID
+            keeper = ndb.Key(Keeper, request.keeper_id).get()
+
+            # If keeper not found, raise exception
+            if not keeper:
+                raise endpoints.BadRequestException("Keeper of ID '" + str(request.keeper_id) + "' not found")
+
+            # Update keeper_id value
+            feeding.keeper_id = keeper_id
+
+        # Write changes
+        feeding.put()
+
+        return message_types.VoidMessage()
+
 
     @endpoints.method(
         EVENT_RESOURCE,
