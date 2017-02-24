@@ -45,3 +45,8 @@ class Event(polymodel.PolyModel):
     @classmethod
     def get_all(cls):
         return cls.query()
+
+
+    class EventLookup(ndb.Model):
+        event_id = ndb.IntegerProperty()
+        location_id = ndb.IntegerProperty()

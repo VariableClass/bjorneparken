@@ -11,6 +11,7 @@ from models.feeding import Feeding
 from models.i18n import InternationalText
 from models.keeper import Keeper
 from models.species import Species
+from models.visitor import Visitor
 from protorpc import message_types
 from protorpc import messages
 from protorpc import remote
@@ -109,6 +110,10 @@ class AreaListResponse(messages.Message):
 ### Events (inc. Feedings) ###
 # All Event and Feeding messages appear to duplicate unnecessarily.
 # This has been done because ProtoRPC messages do not support inheritance
+class EventReference(messages.Message):
+    event_id = messages.IntegerField(1, required=True)
+    location_id = messages.IntegerField(2, required=True)
+
 class EventRequest(messages.Message):
     label = messages.MessageField(InternationalMessage, 1, repeated=True)
     description = messages.MessageField(InternationalMessage, 2, repeated=True)
@@ -162,6 +167,17 @@ class FeedingResponse(messages.Message):
 class EventListResponse(messages.Message):
     events = messages.MessageField(EventResponse, 1, repeated=True)
     feedings = messages.MessageField(FeedingResponse, 2, repeated=True)
+
+### Visitors ###
+class VisitorRequest(messages.Message):
+    visit_start = message_types.DateTimeField(1, required=True)
+    visit_end = message_types.DateTimeField(2, required=True)
+    starred_species = messages.IntegerField(3, repeated=True)
+    itinerary = messages.MessageField(EventReference, 4, repeated=True)
+
+class VisitorResponse(messages.Message):
+    id = messages.IntegerField(1, required=True)
+
 # [END messages]
 
 # [START resources]
@@ -169,10 +185,10 @@ LANGUAGE_RESOURCE = endpoints.ResourceContainer(
     message_types.VoidMessage,
     language_code=messages.StringField(1, required=True))
 
+SPECIES_RESOURCE = endpoints.ResourceContainer(
+    species_id=messages.IntegerField(1, required=True))
 UPDATE_SPECIES_RESOURCE = endpoints.ResourceContainer(
     SpeciesRequest,
-    species_id=messages.IntegerField(1, required=True))
-SPECIES_RESOURCE = endpoints.ResourceContainer(
     species_id=messages.IntegerField(1, required=True))
 
 ANIMAL_RESOURCE = endpoints.ResourceContainer(
@@ -209,6 +225,10 @@ KEEPER_RESOURCE = endpoints.ResourceContainer(
 UPDATE_KEEPER_RESOURCE = endpoints.ResourceContainer(
     KeeperRequest,
     keeper_id=messages.IntegerField(1, required=True))
+
+UPDATE_VISITOR_RESOURCE = endpoints.ResourceContainer(
+    VisitorRequest,
+    visitor_id=messages.IntegerField(1, required=True))
 # [END resources]
 
 
@@ -876,9 +896,6 @@ class BjorneparkappenApi(remote.Service):
                 # Add feeding to return list
                 response.feedings.append(feeding_response)
 
-            else:
-                raise endpoints.UnexpectedException("Event found which is neither Event nor Feeding, consult developer.")
-
         return response
 
     @endpoints.method(
@@ -993,8 +1010,12 @@ class BjorneparkappenApi(remote.Service):
 
         # If event does not exist, raise BadRequestException
         if not event:
+            # If not found, raise BadRequestException
             raise endpoints.BadRequestException("No event found with ID '" +
-                                                str(request.event_id) + "'.")
+                                                str(request.event_id) +
+                                                "' and location ID '" +
+                                                str(request.location_id) +
+                                                "'.")
 
         # If values for label provided
         if request.label:
@@ -1182,7 +1203,6 @@ class BjorneparkappenApi(remote.Service):
 
         return message_types.VoidMessage()
 
-
     @endpoints.method(
         EVENT_RESOURCE,
         message_types.VoidMessage,
@@ -1191,15 +1211,20 @@ class BjorneparkappenApi(remote.Service):
         name='events.delete')
     def delete_event(self, request):
 
-        # Retrieve event
+        # Attempt to retrieve event
         event = Event.get_by_id(request.event_id, parent=ndb.Key(Amenity, request.location_id))
 
+        # If event not found against any amenities, search against enclosures
+        if not event:
+            event = Event.get_by_id(request.event_id, parent=ndb.Key(Enclosure, request.location_id))
+
+        # If event does not exist, raise BadRequestException
         if not event:
             # If not found, raise BadRequestException
             raise endpoints.BadRequestException("No event found with ID '" +
-                                                str(request.animal_id) +
+                                                str(request.event_id) +
                                                 "' and location ID '" +
-                                                str(request.species_id) +
+                                                str(request.location_id) +
                                                 "'.")
 
         # Delete area
@@ -1313,6 +1338,107 @@ class BjorneparkappenApi(remote.Service):
 
         return message_types.VoidMessage()
 
+
+    ### Visitors ###
+
+    @endpoints.method(
+        VisitorRequest,
+        VisitorResponse,
+        path='visitors',
+        http_method='POST',
+        name='visitors.create')
+    def create_visitor(self, request):
+
+        # Validate duration of visit is correct and less than 1 week
+        if (request.visit_end - request.visit_start).total_seconds() < 0 or (request.visit_end - request.visit_start).total_seconds() > 604800:
+            raise endpoints.BadRequestException("End date must be equal to or greater than start date. Duration may not exceed 14 days.")
+
+        # Create new visitor
+        visitor_key = Visitor(starred_species=[],
+            itinerary=[],
+            visit_start=request.visit_start,
+            visit_end=request.visit_start).put()
+
+        return VisitorResponse(id=visitor_key.id())
+
+    @endpoints.method(
+        UPDATE_VISITOR_RESOURCE,
+        message_types.VoidMessage,
+        path='visitors/{visitor_id}',
+        http_method='POST',
+        name='visitors.update')
+    def update_visitor(self, request):
+
+        # Attempt to retrieve visitor
+        visitor = Visitor.get_by_id(request.visitor_id)
+
+        # If visitor does not exist, raise BadRequestException
+        if not visitor:
+            raise endpoints.BadRequestException("No visitor found with ID '" +
+                                                str(request.visitor_id) + "'.")
+
+        # If values for species provided
+        if request.starred_species:
+
+            # For each species
+            for species_id in request.starred_species:
+
+                # Attempt to retrieve species
+                species = Species.get_by_id(species_id)
+
+                # If species does not exist, raise BadRequestException
+                if not species:
+                    raise endpoints.BadRequestException("No species found with ID '" +
+                                                        str(species_id) + "'.")
+            # Update values for species
+            visitor.starred_species = request.starred_species
+
+        # If values for itinerary provided
+        if request.itinerary:
+
+            itinerary = []
+
+            # For each event
+            for event_reference in request.itinerary:
+
+                # Attempt to retrieve event
+                event = Event.get_by_id(event_reference.event_id, parent=ndb.Key(Enclosure, event_reference.location_id))
+
+                # If event not found against any amenities, search against amenities
+                if not event:
+                    event = Event.get_by_id(event_reference.event_id, parent=ndb.Key(Amenity, event_reference.location_id))
+
+                # If event does not exist, raise BadRequestException
+                if not event:
+                    # If not found, raise BadRequestException
+                    raise endpoints.BadRequestException("No event found with ID '" +
+                                                        str(event_reference.event_id) +
+                                                        "' and location ID '" +
+                                                        str(event_reference.location_id) +
+                                                        "'.")
+
+                # Add event to return list
+                itinerary.append(Event.EventLookup(event_id=event_reference.event_id, location_id=event_reference.location_id))
+
+            # Update values for itinerary
+            visitor.itinerary = itinerary
+
+        # If value for visit_start provided
+        if request.visit_start:
+
+            # Update visit_start values
+            visitor.visit_start = request.visit_start
+
+        # If value for visit_end provided
+        if request.visit_end:
+
+            # Update visit_end values
+            visitor.visit_end = request.visit_end
+
+        # Write changes
+        visitor.put()
+
+        return message_types.VoidMessage()
 
 
     ### Static Methods ###
