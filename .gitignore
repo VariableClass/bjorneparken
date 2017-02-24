@@ -1,5 +1,6 @@
 ### Project Specific ###
 android/Bjorneparken/bjorneparkappen
+**.DS_Store
 
 ### Android Studio ###
 
@@ -16,7 +17,6 @@ android/Bjorneparken/bjorneparkappen
 # Generated files
 **bin/
 **gen/
-**out/
 
 # Gradle files
 **.gradle/
