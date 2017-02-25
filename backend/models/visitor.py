@@ -64,3 +64,7 @@ class Visitor(ndb.Model):
     @classmethod
     def get_all_with_species_starred(cls, species_id):
         return cls.query(cls.starred_species==species_id).fetch()
+
+    @classmethod
+    def get_all_with_event_in_itinerary(cls, event_id, location_id):
+        return cls.query(cls.itinerary == Event.EventLookup(event_id=event_id, location_id=location_id)).fetch()

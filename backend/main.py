@@ -1398,6 +1398,24 @@ class BjorneparkappenApi(remote.Service):
                                                 str(request.location_id) +
                                                 "'.")
 
+        # Retrieve all visitors who have added the event to their itineraries
+        visitors = Visitor.get_all_with_event_in_itinerary(request.event_id, request.location_id)
+
+        # For each visitor with the event in their itinerary
+        for visitor in visitors:
+
+            # For each event
+            for event_reference in visitor.itinerary:
+
+                # If the event reference matches the event to be deleted
+                if event_reference.event_id == request.event_id and event_reference.location_id == request.location_id:
+
+                    # Remove the event from the visitor's itinerary
+                    visitor.itinerary.remove(event)
+
+            # Write changes
+            visitor.put()
+
         # Delete area
         event.key.delete()
 
