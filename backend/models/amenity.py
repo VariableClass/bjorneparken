@@ -12,7 +12,7 @@ class Amenity(Area):
     # Class Methods
     @classmethod
     def get_all(cls):
-        return cls.query()
+        return cls.query().fetch()
 
     class AmenityType(Enum):
         ATTRACTION = "ATTRACTION",

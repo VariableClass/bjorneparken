@@ -1,6 +1,7 @@
 from animal import Animal
 from area import Area
 from google.appengine.ext import ndb
+from species import Species
 
 class Enclosure(Area):
 
@@ -19,10 +20,28 @@ class Enclosure(Area):
 
         return species
 
+    def is_available(self):
+
+        unavailable_animals = 0
+
+        # For each animal/species ID pair
+        for animal_reference in self.animals:
+
+            # Retrieve animal
+            animal = Animal.get_by_id(animal_reference.animal_id, parent=ndb.Key(Species, animal_reference.species_id))
+
+            # If an animal is not available, increase count
+            if not animal.is_available:
+                unavailable_animals += 1
+
+        # Returns true if some animals are available, false if none are
+        return unavailable_animals < len(self.animals)
+
+
     # Class Methods
     @classmethod
     def get_all(cls):
-        return cls.query()
+        return cls.query().fetch()
 
     @classmethod
     def get_all_containing_species(cls, species):
@@ -30,7 +49,7 @@ class Enclosure(Area):
         species_enclosures = []
 
         # Retrieve all enclosures
-        enclosures = cls.query().order(cls.name)
+        enclosures = cls.query().fetch()
 
         # For each enclosure
         for enclosure in enclosures:
@@ -43,3 +62,9 @@ class Enclosure(Area):
 
         # Return all compatible enclosures
         return species_enclosures
+
+    @classmethod
+    def get_for_animal(cls, animal_id, species_id):
+
+        return cls.query(cls.animals == Animal.AnimalLookup(animal_id=animal_id,
+                                                            species_id=species_id)).get()

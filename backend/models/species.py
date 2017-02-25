@@ -16,7 +16,7 @@ class Species(ndb.Model):
     # Class Methods
     @classmethod
     def get_all(cls):
-        return cls.query()
+        return cls.query().fetch()
 
     @classmethod
     def get_by_latin_name(cls, latin):

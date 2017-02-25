@@ -11,7 +11,7 @@ class Animal(ndb.Model):
     # Class Methods
     @classmethod
     def get_all(cls):
-        return cls.query().order(cls.name)
+        return cls.query().order(cls.name).fetch()
 
 
     class AnimalLookup(ndb.Model):

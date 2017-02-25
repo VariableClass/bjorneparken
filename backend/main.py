@@ -64,6 +64,11 @@ class AnimalRequest(messages.Message):
     description = messages.MessageField(InternationalMessage, 3, repeated=True)
     is_available = messages.BooleanField(4, required=True)
 
+class UpdateAnimalRequest(messages.Message):
+    name = messages.StringField(1)
+    description = messages.MessageField(InternationalMessage, 2, repeated=True)
+    is_available = messages.BooleanField(3)
+
 class AnimalResponse(messages.Message):
     id = messages.IntegerField(1, required=True)
     name = messages.StringField(2, required=True)
@@ -194,6 +199,10 @@ UPDATE_SPECIES_RESOURCE = endpoints.ResourceContainer(
     species_id=messages.IntegerField(1, required=True))
 
 ANIMAL_RESOURCE = endpoints.ResourceContainer(
+    animal_id=messages.IntegerField(1, required=True),
+    species_id=messages.IntegerField(2, required=True))
+UPDATE_ANIMAL_RESOURCE = endpoints.ResourceContainer(
+    UpdateAnimalRequest,
     animal_id=messages.IntegerField(1, required=True),
     species_id=messages.IntegerField(2, required=True))
 
@@ -422,6 +431,7 @@ class BjorneparkappenApi(remote.Service):
         # Build up response of all animals
         for animal in animals:
 
+            # Retrieve species
             species = animal.key.parent().get()
 
             # Translate translatable species resources
@@ -477,6 +487,64 @@ class BjorneparkappenApi(remote.Service):
             name=request.name,
             description=description,
             is_available=request.is_available).put()
+
+        # Update version
+        self.update_version()
+
+        return message_types.VoidMessage()
+
+    @endpoints.method(
+        UPDATE_ANIMAL_RESOURCE,
+        message_types.VoidMessage,
+        path='animals/{animal_id}',
+        http_method='POST',
+        name='animals.update')
+    def update_animal(self, request):
+
+        # Retrieve animal
+        animal = Animal.get_by_id(request.animal_id, parent=ndb.Key(Species, request.species_id))
+
+        # If not found, raise BadRequestException
+        if not animal:
+            raise endpoints.BadRequestException("No animal found with ID '" +
+                                                str(request.animal_id) +
+                                                "' and species ID '" +
+                                                str(request.species_id) +
+                                                "'.")
+
+        # If value for name provided
+        if request.name:
+            # Update name value
+            animal.name = request.name
+
+        # If values for description provided
+        if request.description:
+            # Convert InternationalMessage formats to InternationalText
+            description = self.convert_i18n_messages_to_i18n_texts(international_messages=request.description)
+
+            # Update description values
+            animal.description=description
+
+        # If value for is_available provided
+        if not request.is_available is None:
+            # Update is_available value
+            animal.is_available = request.is_available
+
+        # Write changes
+        animal.put()
+
+        # Perform updates to any feedings including the animal
+        if not request.is_available is None:
+            # Retrieve animal enclosure
+            enclosure = Enclosure.get_for_animal(animal_id=request.animal_id, species_id=request.species_id)
+
+            # Retrieve all feedings which include the enclosure
+            feedings = Feeding.get_all_for_enclosure(enclosure)
+
+            # Set feeding to active state of enclosure
+            for feeding in feedings:
+                feeding.is_active = enclosure.is_available()
+                feeding.put()
 
         # Update version
         self.update_version()

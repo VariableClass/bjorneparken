@@ -32,4 +32,4 @@ class Area(polymodel.PolyModel):
     # Class Methods
     @classmethod
     def get_all(cls):
-        return cls.query()
+        return cls.query().fetch()

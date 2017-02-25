@@ -44,7 +44,7 @@ class Event(polymodel.PolyModel):
     # Class Methods
     @classmethod
     def get_all(cls):
-        return cls.query()
+        return cls.query().fetch()
 
 
     class EventLookup(ndb.Model):
