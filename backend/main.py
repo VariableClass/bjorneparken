@@ -1,5 +1,6 @@
 # coding=utf-8
 # [START imports]
+import datetime
 import endpoints
 from google.appengine.ext import ndb
 from models.amenity import Amenity
@@ -11,6 +12,7 @@ from models.feeding import Feeding
 from models.i18n import InternationalText
 from models.keeper import Keeper
 from models.species import Species
+from models.version import Version
 from models.visitor import Visitor
 from protorpc import message_types
 from protorpc import messages
@@ -236,6 +238,25 @@ UPDATE_VISITOR_RESOURCE = endpoints.ResourceContainer(
 @endpoints.api(name='bjorneparkappen', version='v1', api_key_required=True)
 class BjorneparkappenApi(remote.Service):
 
+    # Executed whenever a write operation is performed on park data, which
+    # includes creation, updating or deletion of any of the following;
+    # Amenity, Animal, Enclosure, Event, Feeding, Keeper or Species
+    def update_version(self):
+
+        # Retrieve version
+        version = Version.get()
+
+        # If no version exists, create one
+        if not version:
+            version = Version()
+
+        # Set version to current datetime
+        version.version = datetime.datetime.now()
+
+        # Write changes
+        version.put()
+
+
     ### Species ###
 
     @endpoints.method(
@@ -298,6 +319,9 @@ class BjorneparkappenApi(remote.Service):
             latin=request.latin,
             description=description).put()
 
+        # Update version
+        self.update_version()
+
         return message_types.VoidMessage()
 
     @endpoints.method(
@@ -341,6 +365,9 @@ class BjorneparkappenApi(remote.Service):
         # Write changes
         species.put()
 
+        # Update version
+        self.update_version()
+
         return message_types.VoidMessage()
 
     @endpoints.method(
@@ -367,6 +394,9 @@ class BjorneparkappenApi(remote.Service):
 
         # Delete species
         species.key.delete()
+
+        # Update version
+        self.update_version()
 
         return message_types.VoidMessage()
 
@@ -448,6 +478,9 @@ class BjorneparkappenApi(remote.Service):
             description=description,
             is_available=request.is_available).put()
 
+        # Update version
+        self.update_version()
+
         return message_types.VoidMessage()
 
     @endpoints.method(
@@ -461,9 +494,8 @@ class BjorneparkappenApi(remote.Service):
         # Retrieve animal
         animal = Animal.get_by_id(request.animal_id, parent=ndb.Key(Species, request.species_id))
 
-
+        # If not found, raise BadRequestException
         if not animal:
-            # If not found, raise BadRequestException
             raise endpoints.BadRequestException("No animal found with ID '" +
                                                 str(request.animal_id) +
                                                 "' and species ID '" +
@@ -472,6 +504,9 @@ class BjorneparkappenApi(remote.Service):
 
         # Delete animal
         animal.key.delete()
+
+        # Update version
+        self.update_version()
 
         return message_types.VoidMessage()
 
@@ -634,6 +669,9 @@ class BjorneparkappenApi(remote.Service):
                 coordinates=coordinates,
                 animals=animals).put()
 
+        # Update version
+        self.update_version()
+
         return message_types.VoidMessage()
 
     @endpoints.method(
@@ -678,6 +716,9 @@ class BjorneparkappenApi(remote.Service):
                 coordinates=coordinates,
                 description=description,
                 amenity_type=amenity_type.name).put()
+
+        # Update version
+        self.update_version()
 
         return message_types.VoidMessage()
 
@@ -758,6 +799,9 @@ class BjorneparkappenApi(remote.Service):
         # Write changes
         enclosure.put()
 
+        # Update version
+        self.update_version()
+
         return message_types.VoidMessage()
 
     @endpoints.method(
@@ -827,6 +871,9 @@ class BjorneparkappenApi(remote.Service):
         # Write changes
         amenity.put()
 
+        # Update version
+        self.update_version()
+
         return message_types.VoidMessage()
 
     @endpoints.method(
@@ -853,6 +900,9 @@ class BjorneparkappenApi(remote.Service):
 
         # Delete area
         area.key.delete()
+
+        # Update version
+        self.update_version()
 
         return message_types.VoidMessage()
 
@@ -991,6 +1041,9 @@ class BjorneparkappenApi(remote.Service):
             end_time=request.end_time,
             is_active=request.is_active).put()
 
+        # Update version
+        self.update_version()
+
         return message_types.VoidMessage()
 
     @endpoints.method(
@@ -1072,6 +1125,9 @@ class BjorneparkappenApi(remote.Service):
         # Write changes
         event.put()
 
+        # Update version
+        self.update_version()
+
         return message_types.VoidMessage()
 
     @endpoints.method(
@@ -1114,6 +1170,9 @@ class BjorneparkappenApi(remote.Service):
             end_time=request.end_time,
             is_active=request.is_active,
             keeper_id=request.keeper_id).put()
+
+        # Update version
+        self.update_version()
 
         return message_types.VoidMessage()
 
@@ -1201,6 +1260,9 @@ class BjorneparkappenApi(remote.Service):
         # Write changes
         feeding.put()
 
+        # Update version
+        self.update_version()
+
         return message_types.VoidMessage()
 
     @endpoints.method(
@@ -1229,6 +1291,9 @@ class BjorneparkappenApi(remote.Service):
 
         # Delete area
         event.key.delete()
+
+        # Update version
+        self.update_version()
 
         return message_types.VoidMessage()
 
@@ -1282,6 +1347,9 @@ class BjorneparkappenApi(remote.Service):
         Keeper(name=request.name,
             bio=bio).put()
 
+        # Update version
+        self.update_version()
+
         return message_types.VoidMessage()
 
     @endpoints.method(
@@ -1316,6 +1384,9 @@ class BjorneparkappenApi(remote.Service):
         # Write changes
         keeper.put()
 
+        # Update version
+        self.update_version()
+
         return message_types.VoidMessage()
 
     @endpoints.method(
@@ -1335,6 +1406,9 @@ class BjorneparkappenApi(remote.Service):
 
         # Delete species
         keeper.key.delete()
+
+        # Update version
+        self.update_version()
 
         return message_types.VoidMessage()
 
@@ -1550,6 +1624,9 @@ class BjorneparkappenApi(remote.Service):
             coordinates=coordinates,
             description=amenity_description_translation,
             amenity_type=area.amenity_type)
+
+
+    ### Class Methods
 
     @classmethod
     def get_event_response(cls, event, language_code):
