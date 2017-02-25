@@ -1411,7 +1411,7 @@ class BjorneparkappenApi(remote.Service):
                 if event_reference.event_id == request.event_id and event_reference.location_id == request.location_id:
 
                     # Remove the event from the visitor's itinerary
-                    visitor.itinerary.remove(event)
+                    visitor.itinerary.remove(event_reference)
 
             # Write changes
             visitor.put()
