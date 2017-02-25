@@ -1,4 +1,4 @@
-package callumveale.bjorneparken;
+package com.callumveale.bjorneparken.activities;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -12,14 +12,15 @@ import com.google.api.client.json.gson.GsonFactory;
 
 import java.io.IOException;
 
+import com.callumveale.bjorneparken.R;
 import none.bjorneparkappen.Bjorneparkappen;
-import none.bjorneparkappen.model.MainEventListResponse;
-import none.bjorneparkappen.model.MainEventResponse;
+import none.bjorneparkappen.model.MainAmenityResponse;
+import none.bjorneparkappen.model.MainAreaListResponse;
 
-import static callumveale.bjorneparken.HomeActivity.API_KEY;
-import static callumveale.bjorneparken.HomeActivity.ROOT_URL;
+import static com.callumveale.bjorneparken.activities.HomeActivity.API_KEY;
+import static com.callumveale.bjorneparken.activities.HomeActivity.ROOT_URL;
 
-public class ListEventsActivity extends AppCompatActivity {
+public class ListAmenitiesActivity extends AppCompatActivity {
 
     ViewGroup layout;
 
@@ -35,47 +36,47 @@ public class ListEventsActivity extends AppCompatActivity {
         // Retrieve view to which items will be added
         layout = (ViewGroup) findViewById(R.id.view);
 
-        GetEventsTask task = new GetEventsTask(this);
+        GetAmenitiesTask task = new GetAmenitiesTask(this);
         task.execute();
     }
 
-    private void display(MainEventListResponse response){
+    private void display(MainAreaListResponse response){
 
-        if (response.getEvents() != null) {
+        if (response.getAmenities() != null) {
 
-            for (MainEventResponse event : response.getEvents()) {
+            for (MainAmenityResponse amenity : response.getAmenities()) {
 
                 TextView textView = new TextView(this);
                 textView.setTextSize(18);
-                textView.setText(event.getLabel() + "\n" + event.getDescription() + "\n" + event.getLocation().getLabel() + "\n" + event.getStartTime() + "\n\n");
+                textView.setText(amenity.getLabel() + "\n" + amenity.getDescription() + "\n\n");
 
                 layout.addView(textView);
             }
         }
     }
 
-    class GetEventsTask extends AsyncTask<Void, Void, MainEventListResponse> {
+    class GetAmenitiesTask extends AsyncTask<Void, Void, MainAreaListResponse> {
 
-        ListEventsActivity activity;
+        ListAmenitiesActivity activity;
 
-        GetEventsTask(ListEventsActivity activity){
+        GetAmenitiesTask(ListAmenitiesActivity activity){
 
             this.activity = activity;
         }
 
         @Override
-        protected MainEventListResponse doInBackground(Void... params) {
+        protected MainAreaListResponse doInBackground(Void... params) {
 
             Bjorneparkappen.Builder builder = new Bjorneparkappen.Builder(
                     AndroidHttp.newCompatibleTransport(), new GsonFactory(), null);
 
             builder.setRootUrl(ROOT_URL);
 
-            MainEventListResponse response = new MainEventListResponse();
+            MainAreaListResponse response = new MainAreaListResponse();
 
             try {
 
-                response = builder.build().events().list("en").setKey(API_KEY).execute();
+                response = builder.build().amenities().list("en").setKey(API_KEY).execute();
 
             } catch (IOException e) {
 
@@ -86,7 +87,7 @@ public class ListEventsActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(MainEventListResponse response){
+        protected void onPostExecute(MainAreaListResponse response){
 
             activity.display(response);
         }

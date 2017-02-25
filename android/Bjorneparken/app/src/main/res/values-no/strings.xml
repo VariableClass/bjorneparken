@@ -1,8 +1,21 @@
 <resources>
     <string name="app_name">Bjorneparken</string>
-    <string name="edit_message">Skriv inn litt tekst…</string>
+
+    <!-- Navigation Drawer -->
+    <string name="my_visit">My Visit</string>
+    <string name="animals">Animals</string>
+    <string name="attractions">Attractions</string>
+    <string name="amenities">Amenities</string>
+    <string name="park_map">Park Map</string>
+    <string name="restaurant_menu">Restaurant Menu</string>
+    <string name="settings">Settings</string>
+    <string name="contact">Contact</string>
+
+    <!-- Home Activity -->
     <string name="button_species">Hent arter</string>
     <string name="button_amenities">Hent fasiliteter</string>
     <string name="button_events">Hent hendelser</string>
     <string name="button_feedings">Hent fôringer</string>
+    <string name="drawer_close">Navigasjonsmenyen lukket</string>
+    <string name="drawer_open">Navigasjonsmenyen åpen</string>
 </resources>

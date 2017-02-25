@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="callumveale.bjorneparken.ListSpeciesActivity">
+    tools:context="com.callumveale.bjorneparken.activities.ListSpeciesActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"

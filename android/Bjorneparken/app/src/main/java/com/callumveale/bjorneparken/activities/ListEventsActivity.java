@@ -1,4 +1,4 @@
-package callumveale.bjorneparken;
+package com.callumveale.bjorneparken.activities;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -12,14 +12,15 @@ import com.google.api.client.json.gson.GsonFactory;
 
 import java.io.IOException;
 
+import com.callumveale.bjorneparken.R;
 import none.bjorneparkappen.Bjorneparkappen;
 import none.bjorneparkappen.model.MainEventListResponse;
-import none.bjorneparkappen.model.MainFeedingResponse;
+import none.bjorneparkappen.model.MainEventResponse;
 
-import static callumveale.bjorneparken.HomeActivity.API_KEY;
-import static callumveale.bjorneparken.HomeActivity.ROOT_URL;
+import static com.callumveale.bjorneparken.activities.HomeActivity.API_KEY;
+import static com.callumveale.bjorneparken.activities.HomeActivity.ROOT_URL;
 
-public class ListFeedingsActivity extends AppCompatActivity {
+public class ListEventsActivity extends AppCompatActivity {
 
     ViewGroup layout;
 
@@ -35,15 +36,15 @@ public class ListFeedingsActivity extends AppCompatActivity {
         // Retrieve view to which items will be added
         layout = (ViewGroup) findViewById(R.id.view);
 
-        GetFeedingsTask task = new GetFeedingsTask(this);
+        GetEventsTask task = new GetEventsTask(this);
         task.execute();
     }
 
     private void display(MainEventListResponse response){
 
-        if (response.getFeedings() != null) {
+        if (response.getEvents() != null) {
 
-            for (MainFeedingResponse event : response.getFeedings()) {
+            for (MainEventResponse event : response.getEvents()) {
 
                 TextView textView = new TextView(this);
                 textView.setTextSize(18);
@@ -54,11 +55,11 @@ public class ListFeedingsActivity extends AppCompatActivity {
         }
     }
 
-    class GetFeedingsTask extends AsyncTask<Void, Void, MainEventListResponse> {
+    class GetEventsTask extends AsyncTask<Void, Void, MainEventListResponse> {
 
-        ListFeedingsActivity activity;
+        ListEventsActivity activity;
 
-        GetFeedingsTask(ListFeedingsActivity activity){
+        GetEventsTask(ListEventsActivity activity){
 
             this.activity = activity;
         }
@@ -75,7 +76,7 @@ public class ListFeedingsActivity extends AppCompatActivity {
 
             try {
 
-                response = builder.build().feedings().list("en").setKey(API_KEY).execute();
+                response = builder.build().events().list("en").setKey(API_KEY).execute();
 
             } catch (IOException e) {
 

@@ -1,8 +1,8 @@
-package callumveale.bjorneparken;
+package com.callumveale.bjorneparken.activities;
 
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -12,14 +12,15 @@ import com.google.api.client.json.gson.GsonFactory;
 
 import java.io.IOException;
 
+import com.callumveale.bjorneparken.R;
 import none.bjorneparkappen.Bjorneparkappen;
-import none.bjorneparkappen.model.MainAmenityResponse;
-import none.bjorneparkappen.model.MainAreaListResponse;
+import none.bjorneparkappen.model.MainSpeciesListResponse;
+import none.bjorneparkappen.model.MainSpeciesResponse;
 
-import static callumveale.bjorneparken.HomeActivity.API_KEY;
-import static callumveale.bjorneparken.HomeActivity.ROOT_URL;
+import static com.callumveale.bjorneparken.activities.HomeActivity.API_KEY;
+import static com.callumveale.bjorneparken.activities.HomeActivity.ROOT_URL;
 
-public class ListAmenitiesActivity extends AppCompatActivity {
+public class ListSpeciesActivity extends AppCompatActivity {
 
     ViewGroup layout;
 
@@ -35,47 +36,47 @@ public class ListAmenitiesActivity extends AppCompatActivity {
         // Retrieve view to which items will be added
         layout = (ViewGroup) findViewById(R.id.view);
 
-        GetAmenitiesTask task = new GetAmenitiesTask(this);
+        GetSpeciesTask task = new GetSpeciesTask(this);
         task.execute();
     }
 
-    private void display(MainAreaListResponse response){
+    private void display(MainSpeciesListResponse response){
 
-        if (response.getAmenities() != null) {
+        if (response.getSpecies() != null) {
 
-            for (MainAmenityResponse amenity : response.getAmenities()) {
+            for (MainSpeciesResponse speciesInstance : response.getSpecies()) {
 
                 TextView textView = new TextView(this);
                 textView.setTextSize(18);
-                textView.setText(amenity.getLabel() + "\n" + amenity.getDescription() + "\n\n");
+                textView.setText(speciesInstance.getCommonName() + "\n" + speciesInstance.getLatin() + "\n" + speciesInstance.getDescription() + "\n\n");
 
                 layout.addView(textView);
             }
         }
     }
 
-    class GetAmenitiesTask extends AsyncTask<Void, Void, MainAreaListResponse> {
+    class GetSpeciesTask extends AsyncTask<Void, Void, MainSpeciesListResponse> {
 
-        ListAmenitiesActivity activity;
+        ListSpeciesActivity activity;
 
-        GetAmenitiesTask(ListAmenitiesActivity activity){
+        GetSpeciesTask(ListSpeciesActivity activity){
 
             this.activity = activity;
         }
 
         @Override
-        protected MainAreaListResponse doInBackground(Void... params) {
+        protected MainSpeciesListResponse doInBackground(Void... params) {
 
             Bjorneparkappen.Builder builder = new Bjorneparkappen.Builder(
                     AndroidHttp.newCompatibleTransport(), new GsonFactory(), null);
 
             builder.setRootUrl(ROOT_URL);
 
-            MainAreaListResponse response = new MainAreaListResponse();
+            MainSpeciesListResponse response = new MainSpeciesListResponse();
 
             try {
 
-                response = builder.build().amenities().list("en").setKey(API_KEY).execute();
+                response = builder.build().species().list("en").setKey(API_KEY).execute();
 
             } catch (IOException e) {
 
@@ -86,7 +87,7 @@ public class ListAmenitiesActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(MainAreaListResponse response){
+        protected void onPostExecute(MainSpeciesListResponse response){
 
             activity.display(response);
         }
