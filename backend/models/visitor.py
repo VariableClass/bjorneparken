@@ -57,3 +57,10 @@ class Visitor(ndb.Model):
         # If event IS in itinerary, remove it
         if removed == False:
             itinerary.remove(event_to_remove)
+
+
+    # Class methods
+
+    @classmethod
+    def get_all_with_species_starred(cls, species_id):
+        return cls.query(cls.starred_species==species_id).fetch()

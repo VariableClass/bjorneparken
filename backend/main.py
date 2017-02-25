@@ -177,8 +177,8 @@ class EventListResponse(messages.Message):
 
 ### Visitors ###
 class VisitorRequest(messages.Message):
-    visit_start = message_types.DateTimeField(1, required=True)
-    visit_end = message_types.DateTimeField(2, required=True)
+    visit_start = message_types.DateTimeField(1)
+    visit_end = message_types.DateTimeField(2)
     starred_species = messages.IntegerField(3, repeated=True)
     itinerary = messages.MessageField(EventReference, 4, repeated=True)
 
@@ -404,6 +404,14 @@ class BjorneparkappenApi(remote.Service):
         # Delete each
         for animal in animals:
             animal.key.delete()
+
+        # Retrieve all visitors who have starred the species
+        visitors = Visitor.get_all_with_species_starred(request.species_id)
+
+        # Remove from all visitors itineraries
+        for visitor in visitors:
+            visitor.starred_species.remove(request.species_id)
+            visitor.put()
 
         # Delete species
         species.key.delete()
