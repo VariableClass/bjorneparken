@@ -230,6 +230,10 @@ UPDATE_FEEDING_RESOURCE = endpoints.ResourceContainer(
     UpdateFeedingRequest,
     feeding_id=messages.IntegerField(1, required=True),
     location_id=messages.IntegerField(2, required=True))
+FEEDING_SPECIES_RESOURCE = endpoints.ResourceContainer(
+    message_types.VoidMessage,
+    language_code=messages.StringField(1, required=True),
+    species_id=messages.IntegerField(2, required=True))
 
 KEEPER_RESOURCE = endpoints.ResourceContainer(
     keeper_id=messages.IntegerField(1, required=True))
@@ -1075,6 +1079,35 @@ class BjorneparkappenApi(remote.Service):
                 response.feedings.append(feeding_response)
 
         return response
+
+    @endpoints.method(
+        FEEDING_SPECIES_RESOURCE,
+        EventListResponse,
+        path='events/feedings/{species_id}',
+        http_method='GET',
+        name='feedings.species.list')
+    def list_feedings_for_species(self, request):
+
+        # Validate language code
+        self.check_language(language_code=request.language_code)
+
+        # Retrieve all events
+        events = Feeding.get_all_for_species(request.species_id)
+
+        response = EventListResponse()
+
+        # Build up response of all events
+        for event in events:
+
+            # Retrieve an Feeding response
+            feeding_response = self.get_feeding_response(event, request.language_code)
+
+            # Add event to return list
+            response.feedings.append(feeding_response)
+
+        return response
+
+    # def list_events_for_location(self, request):
 
     @endpoints.method(
         EventRequest,

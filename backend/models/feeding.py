@@ -15,8 +15,20 @@ class Feeding(Event):
         # Return all enclosures containing the specified species
         enclosures = Enclosure.get_all_containing_species(species)
 
-        # Perform query to return feedings where location is compatible enclosure
-        return cls.query(cls.location_id.IN(enclosures)).fetch()
+        # Perform asynchronouse queries with each enclosure as an ancestor to
+        # return feedings where location is in compatible enclosures list
+        futures = []
+
+        for enclosure in enclosures:
+          futures.append(cls.query(ancestor=enclosure.key).fetch_async())
+
+
+        results = []
+
+        for future in futures:
+          results.extend(future.get_result())
+
+        return results
 
     @classmethod
     def get_all_for_enclosure(cls, enclosure):

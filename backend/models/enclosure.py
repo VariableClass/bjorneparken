@@ -44,24 +44,10 @@ class Enclosure(Area):
         return cls.query().fetch()
 
     @classmethod
-    def get_all_containing_species(cls, species):
+    def get_all_containing_species(cls, species_id):
 
-        species_enclosures = []
-
-        # Retrieve all enclosures
-        enclosures = cls.query().fetch()
-
-        # For each enclosure
-        for enclosure in enclosures:
-
-            # If the desired species exists within an enclosure
-            if species in enclosure.get_species():
-
-                # Add the enclosure to the list of compatible enclosures
-                species_enclosures.append(enclosure)
-
-        # Return all compatible enclosures
-        return species_enclosures
+        # Retrieve all enclosures including animals with the passed species ID
+        return cls.query(cls.animals == Animal.AnimalLookup(species_id=species_id)).fetch()
 
     @classmethod
     def get_for_animal(cls, animal_id, species_id):
