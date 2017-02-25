@@ -16,10 +16,14 @@ import android.widget.ListView;
 
 import com.callumveale.bjorneparken.R;
 
+import java.util.Locale;
+
 public class HomeActivity extends AppCompatActivity {
 
     public static final String API_KEY = "AIzaSyCuD2dk_XFcn512V5JxAZbFlAK9dgNlQ9c";
     public static final String ROOT_URL = "https://bjorneparkappen.appspot.com/_ah/api/";
+
+    public static String sDefSystemLanguage;
 
     // Home Activity Layout
     private DrawerLayout mDrawerLayout;
@@ -33,6 +37,9 @@ public class HomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
+        // Set language
+        sDefSystemLanguage = Locale.getDefault().getLanguage();
 
         // Build toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);

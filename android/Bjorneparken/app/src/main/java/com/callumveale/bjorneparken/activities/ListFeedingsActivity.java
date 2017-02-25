@@ -19,6 +19,7 @@ import none.bjorneparkappen.model.MainFeedingResponse;
 
 import static com.callumveale.bjorneparken.activities.HomeActivity.API_KEY;
 import static com.callumveale.bjorneparken.activities.HomeActivity.ROOT_URL;
+import static com.callumveale.bjorneparken.activities.HomeActivity.sDefSystemLanguage;
 
 public class ListFeedingsActivity extends AppCompatActivity {
 
@@ -76,7 +77,7 @@ public class ListFeedingsActivity extends AppCompatActivity {
 
             try {
 
-                response = builder.build().feedings().list("en").setKey(API_KEY).execute();
+                response = builder.build().feedings().list(sDefSystemLanguage).setKey(API_KEY).execute();
 
             } catch (IOException e) {
 
