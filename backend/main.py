@@ -188,8 +188,6 @@ class EventListResponse(messages.Message):
 class VisitorRequest(messages.Message):
     visit_start = message_types.DateTimeField(1)
     visit_end = message_types.DateTimeField(2)
-    starred_species = messages.IntegerField(3, repeated=True)
-    itinerary = messages.MessageField(EventReference, 4, repeated=True)
 
 class VisitorResponse(messages.Message):
     id = messages.IntegerField(1)
@@ -252,6 +250,13 @@ UPDATE_VISITOR_REQUEST = endpoints.ResourceContainer(
 ADD_REMOVE_ANIMAL_REQUEST = endpoints.ResourceContainer(
     AnimalReference,
     enclosure_id = messages.IntegerField(1, required=True))
+ADD_REMOVE_SPECIES_REQUEST = endpoints.ResourceContainer(
+    visitor_id = messages.IntegerField(1, required=True),
+    species_id = messages.IntegerField(2, required=True))
+ADD_REMOVE_EVENT_REQUEST = endpoints.ResourceContainer(
+    visitor_id = messages.IntegerField(1, required=True),
+    event_id = messages.IntegerField(2, required=True),
+    location_id = messages.IntegerField(3, required=True))
 # [END update request resources]
 # [END request resources]
 
@@ -1960,52 +1965,6 @@ class VisitorsApi(remote.Service):
             raise endpoints.BadRequestException("No visitor found with ID '" +
                                                 str(request.id) + "'.")
 
-        # If values for species provided
-        if request.starred_species:
-
-            # For each species
-            for species_id in request.starred_species:
-
-                # Attempt to retrieve species
-                species = Species.get_by_id(species_id)
-
-                # If species does not exist, raise BadRequestException
-                if not species:
-                    raise endpoints.BadRequestException("No species found with ID '" +
-                                                        str(species_id) + "'.")
-            # Update values for species
-            visitor.starred_species = request.starred_species
-
-        # If values for itinerary provided
-        if request.itinerary:
-
-            itinerary = []
-
-            # For each event
-            for event_reference in request.itinerary:
-
-                # Attempt to retrieve event
-                event = Event.get_by_id(event_reference.event_id, parent=ndb.Key(Enclosure, event_reference.location_id))
-
-                # If event not found against any amenities, search against amenities
-                if not event:
-                    event = Event.get_by_id(event_reference.event_id, parent=ndb.Key(Amenity, event_reference.location_id))
-
-                # If event does not exist, raise BadRequestException
-                if not event:
-                    # If not found, raise BadRequestException
-                    raise endpoints.BadRequestException("No event found with ID '" +
-                                                        str(event_reference.event_id) +
-                                                        "' and location ID '" +
-                                                        str(event_reference.location_id) +
-                                                        "'.")
-
-                # Add event to return list
-                itinerary.append(Event.EventLookup(event_id=event_reference.event_id, location_id=event_reference.location_id))
-
-            # Update values for itinerary
-            visitor.itinerary = itinerary
-
         # If value for visit_start provided
         if request.visit_start:
 
@@ -2067,6 +2026,154 @@ class VisitorsApi(remote.Service):
                     response.feedings.append(feeding_response)
 
         return response
+
+    @endpoints.method(
+        ADD_REMOVE_SPECIES_REQUEST,
+        message_types.VoidMessage,
+        path='update/starred_species/add',
+        http_method='POST',
+        name='visitors.update.starred_species.add')
+    def add_starred_species(self, request):
+
+        # Attempt to retrieve visitor
+        visitor = Visitor.get_by_id(request.visitor_id)
+
+        # If visitor does not exist, raise BadRequestException
+        if not visitor:
+            raise endpoints.BadRequestException("No visitor found with ID '" +
+                                                str(request.visitor_id) + "'.")
+
+        # Attempt to retrieve species
+        species = Species.get_by_id(request.species_id)
+
+        # If species does not exist, raise BadRequestException
+        if not species:
+            raise endpoints.BadRequestException("No species found with ID '" +
+                                                str(request.species_id) + "'.")
+
+        # Check species does not already exist in list
+        for species_inst in visitor.starred_species:
+            if species_inst == request.species_id:
+                raise endpoints.BadRequestException("Species already starred.")
+
+        # Add species to starred_species list
+        visitor.starred_species.append(request.species_id)
+
+        # Write changes
+        visitor.put()
+
+        return message_types.VoidMessage()
+
+    @endpoints.method(
+        ADD_REMOVE_SPECIES_REQUEST,
+        message_types.VoidMessage,
+        path='update/starred_species/remove',
+        http_method='POST',
+        name='visitors.update.starred_species.remove')
+    def remove_starred_species(self, request):
+
+        # Attempt to retrieve visitor
+        visitor = Visitor.get_by_id(request.visitor_id)
+
+        # If visitor does not exist, raise BadRequestException
+        if not visitor:
+            raise endpoints.BadRequestException("No visitor found with ID '" +
+                                                str(request.visitor_id) + "'.")
+
+        species_to_remove = None
+
+        # Attempt to retrieve species
+        for species_inst in visitor.starred_species:
+            if species_inst == request.species_id:
+                species_to_remove = species_inst
+
+        if species_to_remove is None:
+            raise endpoints.BadRequestException("Species not found in starred species list.")
+
+        # Remove species starred_species list
+        visitor.starred_species.remove(species_to_remove)
+
+        # Write changes
+        visitor.put()
+
+        return message_types.VoidMessage()
+
+    @endpoints.method(
+        ADD_REMOVE_EVENT_REQUEST,
+        message_types.VoidMessage,
+        path='update/itinerary/add',
+        http_method='POST',
+        name='visitors.update.itinerary.add')
+    def add_event_to_itinerary(self, request):
+
+        # Attempt to retrieve visitor
+        visitor = Visitor.get_by_id(request.visitor_id)
+
+        # If visitor does not exist, raise BadRequestException
+        if not visitor:
+            raise endpoints.BadRequestException("No visitor found with ID '" +
+                                                str(request.visitor_id) + "'.")
+
+        # Attempt to retrieve event
+        event = Event.get_by_id(request.event_id, parent=ndb.Key(Area, request.location_id))
+
+        # If event does not exist, raise BadRequestException
+        if not event:
+            # If not found, raise BadRequestException
+            raise endpoints.BadRequestException("No event found with ID '" +
+                                                str(request.event_id) +
+                                                "' and location ID '" +
+                                                str(request.location_id) +
+                                                "'.")
+
+        # Check event does not already exist in list
+        for event_inst in visitor.itinerary:
+            if event_inst == event:
+                raise endpoints.BadRequestException("Event already starred.")
+
+        # Add event to visitor's itinerary
+        visitor.itinerary.append(Event.EventLookup(event_id=request.event_id, location_id=request.location_id))
+
+        # Write changes
+        visitor.put()
+
+        return message_types.VoidMessage()
+
+    @endpoints.method(
+        ADD_REMOVE_EVENT_REQUEST,
+        message_types.VoidMessage,
+        path='update/itinerary/remove',
+        http_method='POST',
+        name='visitors.update.itinerary.remove')
+    def remove_event_from_itinerary(self, request):
+
+        # Attempt to retrieve visitor
+        visitor = Visitor.get_by_id(request.visitor_id)
+
+        # If visitor does not exist, raise BadRequestException
+        if not visitor:
+            raise endpoints.BadRequestException("No visitor found with ID '" +
+                                                str(request.visitor_id) + "'.")
+
+        event = None
+
+        # Attempt to retrieve event
+        for event_inst in visitor.itinerary:
+            if event_inst.event_id == request.event_id and event_inst.location_id == request.location_id:
+                event = event_inst
+
+        if event is None:
+            raise endpoints.BadRequestException("Event not found in itinerary.")
+
+        # Remove event from visitor's itinerary
+        visitor.itinerary.remove(event)
+
+        # Write changes
+        visitor.put()
+
+        return message_types.VoidMessage()
+
+
 # [END Visitors API]
 # [END bjorneparkappen_api]
 
