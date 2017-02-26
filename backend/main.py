@@ -25,6 +25,8 @@ from protorpc import remote
 class InternationalMessage(messages.Message):
     text = messages.StringField(1, required=True)
     language_code = messages.StringField(2, required=True)
+class VersionResponse(messages.Message):
+    version = message_types.DateTimeField(1)
 # [END api messages]
 
 # [START keeper messages]
@@ -1895,6 +1897,24 @@ class KeepersApi(remote.Service):
 
         return message_types.VoidMessage()
 # [END Keepers API]
+
+# [START Versions API]
+@bjorneparkappen_api.api_class(resource_name='version')
+class VersionApi(remote.Service):
+
+    @endpoints.method(
+        message_types.VoidMessage,
+        VersionResponse,
+        path='version',
+        http_method='GET',
+        name='version.get')
+    def get_version(self, request):
+
+        # Retrieve current version
+        version = Version.get().version
+
+        return VersionResponse(version=version)
+# [END Versions API]
 
 # [START Visitors API]
 @bjorneparkappen_api.api_class(resource_name='visitors', path='visitors')
