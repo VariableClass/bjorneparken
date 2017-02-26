@@ -1209,6 +1209,39 @@
         ]
       }
     },
+    "/bjorneparkappen_api/v1.0/visitors/starred_species": {
+      "get": {
+        "operationId": "VisitorsApi_getStarredSpecies",
+        "parameters": [
+          {
+            "format": "int64",
+            "in": "query",
+            "name": "id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "language_code",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response",
+            "schema": {
+              "$ref": "#/definitions/MainSpeciesListResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
     "/bjorneparkappen_api/v1.0/visitors/update": {
       "post": {
         "operationId": "VisitorsApi_updateVisitor",
