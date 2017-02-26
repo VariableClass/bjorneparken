@@ -12,6 +12,7 @@ from models.feeding import Feeding
 from models.i18n import InternationalText
 from models.keeper import Keeper
 from models.species import Species
+from models.time import Time
 from models.version import Version
 from models.visitor import Visitor
 from protorpc import message_types
@@ -151,6 +152,7 @@ class UpdateFeedingRequest(messages.Message):
     start_time = messages.StringField(3)
     end_time = messages.StringField(4)
     is_active = messages.BooleanField(5)
+    keeper_id = messages.IntegerField(6)
 
 class EventResponse(messages.Message):
     id = messages.IntegerField(1, required=True)
@@ -1132,15 +1134,15 @@ class BjorneparkappenApi(remote.Service):
 
         # If location not found, raise exception
         if not location:
-            raise endpoints.BadRequestException("Location of ID '" + str(request.location_id) + "' not found")
+            raise endpoints.BadRequestException("Amenity with ID '" + str(request.location_id) + "' not found")
 
         # Convert InternationalMessage formats to InternationalText
         label = self.convert_i18n_messages_to_i18n_texts(international_messages=request.label)
         description = self.convert_i18n_messages_to_i18n_texts(international_messages=request.description)
 
         # Validate times
-        if not Event.validate_times(request.start_time, request.end_time):
-            raise endpoints.BadRequestException("Time must be in the format 'HH:MM' and end time must not exceed start time.")
+        if not Time.validate_times(request.start_time, request.end_time):
+            raise endpoints.BadRequestException("Time must be in the format 'HH.MM' and end time must not exceed start time.")
 
         # Create new event
         Event(parent=location.key,
@@ -1208,8 +1210,8 @@ class BjorneparkappenApi(remote.Service):
             temp_end_time = request.end_time
 
         # Validate times
-        if not Event.validate_times(temp_start_time, temp_end_time):
-            raise endpoints.BadRequestException("Time must be in the format 'HH:MM' and end time must not exceed start time.")
+        if not Time.validate_times(temp_start_time, temp_end_time):
+            raise endpoints.BadRequestException("Time must be in the format 'HH.MM' and end time must not exceed start time.")
 
         # If value for start_time provided
         if request.start_time:
@@ -1254,15 +1256,15 @@ class BjorneparkappenApi(remote.Service):
 
         # If location not found, raise exception
         if not location:
-            raise endpoints.BadRequestException("Location of ID '" + str(request.location_id) + "' not found")
+            raise endpoints.BadRequestException("Enclosure of ID '" + str(request.location_id) + "' not found")
 
         # Convert InternationalMessage formats to InternationalText
         label = self.convert_i18n_messages_to_i18n_texts(international_messages=request.label)
         description = self.convert_i18n_messages_to_i18n_texts(international_messages=request.description)
 
         # Validate times
-        if not Event.validate_times(request.start_time, request.end_time):
-            raise endpoints.BadRequestException("Time must be in the format 'HH:MM' and end time must not exceed start time.")
+        if not Time.validate_times(request.start_time, request.end_time):
+            raise endpoints.BadRequestException("Time must be in the format 'HH.MM' and end time must not exceed start time.")
 
         # Retrieve keeper
         keeper = ndb.Key(Keeper, request.keeper_id).get()
@@ -1270,6 +1272,10 @@ class BjorneparkappenApi(remote.Service):
         # If keeper not found, raise BadRequestException
         if not keeper:
             raise endpoints.BadRequestException("No keeper by ID '" + str(request.keeper_id) + "' found.")
+
+        # If keeper busy, raise BadRequestException
+        if not keeper.is_available(request.start_time, request.end_time):
+            raise endpoints.BadRequestException("Keeper '" + str(request.keeper_id) + "' busy during requested times.")
 
         # Create new feeding
         Feeding(parent=location.key,
@@ -1330,8 +1336,19 @@ class BjorneparkappenApi(remote.Service):
             temp_end_time = request.end_time
 
         # Validate times
-        if not Event.validate_times(temp_start_time, temp_end_time):
-            raise endpoints.BadRequestException("Time must be in the format 'HH:MM' and end time must not exceed start time.")
+        if not Time.validate_times(temp_start_time, temp_end_time):
+            raise endpoints.BadRequestException("Time must be in the format 'HH.MM' and end time must not exceed start time.")
+
+        # Retrieve keeper
+        keeper = ndb.Key(Keeper, request.keeper_id).get()
+
+        # If keeper not found, raise BadRequestException
+        if not keeper:
+            raise endpoints.BadRequestException("No keeper by ID '" + str(request.keeper_id) + "' found.")
+
+        # If keeper busy, raise BadRequestException
+        if not keeper.is_available(request.start_time, request.end_time):
+            raise endpoints.BadRequestException("Keeper '" + str(request.keeper_id) + "' busy during requested times.")
 
         # If value for start_time provided
         if request.start_time:

@@ -1,6 +1,5 @@
 from event import Event
 from enclosure import Enclosure
-from keeper import Keeper
 from google.appengine.ext import ndb
 
 class Feeding(Event):
@@ -35,3 +34,9 @@ class Feeding(Event):
 
         # Perform query to return feedings where location is compatible enclosure
         return cls.query(ancestor=enclosure.key).fetch()
+
+    @classmethod
+    def get_all_for_keeper(cls, keeper):
+
+        # Perform query to return feedings for passed keeper
+        return cls.query(cls.keeper_id==keeper.key.id()).fetch()
