@@ -41,4 +41,4 @@ class Time():
             time_array = time.split(".")
             time = time_array[0] + time_array[1]
 
-        return time
+        return int(time)

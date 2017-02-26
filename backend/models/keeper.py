@@ -1,6 +1,7 @@
 from feeding import Feeding
 from google.appengine.ext import ndb
 from i18n import InternationalText
+from time import Time
 
 class Keeper(ndb.Model):
 
@@ -18,15 +19,15 @@ class Keeper(ndb.Model):
         for feeding in feedings:
 
             # If end time after start_time
-            if Time.validate_times(end_time, feeding.start_time):
+            if Time.validate_times(feeding.start_time, end_time):
                 # Check start time not before end time
-                if Time.validate_times(feeding.end_time, start_time):
+                if Time.validate_times(start_time, feeding.end_time):
                     return False
 
             # If start time before end_time
-            if Time.validate_times(feeding.end_time, start_time):
+            if Time.validate_times(start_time, feeding.end_time):
                 # Check end time not after end time
-                if Time.validate_times(end_time, feeding.start_time):
+                if Time.validate_times(feeding.start_time, end_time):
                     return False
 
         return True

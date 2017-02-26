@@ -744,7 +744,7 @@ class AnimalsApi(remote.Service):
 
             # Set feeding to active state of enclosure
             for feeding in feedings:
-                feeding.is_active = enclosure.is_available()
+                feeding.is_active = enclosure.is_active()
                 feeding.put()
 
         # Update version
@@ -784,7 +784,7 @@ class AnimalsApi(remote.Service):
 
         # Set feeding to active state of enclosure
         for feeding in feedings:
-            feeding.is_active = enclosure.is_available()
+            feeding.is_active = enclosure.is_active()
             feeding.put()
 
         # Delete animal
@@ -1399,8 +1399,6 @@ class EventsApi(remote.Service):
         name='events.create')
     def create_event(self, request):
 
-        # TODO Check for clashes at a location
-
         # Validate all required values have been provided
         if not request.label and request.description and request.location_id and request.start_time and request.end_time and is_active is not None:
             raise endpoints.BadRequestException("Please provided values for 'label', 'description', 'location_id', 'start_time', 'end_time' and 'is_active'.")
@@ -1412,13 +1410,17 @@ class EventsApi(remote.Service):
         if not location or location._class_name() is Enclosure._class_name():
             raise endpoints.BadRequestException("Amenity with ID '" + str(request.location_id) + "' not found")
 
-        # Convert InternationalMessage formats to InternationalText
-        label = ApiHelper.convert_i18n_messages_to_i18n_texts(international_messages=request.label)
-        description = ApiHelper.convert_i18n_messages_to_i18n_texts(international_messages=request.description)
-
         # Validate times
         if not Time.validate_times(request.start_time, request.end_time):
             raise endpoints.BadRequestException("Time must be in the format 'HH.MM' and end time must not exceed start time.")
+
+        # Check location is free
+        if not location.is_available(request.start_time, request.end_time):
+            raise endpoints.BadRequestException("Location with ID '" + str(request.location_id) + "' is holding another event during the selected times.")
+
+        # Convert InternationalMessage formats to InternationalText
+        label = ApiHelper.convert_i18n_messages_to_i18n_texts(international_messages=request.label)
+        description = ApiHelper.convert_i18n_messages_to_i18n_texts(international_messages=request.description)
 
         # Create new event
         Event(parent=location.key,
@@ -1521,8 +1523,6 @@ class EventsApi(remote.Service):
         name='events.feedings.create')
     def create_feeding(self, request):
 
-        # TODO Check for clashes at a location
-
         # Validate all required values have been provided
         if not request.label and request.description and request.location_id and request.start_time and request.end_time and is_active is not None:
             raise endpoints.BadRequestException("Please provided values for 'label', 'description', 'location_id', 'start_time', 'end_time' and 'is_active'.")
@@ -1530,17 +1530,21 @@ class EventsApi(remote.Service):
         # Retrieve location from provided ID
         location = Area.get_by_id(request.location_id)
 
+        # Validate times
+        if not Time.validate_times(request.start_time, request.end_time):
+            raise endpoints.BadRequestException("Time must be in the format 'HH.MM' and end time must not exceed start time.")
+
         # If location not found, raise exception
         if not location or location._class_name() is Amenity._class_name():
             raise endpoints.BadRequestException("Enclosure of ID '" + str(request.location_id) + "' not found")
 
+        # Check location is free
+        if not location.is_available(request.start_time, request.end_time):
+            raise endpoints.BadRequestException("Location with ID '" + str(request.location_id) + "' is holding another event during the selected times.")
+
         # Convert InternationalMessage formats to InternationalText
         label = ApiHelper.convert_i18n_messages_to_i18n_texts(international_messages=request.label)
         description = ApiHelper.convert_i18n_messages_to_i18n_texts(international_messages=request.description)
-
-        # Validate times
-        if not Time.validate_times(request.start_time, request.end_time):
-            raise endpoints.BadRequestException("Time must be in the format 'HH.MM' and end time must not exceed start time.")
 
         # If keeper provided
         if request.keeper_id:

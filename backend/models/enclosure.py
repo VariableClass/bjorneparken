@@ -20,7 +20,7 @@ class Enclosure(Area):
 
         return species
 
-    def is_available(self):
+    def is_active(self):
 
         unavailable_animals = 0
 
