@@ -1964,6 +1964,51 @@ class VisitorsApi(remote.Service):
         visitor.put()
 
         return message_types.VoidMessage()
+
+    @endpoints.method(
+        ID_LANGUAGE_REQUEST,
+        EventListResponse,
+        path='itinerary',
+        http_method='GET',
+        name='visitors.itinerary')
+    def get_itinerary(self, request):
+
+        # Validate language code
+        ApiHelper.check_language(language_code=request.language_code)
+
+        # Attempt to retrieve visitor
+        visitor = Visitor.get_by_id(request.id)
+
+        response = EventListResponse()
+
+        # For all events in the visitor's itinerary
+        for event_reference in visitor.itinerary:
+
+            # Attempt to retrieve the event
+            event = Event.get_by_id(event_reference.event_id, parent=ndb.Key(Area, event_reference.location_id))
+
+            # If event successffully retrieved
+            if event:
+
+                # If event is an Event
+                if type(event) is Event:
+
+                    # Retrieve an Event response
+                    event_response = ApiHelper.get_event_response(event, request.language_code)
+
+                    # Add event to return list
+                    response.events.append(event_response)
+
+                # Else if event is a Feeding
+                elif type(event) is Feeding:
+
+                    # Retrieve a Feeding response
+                    feeding_response = ApiHelper.get_feeding_response(event, request.language_code)
+
+                    # Add feeding to return list
+                    response.feedings.append(feeding_response)
+
+        return response
 # [END Visitors API]
 # [END bjorneparkappen_api]
 
