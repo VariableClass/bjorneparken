@@ -29,7 +29,7 @@ class Keeper(ndb.Model):
                 if Time.validate_times(end_time, feeding.start_time):
                     return False
 
-            return True
+        return True
 
     # Class Methods
     @classmethod
