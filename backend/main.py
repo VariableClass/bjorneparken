@@ -2002,6 +2002,11 @@ class VisitorsApi(remote.Service):
         # Attempt to retrieve visitor
         visitor = Visitor.get_by_id(request.id)
 
+        # If visitor does not exist, raise BadRequestException
+        if not visitor:
+            raise endpoints.BadRequestException("No visitor found with ID '" +
+                                                str(request.id) + "'.")
+
         response = EventListResponse()
 
         # For all events in the visitor's itinerary
@@ -2030,6 +2035,52 @@ class VisitorsApi(remote.Service):
 
                     # Add feeding to return list
                     response.feedings.append(feeding_response)
+
+        return response
+
+    @endpoints.method(
+        ID_LANGUAGE_REQUEST,
+        SpeciesListResponse,
+        path='starred_species',
+        http_method='GET',
+        name='visitors.starred_species')
+    def get_starred_species(self, request):
+        # Validate language code
+        ApiHelper.check_language(language_code=request.language_code)
+
+        # Attempt to retrieve visitor
+        visitor = Visitor.get_by_id(request.id)
+
+        # If visitor does not exist, raise BadRequestException
+        if not visitor:
+            raise endpoints.BadRequestException("No visitor found with ID '" +
+                                                str(request.id) + "'.")
+
+        response = SpeciesListResponse()
+
+        # For all species in the visitor's starred species list
+        for species_id in visitor.starred_species:
+
+            # Attempt to retrieve the species
+            species = Species.get_by_id(species_id)
+
+            # If species successffully retrieved
+            if species:
+
+                # Translate translatable species resources
+                species_common_name_translation = InternationalText.get_translation(
+                        request.language_code,
+                        species.common_name)
+                species_description_translation = InternationalText.get_translation(
+                        request.language_code,
+                        species.description)
+
+                # Add species to return list
+                response.species.append(SpeciesResponse(
+                    id=species.key.id(),
+                    common_name=species_common_name_translation,
+                    latin=species.latin,
+                    description=species_description_translation))
 
         return response
 
