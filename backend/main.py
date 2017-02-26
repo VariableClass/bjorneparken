@@ -91,7 +91,6 @@ class EnclosureRequest(messages.Message):
     label = messages.MessageField(InternationalMessage, 1, repeated=True)
     visitor_destination = messages.StringField(2)
     coordinates = messages.StringField(3, repeated=True)
-    animals = messages.MessageField(AnimalReference, 4, repeated=True)
 
 class AmenityRequest(messages.Message):
     label = messages.MessageField(InternationalMessage, 1, repeated=True)
@@ -214,6 +213,12 @@ EVENT_ID_REQUEST = endpoints.ResourceContainer(
     EventReference)
 # [END get/delete request resources]
 
+# [START create request resources]
+CREATE_ANIMAL_REQUEST = endpoints.ResourceContainer(
+    AnimalRequest,
+    enclosure_id = messages.IntegerField(1, required = True))
+# [END create request resources]
+
 # [START update request resources]
 UPDATE_AMENITY_REQUEST = endpoints.ResourceContainer(
     AmenityRequest,
@@ -242,6 +247,9 @@ UPDATE_SPECIES_REQUEST = endpoints.ResourceContainer(
 UPDATE_VISITOR_REQUEST = endpoints.ResourceContainer(
     VisitorRequest,
     id=messages.IntegerField(1, required=True))
+ADD_REMOVE_ANIMAL_REQUEST = endpoints.ResourceContainer(
+    AnimalReference,
+    enclosure_id = messages.IntegerField(1, required=True))
 # [END update request resources]
 # [END request resources]
 
@@ -420,7 +428,15 @@ class ApiHelper():
                 feeding.description)
 
         # Retrieve location
-        location = cls.get_enclosure_response(feeding.key.parent().get(), language_code)
+        location = feeding.key.parent().get()
+
+        # If enclosure inactive update feeding active state
+        if not location.is_active():
+            feeding.is_active = False
+            feeding.put()
+
+        # Get formatted location response
+        location_response = cls.get_enclosure_response(feeding.key.parent().get(), language_code)
 
         # Retrieve keeper
         keeper = ndb.Key(Keeper, feeding.keeper_id).get()
@@ -440,7 +456,7 @@ class ApiHelper():
             id=feeding.key.id(),
             label=feeding_label_translation,
             description=feeding_description_translation,
-            location=location,
+            location=location_response,
             start_time=feeding.start_time,
             end_time=feeding.end_time,
             is_active=feeding.is_active,
@@ -662,7 +678,7 @@ class AnimalsApi(remote.Service):
         return response
 
     @endpoints.method(
-        AnimalRequest,
+        CREATE_ANIMAL_REQUEST,
         message_types.VoidMessage,
         path='create',
         http_method='POST',
@@ -670,24 +686,35 @@ class AnimalsApi(remote.Service):
     def create_animal(self, request):
 
         # Validate all required values have been provided
-        if not request.name and request.species_id and request.description and request.is_available is not None:
+        if not request.name and request.species_id and request.description and request.enclosure_id and request.is_available is not None:
             raise endpoints.BadRequestException("Please provided values for 'name', 'species_id', 'description' and 'is_available'.")
 
         # Retrieve species from provided ID
         species = ndb.Key(Species, request.species_id).get()
 
-        # If species not found, raise exception
+        # If species not found, raise BadRequestException
         if not species:
             raise endpoints.BadRequestException("Species of ID '" + str(request.species_id) + "' not found")
+
+        # Retrieve enclosure from provided ID
+        enclosure = ndb.Key(Enclosure, request.enclosure_id).get()
+
+        # If enclosure not found, raise BadRequestException
+        if not enclosure:
+            raise endpoints.BadRequestException("Enclosure of ID '" + str(request.species_id) + "' not found")
 
         # Convert InternationalMessage formats to InternationalText
         description = ApiHelper.convert_i18n_messages_to_i18n_texts(international_messages=request.description)
 
         # Create new animal
-        Animal(parent=species.key,
+        animal = Animal(parent=species.key,
             name=request.name,
             description=description,
             is_available=request.is_available).put()
+
+        # Add animal to enclosure and write changes
+        enclosure.animals.append(Animal.AnimalLookup(animal_id=animal.id(), species_id=request.species_id))
+        enclosure.put()
 
         # Update version
         ApiHelper.update_version()
@@ -934,31 +961,10 @@ class AreasApi(remote.Service):
             coordinate_array = coordinate_string.split(", ")
             coordinates.append(ndb.GeoPt(coordinate_array[0], coordinate_array[1]))
 
-        animals = []
-
-        # For each animal/species key set
-        for animal_reference in request.animals:
-
-            # Retrieve animal
-            animal = Animal.get_by_id(animal_reference.animal_id, parent=ndb.Key(Species, animal_reference.species_id))
-
-            if not animal:
-                # If not found, raise BadRequestException
-                raise endpoints.BadRequestException("No animal found with ID '" +
-                                                    str(animal_reference.animal_id) +
-                                                    "' and species ID '" +
-                                                    str(animal_reference.species_id) +
-                                                    "'.")
-
-            # Add animal reference to list
-            animals.append(Animal.AnimalLookup(animal_id=animal_reference.animal_id,
-                                                species_id=animal_reference.species_id))
-
         # Create new enclosure
         Enclosure(label=label,
                 visitor_destination=visitor_destination,
-                coordinates=coordinates,
-                animals=animals).put()
+                coordinates=coordinates).put()
 
         # Update version
         ApiHelper.update_version()
@@ -1064,7 +1070,6 @@ class AreasApi(remote.Service):
             except:
                 raise endpoints.BadRequestException("Co-ordinates must be in the form 'X-value, Y-value'")
 
-
         # If values for co-ordinates provided
         if request.coordinates:
 
@@ -1075,30 +1080,59 @@ class AreasApi(remote.Service):
                 coordinate_array = coordinate_string.split(", ")
                 coordinates.append(ndb.GeoPt(coordinate_array[0], coordinate_array[1]))
 
-        # If values for animals provided
-        if request.animals:
+        # Write changes
+        enclosure.put()
 
-            animals = []
+        # Update version
+        ApiHelper.update_version()
 
-            # For each animal/species key set
-            for animal_reference in request.animals:
+        return message_types.VoidMessage()
 
-                # Retrieve animal
-                animal = Animal.get_by_id(animal_reference.animal_id, parent=ndb.Key(Species, animal_reference.species_id))
+    @endpoints.method(
+        ADD_REMOVE_ANIMAL_REQUEST,
+        message_types.VoidMessage,
+        path='enclosures/update/animals/add',
+        http_method='POST',
+        name='areas.enclosures.update.animals.add')
+    def add_animal_to_enclosure(self, request):
 
-                if not animal:
-                    # If not found, raise BadRequestException
-                    raise endpoints.BadRequestException("No animal found with ID '" +
-                                                        str(animal_reference.animal_id) +
-                                                        "' and species ID '" +
-                                                        str(animal_reference.species_id) +
-                                                        "'.")
+        # Attempt to retrieve enclosure
+        enclosure = Enclosure.get_by_id(request.enclosure_id)
 
-                # Add animal reference to list
-                animals.append(Animal.AnimalLookup(animal_id=animal_reference.animal_id,
-                                                    species_id=animal_reference.species_id))
+        # If enclosure does not exist, raise BadRequestException
+        if not enclosure:
+            raise endpoints.BadRequestException("No enclosure found with ID '" +
+                                                str(request.enclosure_id) + "'.")
 
-                enclosure.animals = animals
+        # Check animal does not already exist in list
+        for animal_reference in enclosure.animals:
+            if animal_reference.animal_id == request.animal_id and animal_reference.species_id == request.species_id:
+                raise endpoints.BadRequestException("Animal already in enclosure.")
+
+        # Retrieve animal
+        animal = Animal.get_by_id(request.animal_id, parent=ndb.Key(Species, request.species_id))
+
+        if not animal:
+            # If not found, raise BadRequestException
+            raise endpoints.BadRequestException("No animal found with ID '" +
+                                                str(animal_reference.animal_id) +
+                                                "' and species ID '" +
+                                                str(animal_reference.species_id) +
+                                                "'.")
+
+        # Check whether animal is in another enclosure
+        current_enclosure = Enclosure.get_for_animal(request.animal_id, request.species_id)
+
+        # If it is, remove the animal from that enclosure and write changes
+        if current_enclosure:
+            for animal_reference in current_enclosure.animals:
+                if animal_reference.animal_id == request.animal_id and animal_reference.species_id == request.species_id:
+                    current_enclosure.animals.remove(animal_reference)
+                    current_enclosure.put()
+
+        # Add animal to this enclosure
+        enclosure.animals.append(Animal.AnimalLookup(animal_id=request.animal_id,
+                                            species_id=request.species_id))
 
         # Write changes
         enclosure.put()
