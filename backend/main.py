@@ -471,7 +471,7 @@ class ApiHelper():
 # [END ApiHelper]
 
 # [START Species API]
-@bjorneparkappen_api.api_class(resource_name='species', path='species')
+@bjorneparkappen_api.api_class(path='species')
 class SpeciesApi(remote.Service):
 
     @endpoints.method(
@@ -629,7 +629,7 @@ class SpeciesApi(remote.Service):
 # [END Species API]
 
 # [START Animals API]
-@bjorneparkappen_api.api_class(resource_name='animals', path='animals')
+@bjorneparkappen_api.api_class(path='animals')
 class AnimalsApi(remote.Service):
 
     @endpoints.method(
@@ -831,7 +831,7 @@ class AnimalsApi(remote.Service):
 # [END Animals API]
 
 # [START Areas API]
-@bjorneparkappen_api.api_class(resource_name='areas', path='areas')
+@bjorneparkappen_api.api_class(path='areas')
 class AreasApi(remote.Service):
 
     @endpoints.method(
@@ -1261,7 +1261,7 @@ class AreasApi(remote.Service):
 # [END Areas API]
 
 # [START Events API]
-@bjorneparkappen_api.api_class(resource_name='events', path='events')
+@bjorneparkappen_api.api_class(path='events')
 class EventsApi(remote.Service):
 
     @endpoints.method(
@@ -1782,7 +1782,7 @@ class EventsApi(remote.Service):
 # [END Events API]
 
 # [START Keepers API]
-@bjorneparkappen_api.api_class(resource_name='keepers', path='keepers')
+@bjorneparkappen_api.api_class(path='keepers')
 class KeepersApi(remote.Service):
 
     @endpoints.method(
@@ -1904,7 +1904,7 @@ class KeepersApi(remote.Service):
 # [END Keepers API]
 
 # [START Versions API]
-@bjorneparkappen_api.api_class(resource_name='version')
+@bjorneparkappen_api.api_class()
 class VersionApi(remote.Service):
 
     @endpoints.method(
@@ -1928,7 +1928,7 @@ class VersionApi(remote.Service):
 # [END Versions API]
 
 # [START Visitors API]
-@bjorneparkappen_api.api_class(resource_name='visitors', path='visitors')
+@bjorneparkappen_api.api_class(path='visitors')
 class VisitorsApi(remote.Service):
 
     @endpoints.method(
