@@ -29,13 +29,13 @@ class InternationalMessage(messages.Message):
 
 # [START keeper messages]
 class KeeperRequest(messages.Message):
-    name = messages.StringField(1, required=True)
+    name = messages.StringField(1)
     bio = messages.MessageField(InternationalMessage, 2, repeated=True)
 
 class KeeperResponse(messages.Message):
-    id = messages.IntegerField(1, required=True)
-    name = messages.StringField(2, required=True)
-    bio = messages.StringField(3, required=True)
+    id = messages.IntegerField(1)
+    name = messages.StringField(2)
+    bio = messages.StringField(3)
 
 class KeeperListResponse(messages.Message):
     keepers = messages.MessageField(KeeperResponse, 1, repeated=True)
@@ -44,14 +44,14 @@ class KeeperListResponse(messages.Message):
 # [START species messages]
 class SpeciesRequest(messages.Message):
     common_name = messages.MessageField(InternationalMessage, 1, repeated=True)
-    latin = messages.StringField(2, required=True)
+    latin = messages.StringField(2)
     description = messages.MessageField(InternationalMessage, 3, repeated=True)
 
 class SpeciesResponse(messages.Message):
-    id = messages.IntegerField(1, required=True)
-    common_name = messages.StringField(2, required=True)
-    latin = messages.StringField(3, required=True)
-    description = messages.StringField(4, required=True)
+    id = messages.IntegerField(1)
+    common_name = messages.StringField(2)
+    latin = messages.StringField(3)
+    description = messages.StringField(4)
 
 class SpeciesListResponse(messages.Message):
     species = messages.MessageField(SpeciesResponse, 1, repeated=True)
@@ -63,10 +63,10 @@ class AnimalReference(messages.Message):
     species_id = messages.IntegerField(2, required=True)
 
 class AnimalRequest(messages.Message):
-    name = messages.StringField(1, required=True)
-    species_id = messages.IntegerField(2, required=True)
+    name = messages.StringField(1)
+    species_id = messages.IntegerField(2)
     description = messages.MessageField(InternationalMessage, 3, repeated=True)
-    is_available = messages.BooleanField(4, required=True)
+    is_available = messages.BooleanField(4)
 
 class UpdateAnimalRequest(messages.Message):
     name = messages.StringField(1)
@@ -74,11 +74,11 @@ class UpdateAnimalRequest(messages.Message):
     is_available = messages.BooleanField(3)
 
 class AnimalResponse(messages.Message):
-    id = messages.IntegerField(1, required=True)
-    name = messages.StringField(2, required=True)
-    species = messages.MessageField(SpeciesResponse, 3, required=True)
-    description = messages.StringField(4, required=True)
-    is_available = messages.BooleanField(5, required=True)
+    id = messages.IntegerField(1)
+    name = messages.StringField(2)
+    species = messages.MessageField(SpeciesResponse, 3)
+    description = messages.StringField(4)
+    is_available = messages.BooleanField(5)
 
 class AnimalListResponse(messages.Message):
     animals = messages.MessageField(AnimalResponse, 1, repeated=True)
@@ -95,22 +95,22 @@ class EnclosureRequest(messages.Message):
 
 class AmenityRequest(messages.Message):
     label = messages.MessageField(InternationalMessage, 1, repeated=True)
-    visitor_destination = messages.StringField(2, required=True)
+    visitor_destination = messages.StringField(2)
     coordinates = messages.StringField(3, repeated=True)
     description = messages.MessageField(InternationalMessage, 4, repeated=True)
     amenity_type = messages.StringField(5)
 
 class EnclosureResponse(messages.Message):
-    id = messages.IntegerField(1, required=True)
-    label = messages.StringField(2, required=True)
-    visitor_destination = messages.StringField(3, required=True)
+    id = messages.IntegerField(1)
+    label = messages.StringField(2)
+    visitor_destination = messages.StringField(3)
     coordinates = messages.StringField(4, repeated=True)
     animals = messages.MessageField(AnimalResponse, 5, repeated=True)
 
 class AmenityResponse(messages.Message):
-    id = messages.IntegerField(1, required=True)
-    label = messages.StringField(2, required=True)
-    visitor_destination = messages.StringField(3, required=True)
+    id = messages.IntegerField(1)
+    label = messages.StringField(2)
+    visitor_destination = messages.StringField(3)
     coordinates = messages.StringField(4, repeated=True)
     description = messages.StringField(5)
     amenity_type = messages.StringField(6)
@@ -130,10 +130,10 @@ class EventReference(messages.Message):
 class EventRequest(messages.Message):
     label = messages.MessageField(InternationalMessage, 1, repeated=True)
     description = messages.MessageField(InternationalMessage, 2, repeated=True)
-    location_id = messages.IntegerField(3, required=True)
-    start_time = messages.StringField(4, required=True)
-    end_time = messages.StringField(5, required=True)
-    is_active = messages.BooleanField(6, required=True)
+    location_id = messages.IntegerField(3)
+    start_time = messages.StringField(4)
+    end_time = messages.StringField(5)
+    is_active = messages.BooleanField(6)
 
 class UpdateEventRequest(messages.Message):
     label = messages.MessageField(InternationalMessage, 1, repeated=True)
@@ -145,10 +145,10 @@ class UpdateEventRequest(messages.Message):
 class FeedingRequest(messages.Message):
     label = messages.MessageField(InternationalMessage, 1, repeated=True)
     description = messages.MessageField(InternationalMessage, 2, repeated=True)
-    location_id = messages.IntegerField(3, required=True)
-    start_time = messages.StringField(4, required=True)
-    end_time = messages.StringField(5, required=True)
-    is_active = messages.BooleanField(6, required=True)
+    location_id = messages.IntegerField(3)
+    start_time = messages.StringField(4)
+    end_time = messages.StringField(5)
+    is_active = messages.BooleanField(6)
     keeper_id = messages.IntegerField(7)
 
 class UpdateFeedingRequest(messages.Message):
@@ -160,22 +160,22 @@ class UpdateFeedingRequest(messages.Message):
     keeper_id = messages.IntegerField(6)
 
 class EventResponse(messages.Message):
-    id = messages.IntegerField(1, required=True)
-    label = messages.StringField(2, required=True)
-    description = messages.StringField(3, required=True)
-    location = messages.MessageField(AmenityResponse, 4, required=True)
-    start_time = messages.StringField(5, required=True)
-    end_time = messages.StringField(6, required=True)
-    is_active = messages.BooleanField(7, required=True)
+    id = messages.IntegerField(1)
+    label = messages.StringField(2)
+    description = messages.StringField(3)
+    location = messages.MessageField(AmenityResponse, 4)
+    start_time = messages.StringField(5)
+    end_time = messages.StringField(6)
+    is_active = messages.BooleanField(7)
 
 class FeedingResponse(messages.Message):
-    id = messages.IntegerField(1, required=True)
-    label = messages.StringField(2, required=True)
-    description = messages.StringField(3, required=True)
-    location = messages.MessageField(EnclosureResponse, 4, required=True)
-    start_time = messages.StringField(5, required=True)
-    end_time = messages.StringField(6, required=True)
-    is_active = messages.BooleanField(7, required=True)
+    id = messages.IntegerField(1)
+    label = messages.StringField(2)
+    description = messages.StringField(3)
+    location = messages.MessageField(EnclosureResponse, 4)
+    start_time = messages.StringField(5)
+    end_time = messages.StringField(6)
+    is_active = messages.BooleanField(7)
     keeper = messages.MessageField(KeeperResponse, 8)
 
 class EventListResponse(messages.Message):
@@ -191,7 +191,7 @@ class VisitorRequest(messages.Message):
     itinerary = messages.MessageField(EventReference, 4, repeated=True)
 
 class VisitorResponse(messages.Message):
-    id = messages.IntegerField(1, required=True)
+    id = messages.IntegerField(1)
 # [END visitor messages]
 # [END messages]
 
@@ -495,6 +495,10 @@ class SpeciesApi(remote.Service):
         name='species.create')
     def create_species(self, request):
 
+        # Validate all required values have been provided
+        if not request.common_name and request.latin and request.description:
+            raise endpoints.BadRequestException("Please provided values for 'common_name', 'latin' and 'description'.")
+
         # Attempt to retrieve species
         pre_existing = Species.get_by_latin_name(request.latin)
 
@@ -664,6 +668,10 @@ class AnimalsApi(remote.Service):
         http_method='POST',
         name='animals.create')
     def create_animal(self, request):
+
+        # Validate all required values have been provided
+        if not request.name and request.species_id and request.description and request.is_available is not None:
+            raise endpoints.BadRequestException("Please provided values for 'name', 'species_id', 'description' and 'is_available'.")
 
         # Retrieve species from provided ID
         species = ndb.Key(Species, request.species_id).get()
@@ -904,6 +912,10 @@ class AreasApi(remote.Service):
 
         # TODO Check for intersection of any existing areas
 
+        # Validate all required values have been provided
+        if not request.label and request.visitor_destination and request.coordinates:
+            raise endpoints.BadRequestException("Please provided values for 'label', 'visitor_destination' and 'coordinates'.")
+
         # Convert InternationalMessage formats to InternationalText
         label = ApiHelper.convert_i18n_messages_to_i18n_texts(international_messages=request.label)
 
@@ -962,6 +974,11 @@ class AreasApi(remote.Service):
     def create_amenity(self, request):
 
         # TODO Check for intersection of any existing areas
+
+        # Validate all required values have been provided
+        if not request.label and request.visitor_destination and request.coordinates and request.description and request.amenity_type:
+            raise endpoints.BadRequestException("Please provided values for 'label', 'visitor_destination', 'coordinates', 'description' and 'amenity_type'.")
+
 
         # Convert InternationalMessage formats to InternationalText
         label = ApiHelper.convert_i18n_messages_to_i18n_texts(international_messages=request.label)
@@ -1384,6 +1401,10 @@ class EventsApi(remote.Service):
 
         # TODO Check for clashes at a location
 
+        # Validate all required values have been provided
+        if not request.label and request.description and request.location_id and request.start_time and request.end_time and is_active is not None:
+            raise endpoints.BadRequestException("Please provided values for 'label', 'description', 'location_id', 'start_time', 'end_time' and 'is_active'.")
+
         # Retrieve location from provided ID
         location = ndb.Key(Amenity, request.location_id).get()
 
@@ -1506,6 +1527,10 @@ class EventsApi(remote.Service):
 
         # TODO Check for clashes at a location
 
+        # Validate all required values have been provided
+        if not request.label and request.description and request.location_id and request.start_time and request.end_time and is_active is not None:
+            raise endpoints.BadRequestException("Please provided values for 'label', 'description', 'location_id', 'start_time', 'end_time' and 'is_active'.")
+
         # Retrieve location from provided ID
         location = ndb.Key(Enclosure, request.location_id).get()
 
@@ -1560,7 +1585,10 @@ class EventsApi(remote.Service):
         # If feeding does not exist, raise BadRequestException
         if not feeding:
             raise endpoints.BadRequestException("No feeding found with ID '" +
-                                                str(request.feeding_id) + "'.")
+                                                str(request.feeding_id) +
+                                                "' and location ID '" +
+                                                str(request.location_id) +
+                                                "'.")
 
         # If values for label provided
         if request.label:
@@ -1741,6 +1769,11 @@ class KeepersApi(remote.Service):
         name='keepers.create')
     def create_keeper(self, request):
 
+        # Validate all required values have been provided
+        if not request.name and request.bio:
+            raise endpoints.BadRequestException("Please provided values for 'name' and 'bio'.")
+
+
         # Convert InternationalMessage formats to InternationalText
         bio = ApiHelper.convert_i18n_messages_to_i18n_texts(international_messages=request.bio)
 
@@ -1825,6 +1858,10 @@ class VisitorsApi(remote.Service):
         http_method='POST',
         name='visitors.create')
     def create_visitor(self, request):
+
+        # Validate all required values have been provided
+        if not request.visit_start and request.visit_end:
+            raise endpoints.BadRequestException("Please provided values for 'visit_start' and 'visit_end'.")
 
         # Validate duration of visit is correct and less than 1 week
         if (request.visit_end - request.visit_start).total_seconds() < 0 or (request.visit_end - request.visit_start).total_seconds() > 604800:
