@@ -1265,9 +1265,9 @@ class EventsApi(remote.Service):
     @endpoints.method(
         LANGUAGE_CODE_REQUEST,
         EventListResponse,
-        path='events/all',
+        path='events',
         http_method='GET',
-        name='events.events.all')
+        name='events.events')
     def list_events(self, request):
 
         # Validate language code
@@ -1406,10 +1406,10 @@ class EventsApi(remote.Service):
             raise endpoints.BadRequestException("Please provided values for 'label', 'description', 'location_id', 'start_time', 'end_time' and 'is_active'.")
 
         # Retrieve location from provided ID
-        location = ndb.Key(Amenity, request.location_id).get()
+        location = Area.get_by_id(request.location_id)
 
         # If location not found, raise exception
-        if not location:
+        if not location or location._class_name() is Enclosure._class_name():
             raise endpoints.BadRequestException("Amenity with ID '" + str(request.location_id) + "' not found")
 
         # Convert InternationalMessage formats to InternationalText
@@ -1443,10 +1443,6 @@ class EventsApi(remote.Service):
 
         # Attempt to retrieve event
         event = Event.get_by_id(request.event_id, parent=ndb.Key(Amenity, request.location_id))
-
-        # If event not found against any amenities, search against enclosures
-        if not event:
-            event = Event.get_by_id(request.event_id, parent=ndb.Key(Enclosure, request.location_id))
 
         # If event does not exist, raise BadRequestException
         if not event:
@@ -1532,10 +1528,10 @@ class EventsApi(remote.Service):
             raise endpoints.BadRequestException("Please provided values for 'label', 'description', 'location_id', 'start_time', 'end_time' and 'is_active'.")
 
         # Retrieve location from provided ID
-        location = ndb.Key(Enclosure, request.location_id).get()
+        location = Area.get_by_id(request.location_id)
 
         # If location not found, raise exception
-        if not location:
+        if not location or location._class_name() is Amenity._class_name():
             raise endpoints.BadRequestException("Enclosure of ID '" + str(request.location_id) + "' not found")
 
         # Convert InternationalMessage formats to InternationalText
@@ -1546,25 +1542,40 @@ class EventsApi(remote.Service):
         if not Time.validate_times(request.start_time, request.end_time):
             raise endpoints.BadRequestException("Time must be in the format 'HH.MM' and end time must not exceed start time.")
 
-        # Retrieve keeper
-        keeper = ndb.Key(Keeper, request.keeper_id).get()
+        # If keeper provided
+        if request.keeper_id:
+            # Retrieve keeper
+            keeper = ndb.Key(Keeper, request.keeper_id).get()
 
-        # If keeper not found, raise BadRequestException
-        if not keeper:
-            raise endpoints.BadRequestException("No keeper by ID '" + str(request.keeper_id) + "' found.")
+            # If keeper not found, raise BadRequestException
+            if not keeper:
+                raise endpoints.BadRequestException("No keeper by ID '" + str(request.keeper_id) + "' found.")
 
-        # If keeper busy, raise BadRequestException
-        if not keeper.is_available(request.start_time, request.end_time):
-            raise endpoints.BadRequestException("Keeper '" + str(request.keeper_id) + "' busy during requested times.")
+            # If keeper busy, raise BadRequestException
+            if not keeper.is_available(request.start_time, request.end_time):
+                raise endpoints.BadRequestException("Keeper '" + str(request.keeper_id) + "' busy during requested times.")
 
-        # Create new feeding
-        Feeding(parent=location.key,
-            label=label,
-            description=description,
-            start_time=request.start_time,
-            end_time=request.end_time,
-            is_active=request.is_active,
-            keeper_id=request.keeper_id).put()
+            # Create new feeding with keeper
+            feeding = Feeding(parent=location.key,
+                label=label,
+                description=description,
+                start_time=request.start_time,
+                end_time=request.end_time,
+                is_active=request.is_active,
+                keeper_id=request.keeper_id)
+
+        else:
+
+            # Create new feeding without keeper
+            feeding = Feeding(parent=location.key,
+                label=label,
+                description=description,
+                start_time=request.start_time,
+                end_time=request.end_time,
+                is_active=request.is_active)
+
+        # Write changes
+        feeding.put()
 
         # Update version
         ApiHelper.update_version()
