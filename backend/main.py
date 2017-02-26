@@ -787,7 +787,15 @@ class BjorneparkappenApi(remote.Service):
 
         # Validate AmenityType is existing AmenityType
         if not Amenity.AmenityType.validate(request.amenity_type):
-            raise endpoints.BadRequestException("No AmenityType found by the name'" + request.amenity_type + "'.")
+
+            # Generate a string representation of the Amenity.AmenityType enum
+            amenity_types = [amenity_type.name for amenity_type in Amenity.AmenityType]
+            amenity_types.sort()
+            string_amenity_types = ', '.join(amenity_types)
+
+            # Raise BadRequestException
+            raise endpoints.BadRequestException("No AmenityType found by the name '" + request.amenity_type +
+                                                "'. Amenities may be any of the following: " + string_amenity_types)
 
         # Set amenity type
         amenity_type = Amenity.AmenityType[request.amenity_type]
@@ -948,7 +956,15 @@ class BjorneparkappenApi(remote.Service):
         if request.amenity_type:
 
             if not Amenity.AmenityType.validate(request.amenity_type):
-                raise endpoints.BadRequestException("No AmenityType found by the name'" + request.amenity_type + "'.")
+
+                # Generate a string representation of the Amenity.AmenityType enum
+                amenity_types = [amenity_type.name for amenity_type in Amenity.AmenityType]
+                amenity_types.sort()
+                string_amenity_types = ', '.join(amenity_types)
+
+                # Raise BadRequestException
+                raise endpoints.BadRequestException("No AmenityType found by the name '" + request.amenity_type +
+                                                    "'. Amenities may be any of the following: " + string_amenity_types)
 
         # Write changes
         amenity.put()
