@@ -199,7 +199,7 @@ class VisitorResponse(messages.Message):
 # [START list request resources]
 LANGUAGE_CODE_REQUEST = endpoints.ResourceContainer(
     language_code=messages.StringField(1, required=True))
-FEEDING_SPECIES_ID_REQUEST = endpoints.ResourceContainer(
+ID_LANGUAGE_REQUEST = endpoints.ResourceContainer(
     language_code=messages.StringField(1, required=True),
     id=messages.IntegerField(2, required=True))
 # [END list request resources]
@@ -1306,7 +1306,7 @@ class EventsApi(remote.Service):
         return response
 
     @endpoints.method(
-        FEEDING_SPECIES_ID_REQUEST,
+        ID_LANGUAGE_REQUEST,
         EventListResponse,
         path='feedings/species',
         http_method='GET',
@@ -1339,7 +1339,40 @@ class EventsApi(remote.Service):
 
         return response
 
-    # TODO def list_events_for_location(self, request):
+    @endpoints.method(
+        ID_LANGUAGE_REQUEST,
+        EventListResponse,
+        path='amenity',
+        http_method='GET',
+        name='events.amenity')
+    def list_events_for_amenity(self, request):
+
+        # Validate language code
+        ApiHelper.check_language(language_code=request.language_code)
+
+        # Attempt to retrieve amenity
+        amenity = Amenity.get_by_id(request.id)
+
+        # If amenity does not exist, raise BadRequestException
+        if not amenity:
+            raise endpoints.BadRequestException("No amenity found with ID '" +
+                                                str(request.id) + "'.")
+
+        # Retrieve all events for amenity
+        events = Event.get_all_for_location(amenity)
+
+        response = EventListResponse()
+
+        # Build up response of all events
+        for event in events:
+
+            # Retrieve an Event response
+            event_response = ApiHelper.get_event_response(event, request.language_code)
+
+            # Add event to return list
+            response.events.append(event_response)
+
+        return response
 
     @endpoints.method(
         EventRequest,

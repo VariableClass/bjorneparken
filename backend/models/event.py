@@ -16,6 +16,9 @@ class Event(polymodel.PolyModel):
     def get_all(cls):
         return cls.query().fetch()
 
+    @classmethod
+    def get_all_for_location(cls, amenity):
+        return cls.query(ancestor=amenity.key).fetch()
 
     class EventLookup(ndb.Model):
         event_id = ndb.IntegerProperty()
