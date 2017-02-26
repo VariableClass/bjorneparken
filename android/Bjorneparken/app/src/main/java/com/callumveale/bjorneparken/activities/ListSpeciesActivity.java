@@ -8,14 +8,15 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.google.api.client.extensions.android.http.AndroidHttp;
-import com.google.api.client.json.gson.GsonFactory;
 
 import java.io.IOException;
 
 import com.callumveale.bjorneparken.R;
-import none.bjorneparkappen.Bjorneparkappen;
-import none.bjorneparkappen.model.MainSpeciesListResponse;
-import none.bjorneparkappen.model.MainSpeciesResponse;
+import com.google.api.client.json.jackson2.JacksonFactory;
+
+import none.bjorneparkappen_api.BjorneparkappenApi;
+import none.bjorneparkappen_api.model.MainSpeciesListResponse;
+import none.bjorneparkappen_api.model.MainSpeciesResponse;
 
 import static com.callumveale.bjorneparken.activities.HomeActivity.API_KEY;
 import static com.callumveale.bjorneparken.activities.HomeActivity.ROOT_URL;
@@ -68,8 +69,8 @@ public class ListSpeciesActivity extends AppCompatActivity {
         @Override
         protected MainSpeciesListResponse doInBackground(Void... params) {
 
-            Bjorneparkappen.Builder builder = new Bjorneparkappen.Builder(
-                    AndroidHttp.newCompatibleTransport(), new GsonFactory(), null);
+            BjorneparkappenApi.Builder builder = new BjorneparkappenApi.Builder(
+                    AndroidHttp.newCompatibleTransport(), new JacksonFactory(), null);
 
             builder.setRootUrl(ROOT_URL);
 
@@ -77,7 +78,7 @@ public class ListSpeciesActivity extends AppCompatActivity {
 
             try {
 
-                response = builder.build().species().list(sDefSystemLanguage).setKey(API_KEY).execute();
+                response = builder.build().species().all(sDefSystemLanguage).setKey(API_KEY).execute();
 
             } catch (IOException e) {
 
