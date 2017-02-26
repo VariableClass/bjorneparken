@@ -285,7 +285,7 @@ class ApiHelper():
         version.version = datetime.datetime.now()
 
         # Write changes
-        version.put()
+        return version.put()
 
     @staticmethod
     def check_language(language_code):
@@ -1916,9 +1916,15 @@ class VersionApi(remote.Service):
     def get_version(self, request):
 
         # Retrieve current version
-        version = Version.get().version
+        version = Version.get()
 
-        return VersionResponse(version=version)
+        # If no version exists
+        if version is None:
+            # Create one and retrieve it
+            version_key = ApiHelper.update_version()
+            version = version_key.get()
+
+        return VersionResponse(version=version.version)
 # [END Versions API]
 
 # [START Visitors API]
