@@ -201,7 +201,7 @@ LANGUAGE_CODE_REQUEST = endpoints.ResourceContainer(
     language_code=messages.StringField(1, required=True))
 FEEDING_SPECIES_ID_REQUEST = endpoints.ResourceContainer(
     language_code=messages.StringField(1, required=True),
-    species_id=messages.IntegerField(2, required=True))
+    id=messages.IntegerField(2, required=True))
 # [END list request resources]
 
 # [START get/delete request resources]
@@ -217,14 +217,14 @@ EVENT_ID_REQUEST = endpoints.ResourceContainer(
 # [START update request resources]
 UPDATE_AMENITY_REQUEST = endpoints.ResourceContainer(
     AmenityRequest,
-    amenity_id=messages.IntegerField(1, required=True))
+    id=messages.IntegerField(1, required=True))
 UPDATE_ANIMAL_REQUEST = endpoints.ResourceContainer(
     UpdateAnimalRequest,
     animal_id=messages.IntegerField(1, required=True),
     species_id=messages.IntegerField(2, required=True))
 UPDATE_ENCLOSURE_REQUEST = endpoints.ResourceContainer(
     EnclosureRequest,
-    enclosure_id=messages.IntegerField(1, required=True))
+    id=messages.IntegerField(1, required=True))
 UPDATE_EVENT_REQUEST = endpoints.ResourceContainer(
     UpdateEventRequest,
     event_id=messages.IntegerField(1, required=True),
@@ -235,13 +235,13 @@ UPDATE_FEEDING_REQUEST = endpoints.ResourceContainer(
     location_id=messages.IntegerField(2, required=True))
 UPDATE_KEEPER_REQUEST = endpoints.ResourceContainer(
     KeeperRequest,
-    keeper_id=messages.IntegerField(1, required=True))
+    id=messages.IntegerField(1, required=True))
 UPDATE_SPECIES_REQUEST = endpoints.ResourceContainer(
     SpeciesRequest,
-    species_id=messages.IntegerField(1, required=True))
+    id=messages.IntegerField(1, required=True))
 UPDATE_VISITOR_REQUEST = endpoints.ResourceContainer(
     VisitorRequest,
-    visitor_id=messages.IntegerField(1, required=True))
+    id=messages.IntegerField(1, required=True))
 # [END update request resources]
 # [END request resources]
 
@@ -525,12 +525,12 @@ class SpeciesApi(remote.Service):
     def update_species(self, request):
 
         # Attempt to retrieve species
-        species = Species.get_by_id(request.species_id)
+        species = Species.get_by_id(request.id)
 
         # If species does not exist, raise BadRequestException
         if not species:
             raise endpoints.BadRequestException("No species found with ID '" +
-                                                str(request.species_id) + "'.")
+                                                str(request.id) + "'.")
 
         # If values for common_name provided
         if request.common_name:
@@ -762,6 +762,22 @@ class AnimalsApi(remote.Service):
                                                 "' and species ID '" +
                                                 str(request.species_id) +
                                                 "'.")
+
+        # Retrieve animal enclosure
+        enclosure = Enclosure.get_for_animal(animal_id=request.animal_id, species_id=request.species_id)
+
+        # Remove animal from enclosure
+        for animal_reference in enclosure:
+            if animal_reference.animal_id == request.animal_id and animal_reference.species_id == request.species_id:
+                enclosure.remove(animal_reference)
+
+        # Retrieve all feedings which include the enclosure
+        feedings = Feeding.get_all_for_enclosure(enclosure)
+
+        # Set feeding to active state of enclosure
+        for feeding in feedings:
+            feeding.is_active = enclosure.is_available()
+            feeding.put()
 
         # Delete animal
         animal.key.delete()
@@ -1002,12 +1018,12 @@ class AreasApi(remote.Service):
     def update_enclosure(self, request):
 
         # Attempt to retrieve enclosure
-        enclosure = Enclosure.get_by_id(request.enclosure_id)
+        enclosure = Enclosure.get_by_id(request.id)
 
         # If enclosure does not exist, raise BadRequestException
         if not enclosure:
             raise endpoints.BadRequestException("No enclosure found with ID '" +
-                                                str(request.enclosure_id) + "'.")
+                                                str(request.id) + "'.")
 
         # If values for label provided
         if request.label:
@@ -1084,12 +1100,12 @@ class AreasApi(remote.Service):
     def update_amenity(self, request):
 
         # Attempt to retrieve amenity
-        amenity = Amenity.get_by_id(request.amenity_id)
+        amenity = Amenity.get_by_id(request.id)
 
         # If amenity does not exist, raise BadRequestException
         if not amenity:
             raise endpoints.BadRequestException("No amenity found with ID '" +
-                                                str(request.amenity_id) + "'.")
+                                                str(request.id) + "'.")
 
         # If values for label provided
         if request.label:
@@ -1158,7 +1174,7 @@ class AreasApi(remote.Service):
     @endpoints.method(
         ID_REQUEST,
         message_types.VoidMessage,
-        path='areas/delete',
+        path='delete',
         http_method='DELETE',
         name='areas.delete')
     def delete_area(self, request):
@@ -1300,8 +1316,15 @@ class EventsApi(remote.Service):
         # Validate language code
         ApiHelper.check_language(language_code=request.language_code)
 
+        # Retrieve species from ID
+        species = Species.get_by_id(request.id)
+
+        # If not found, raise BadRequestException
+        if not species:
+            raise endpoints.BadRequestException("No species found with ID '" + str(request.id) + "'.")
+
         # Retrieve all events
-        events = Feeding.get_all_for_species(request.species_id)
+        events = Feeding.get_all_for_species(request.id)
 
         response = EventListResponse()
 
@@ -1706,12 +1729,12 @@ class KeepersApi(remote.Service):
     def update_keeper(self, request):
 
         # Attempt to retrieve keeper
-        keeper = Keeper.get_by_id(request.keeper_id)
+        keeper = Keeper.get_by_id(request.id)
 
         # If keeper does not exist, raise BadRequestException
         if not keeper:
             raise endpoints.BadRequestException("No keeper found with ID '" +
-                                                str(request.keeper_id) + "'.")
+                                                str(request.id) + "'.")
 
         # If value for name provided
         if request.name:
@@ -1791,12 +1814,12 @@ class VisitorsApi(remote.Service):
     def update_visitor(self, request):
 
         # Attempt to retrieve visitor
-        visitor = Visitor.get_by_id(request.visitor_id)
+        visitor = Visitor.get_by_id(request.id)
 
         # If visitor does not exist, raise BadRequestException
         if not visitor:
             raise endpoints.BadRequestException("No visitor found with ID '" +
-                                                str(request.visitor_id) + "'.")
+                                                str(request.id) + "'.")
 
         # If values for species provided
         if request.starred_species:
