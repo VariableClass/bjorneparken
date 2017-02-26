@@ -4,7 +4,7 @@
     "application/json"
   ],
   "definitions": {
-    "AmenityRequest": {
+    "MainAmenityRequest": {
       "properties": {
         "amenity_type": {
           "type": "string"
@@ -17,13 +17,13 @@
         },
         "description": {
           "items": {
-            "$ref": "#/definitions/InternationalMessage"
+            "$ref": "#/definitions/MainInternationalMessage"
           },
           "type": "array"
         },
         "label": {
           "items": {
-            "$ref": "#/definitions/InternationalMessage"
+            "$ref": "#/definitions/MainInternationalMessage"
           },
           "type": "array"
         },
@@ -31,12 +31,9 @@
           "type": "string"
         }
       },
-      "required": [
-        "visitor_destination"
-      ],
       "type": "object"
     },
-    "AmenityResponse": {
+    "MainAmenityResponse": {
       "properties": {
         "amenity_type": {
           "type": "string"
@@ -61,68 +58,20 @@
           "type": "string"
         }
       },
-      "required": [
-        "id",
-        "label",
-        "visitor_destination"
-      ],
       "type": "object"
     },
-    "AnimalListResponse": {
+    "MainAnimalListResponse": {
       "properties": {
         "animals": {
           "items": {
-            "$ref": "#/definitions/AnimalResponse"
+            "$ref": "#/definitions/MainAnimalResponse"
           },
           "type": "array"
         }
       },
       "type": "object"
     },
-    "AnimalReference": {
-      "properties": {
-        "animal_id": {
-          "format": "int64",
-          "type": "string"
-        },
-        "species_id": {
-          "format": "int64",
-          "type": "string"
-        }
-      },
-      "required": [
-        "animal_id",
-        "species_id"
-      ],
-      "type": "object"
-    },
-    "AnimalRequest": {
-      "properties": {
-        "description": {
-          "items": {
-            "$ref": "#/definitions/InternationalMessage"
-          },
-          "type": "array"
-        },
-        "is_available": {
-          "type": "boolean"
-        },
-        "name": {
-          "type": "string"
-        },
-        "species_id": {
-          "format": "int64",
-          "type": "string"
-        }
-      },
-      "required": [
-        "is_available",
-        "name",
-        "species_id"
-      ],
-      "type": "object"
-    },
-    "AnimalResponse": {
+    "MainAnimalResponse": {
       "properties": {
         "description": {
           "type": "string"
@@ -138,43 +87,30 @@
           "type": "string"
         },
         "species": {
-          "$ref": "#/definitions/SpeciesResponse"
+          "$ref": "#/definitions/MainSpeciesResponse"
         }
       },
-      "required": [
-        "description",
-        "id",
-        "is_available",
-        "name",
-        "species"
-      ],
       "type": "object"
     },
-    "AreaListResponse": {
+    "MainAreaListResponse": {
       "properties": {
         "amenities": {
           "items": {
-            "$ref": "#/definitions/AmenityResponse"
+            "$ref": "#/definitions/MainAmenityResponse"
           },
           "type": "array"
         },
         "enclosures": {
           "items": {
-            "$ref": "#/definitions/EnclosureResponse"
+            "$ref": "#/definitions/MainEnclosureResponse"
           },
           "type": "array"
         }
       },
       "type": "object"
     },
-    "EnclosureRequest": {
+    "MainEnclosureRequest": {
       "properties": {
-        "animals": {
-          "items": {
-            "$ref": "#/definitions/AnimalReference"
-          },
-          "type": "array"
-        },
         "coordinates": {
           "items": {
             "type": "string"
@@ -183,7 +119,7 @@
         },
         "label": {
           "items": {
-            "$ref": "#/definitions/InternationalMessage"
+            "$ref": "#/definitions/MainInternationalMessage"
           },
           "type": "array"
         },
@@ -193,11 +129,11 @@
       },
       "type": "object"
     },
-    "EnclosureResponse": {
+    "MainEnclosureResponse": {
       "properties": {
         "animals": {
           "items": {
-            "$ref": "#/definitions/AnimalResponse"
+            "$ref": "#/definitions/MainAnimalResponse"
           },
           "type": "array"
         },
@@ -218,52 +154,30 @@
           "type": "string"
         }
       },
-      "required": [
-        "id",
-        "label",
-        "visitor_destination"
-      ],
       "type": "object"
     },
-    "EventListResponse": {
+    "MainEventListResponse": {
       "properties": {
         "events": {
           "items": {
-            "$ref": "#/definitions/EventResponse"
+            "$ref": "#/definitions/MainEventResponse"
           },
           "type": "array"
         },
         "feedings": {
           "items": {
-            "$ref": "#/definitions/FeedingResponse"
+            "$ref": "#/definitions/MainFeedingResponse"
           },
           "type": "array"
         }
       },
       "type": "object"
     },
-    "EventReference": {
-      "properties": {
-        "event_id": {
-          "format": "int64",
-          "type": "string"
-        },
-        "location_id": {
-          "format": "int64",
-          "type": "string"
-        }
-      },
-      "required": [
-        "event_id",
-        "location_id"
-      ],
-      "type": "object"
-    },
-    "EventRequest": {
+    "MainEventRequest": {
       "properties": {
         "description": {
           "items": {
-            "$ref": "#/definitions/InternationalMessage"
+            "$ref": "#/definitions/MainInternationalMessage"
           },
           "type": "array"
         },
@@ -275,7 +189,7 @@
         },
         "label": {
           "items": {
-            "$ref": "#/definitions/InternationalMessage"
+            "$ref": "#/definitions/MainInternationalMessage"
           },
           "type": "array"
         },
@@ -287,15 +201,9 @@
           "type": "string"
         }
       },
-      "required": [
-        "end_time",
-        "is_active",
-        "location_id",
-        "start_time"
-      ],
       "type": "object"
     },
-    "EventResponse": {
+    "MainEventResponse": {
       "properties": {
         "description": {
           "type": "string"
@@ -314,28 +222,19 @@
           "type": "string"
         },
         "location": {
-          "$ref": "#/definitions/AmenityResponse"
+          "$ref": "#/definitions/MainAmenityResponse"
         },
         "start_time": {
           "type": "string"
         }
       },
-      "required": [
-        "description",
-        "end_time",
-        "id",
-        "is_active",
-        "label",
-        "location",
-        "start_time"
-      ],
       "type": "object"
     },
-    "FeedingRequest": {
+    "MainFeedingRequest": {
       "properties": {
         "description": {
           "items": {
-            "$ref": "#/definitions/InternationalMessage"
+            "$ref": "#/definitions/MainInternationalMessage"
           },
           "type": "array"
         },
@@ -351,7 +250,7 @@
         },
         "label": {
           "items": {
-            "$ref": "#/definitions/InternationalMessage"
+            "$ref": "#/definitions/MainInternationalMessage"
           },
           "type": "array"
         },
@@ -363,15 +262,9 @@
           "type": "string"
         }
       },
-      "required": [
-        "end_time",
-        "is_active",
-        "location_id",
-        "start_time"
-      ],
       "type": "object"
     },
-    "FeedingResponse": {
+    "MainFeedingResponse": {
       "properties": {
         "description": {
           "type": "string"
@@ -387,30 +280,21 @@
           "type": "boolean"
         },
         "keeper": {
-          "$ref": "#/definitions/KeeperResponse"
+          "$ref": "#/definitions/MainKeeperResponse"
         },
         "label": {
           "type": "string"
         },
         "location": {
-          "$ref": "#/definitions/EnclosureResponse"
+          "$ref": "#/definitions/MainEnclosureResponse"
         },
         "start_time": {
           "type": "string"
         }
       },
-      "required": [
-        "description",
-        "end_time",
-        "id",
-        "is_active",
-        "label",
-        "location",
-        "start_time"
-      ],
       "type": "object"
     },
-    "InternationalMessage": {
+    "MainInternationalMessage": {
       "properties": {
         "language_code": {
           "type": "string"
@@ -425,22 +309,22 @@
       ],
       "type": "object"
     },
-    "KeeperListResponse": {
+    "MainKeeperListResponse": {
       "properties": {
         "keepers": {
           "items": {
-            "$ref": "#/definitions/KeeperResponse"
+            "$ref": "#/definitions/MainKeeperResponse"
           },
           "type": "array"
         }
       },
       "type": "object"
     },
-    "KeeperRequest": {
+    "MainKeeperRequest": {
       "properties": {
         "bio": {
           "items": {
-            "$ref": "#/definitions/InternationalMessage"
+            "$ref": "#/definitions/MainInternationalMessage"
           },
           "type": "array"
         },
@@ -448,12 +332,9 @@
           "type": "string"
         }
       },
-      "required": [
-        "name"
-      ],
       "type": "object"
     },
-    "KeeperResponse": {
+    "MainKeeperResponse": {
       "properties": {
         "bio": {
           "type": "string"
@@ -466,35 +347,30 @@
           "type": "string"
         }
       },
-      "required": [
-        "bio",
-        "id",
-        "name"
-      ],
       "type": "object"
     },
-    "SpeciesListResponse": {
+    "MainSpeciesListResponse": {
       "properties": {
         "species": {
           "items": {
-            "$ref": "#/definitions/SpeciesResponse"
+            "$ref": "#/definitions/MainSpeciesResponse"
           },
           "type": "array"
         }
       },
       "type": "object"
     },
-    "SpeciesRequest": {
+    "MainSpeciesRequest": {
       "properties": {
         "common_name": {
           "items": {
-            "$ref": "#/definitions/InternationalMessage"
+            "$ref": "#/definitions/MainInternationalMessage"
           },
           "type": "array"
         },
         "description": {
           "items": {
-            "$ref": "#/definitions/InternationalMessage"
+            "$ref": "#/definitions/MainInternationalMessage"
           },
           "type": "array"
         },
@@ -502,12 +378,9 @@
           "type": "string"
         }
       },
-      "required": [
-        "latin"
-      ],
       "type": "object"
     },
-    "SpeciesResponse": {
+    "MainSpeciesResponse": {
       "properties": {
         "common_name": {
           "type": "string"
@@ -523,29 +396,19 @@
           "type": "string"
         }
       },
-      "required": [
-        "common_name",
-        "description",
-        "id",
-        "latin"
-      ],
       "type": "object"
     },
-    "VisitorRequest": {
+    "MainVersionResponse": {
       "properties": {
-        "itinerary": {
-          "items": {
-            "$ref": "#/definitions/EventReference"
-          },
-          "type": "array"
-        },
-        "starred_species": {
-          "items": {
-            "format": "int64",
-            "type": "string"
-          },
-          "type": "array"
-        },
+        "version": {
+          "format": "date-time",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "MainVisitorRequest": {
+      "properties": {
         "visit_end": {
           "format": "date-time",
           "type": "string"
@@ -557,29 +420,26 @@
       },
       "type": "object"
     },
-    "VisitorResponse": {
+    "MainVisitorResponse": {
       "properties": {
         "id": {
           "format": "int64",
           "type": "string"
         }
       },
-      "required": [
-        "id"
-      ],
       "type": "object"
     },
     "ProtorpcMessagesCombinedContainer": {
       "properties": {
-        "animal_id": {
-          "format": "int64",
-          "type": "string"
-        },
         "description": {
           "items": {
-            "$ref": "#/definitions/InternationalMessage"
+            "$ref": "#/definitions/MainInternationalMessage"
           },
           "type": "array"
+        },
+        "enclosure_id": {
+          "format": "int64",
+          "type": "string"
         },
         "is_available": {
           "type": "boolean"
@@ -593,8 +453,7 @@
         }
       },
       "required": [
-        "animal_id",
-        "species_id"
+        "enclosure_id"
       ],
       "type": "object"
     }
@@ -620,7 +479,7 @@
           "200": {
             "description": "A successful response",
             "schema": {
-              "$ref": "#/definitions/AnimalListResponse"
+              "$ref": "#/definitions/MainAnimalListResponse"
             }
           }
         },
@@ -709,7 +568,7 @@
           "200": {
             "description": "A successful response",
             "schema": {
-              "$ref": "#/definitions/AreaListResponse"
+              "$ref": "#/definitions/MainAreaListResponse"
             }
           }
         },
@@ -735,7 +594,7 @@
           "200": {
             "description": "A successful response",
             "schema": {
-              "$ref": "#/definitions/AreaListResponse"
+              "$ref": "#/definitions/MainAreaListResponse"
             }
           }
         },
@@ -778,7 +637,7 @@
         ]
       }
     },
-    "/bjorneparkappen_api/v1.0/areas/areas/delete": {
+    "/bjorneparkappen_api/v1.0/areas/delete": {
       "delete": {
         "operationId": "AreasApi_deleteArea",
         "parameters": [
@@ -817,7 +676,7 @@
           "200": {
             "description": "A successful response",
             "schema": {
-              "$ref": "#/definitions/AreaListResponse"
+              "$ref": "#/definitions/MainAreaListResponse"
             }
           }
         },
@@ -860,6 +719,22 @@
         ]
       }
     },
+    "/bjorneparkappen_api/v1.0/areas/enclosures/update/animals/add": {
+      "post": {
+        "operationId": "AreasApi_addAnimalToEnclosure",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "A successful response"
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
     "/bjorneparkappen_api/v1.0/events/all": {
       "get": {
         "operationId": "EventsApi_listAllEvents",
@@ -875,7 +750,40 @@
           "200": {
             "description": "A successful response",
             "schema": {
-              "$ref": "#/definitions/EventListResponse"
+              "$ref": "#/definitions/MainEventListResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/bjorneparkappen_api/v1.0/events/amenity": {
+      "get": {
+        "operationId": "EventsApi_listEventsForAmenity",
+        "parameters": [
+          {
+            "format": "int64",
+            "in": "query",
+            "name": "id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "language_code",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response",
+            "schema": {
+              "$ref": "#/definitions/MainEventListResponse"
             }
           }
         },
@@ -933,7 +841,7 @@
         ]
       }
     },
-    "/bjorneparkappen_api/v1.0/events/events/all": {
+    "/bjorneparkappen_api/v1.0/events/events": {
       "get": {
         "operationId": "EventsApi_listEvents",
         "parameters": [
@@ -948,7 +856,7 @@
           "200": {
             "description": "A successful response",
             "schema": {
-              "$ref": "#/definitions/EventListResponse"
+              "$ref": "#/definitions/MainEventListResponse"
             }
           }
         },
@@ -974,7 +882,7 @@
           "200": {
             "description": "A successful response",
             "schema": {
-              "$ref": "#/definitions/EventListResponse"
+              "$ref": "#/definitions/MainEventListResponse"
             }
           }
         },
@@ -1008,7 +916,7 @@
           {
             "format": "int64",
             "in": "query",
-            "name": "species_id",
+            "name": "id",
             "required": true,
             "type": "string"
           },
@@ -1023,7 +931,7 @@
           "200": {
             "description": "A successful response",
             "schema": {
-              "$ref": "#/definitions/EventListResponse"
+              "$ref": "#/definitions/MainEventListResponse"
             }
           }
         },
@@ -1081,7 +989,7 @@
           "200": {
             "description": "A successful response",
             "schema": {
-              "$ref": "#/definitions/KeeperListResponse"
+              "$ref": "#/definitions/MainKeeperListResponse"
             }
           }
         },
@@ -1163,7 +1071,7 @@
           "200": {
             "description": "A successful response",
             "schema": {
-              "$ref": "#/definitions/SpeciesListResponse"
+              "$ref": "#/definitions/MainSpeciesListResponse"
             }
           }
         },
@@ -1230,6 +1138,25 @@
         ]
       }
     },
+    "/bjorneparkappen_api/v1.0/version": {
+      "get": {
+        "operationId": "VersionApi_getVersion",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "A successful response",
+            "schema": {
+              "$ref": "#/definitions/MainVersionResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
     "/bjorneparkappen_api/v1.0/visitors/create": {
       "post": {
         "operationId": "VisitorsApi_createVisitor",
@@ -1238,7 +1165,40 @@
           "200": {
             "description": "A successful response",
             "schema": {
-              "$ref": "#/definitions/VisitorResponse"
+              "$ref": "#/definitions/MainVisitorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/bjorneparkappen_api/v1.0/visitors/itinerary": {
+      "get": {
+        "operationId": "VisitorsApi_getItinerary",
+        "parameters": [
+          {
+            "format": "int64",
+            "in": "query",
+            "name": "id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "language_code",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response",
+            "schema": {
+              "$ref": "#/definitions/MainEventListResponse"
             }
           }
         },
@@ -1252,6 +1212,70 @@
     "/bjorneparkappen_api/v1.0/visitors/update": {
       "post": {
         "operationId": "VisitorsApi_updateVisitor",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "A successful response"
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/bjorneparkappen_api/v1.0/visitors/update/itinerary/add": {
+      "post": {
+        "operationId": "VisitorsApi_addEventToItinerary",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "A successful response"
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/bjorneparkappen_api/v1.0/visitors/update/itinerary/remove": {
+      "post": {
+        "operationId": "VisitorsApi_removeEventFromItinerary",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "A successful response"
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/bjorneparkappen_api/v1.0/visitors/update/starred_species/add": {
+      "post": {
+        "operationId": "VisitorsApi_addStarredSpecies",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "A successful response"
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/bjorneparkappen_api/v1.0/visitors/update/starred_species/remove": {
+      "post": {
+        "operationId": "VisitorsApi_removeStarredSpecies",
         "parameters": [],
         "responses": {
           "200": {
