@@ -17,10 +17,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.ListAmenitiesActivity" />
-        <activity android:name=".activities.ListEventsActivity" />
-        <activity android:name=".activities.ListFeedingsActivity" />
-        <activity android:name=".activities.ListSpeciesActivity" />
 
     </application>
 
