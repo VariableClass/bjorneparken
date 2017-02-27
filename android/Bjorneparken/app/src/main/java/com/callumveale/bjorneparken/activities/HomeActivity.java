@@ -1,12 +1,14 @@
 package com.callumveale.bjorneparken.activities;
 
 import android.content.res.Configuration;
-import android.os.AsyncTask;
 
+import android.os.Parcelable;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,25 +18,18 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
+import com.callumveale.bjorneparken.adapters.NavigationDrawerAdapter;
+import com.callumveale.bjorneparken.fragments.ListFragment;
+import com.callumveale.bjorneparken.models.NavigationDrawerItem;
+import com.callumveale.bjorneparken.requests.GetAllAmenities;
+import com.callumveale.bjorneparken.requests.GetAllSpecies;
 import com.callumveale.bjorneparken.R;
-import com.callumveale.bjorneparken.models.Species;
-import com.google.api.client.extensions.android.http.AndroidHttp;
-import com.google.api.client.json.jackson2.JacksonFactory;
+import com.callumveale.bjorneparken.requests.RequestsModule;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import none.bjorneparkappen_api.BjorneparkappenApi;
-import none.bjorneparkappen_api.model.MainSpeciesListResponse;
-import none.bjorneparkappen_api.model.MainSpeciesResponse;
-
-public class HomeActivity extends AppCompatActivity implements SpeciesFragment.OnListFragmentInteractionListener {
-
-    public static final String API_KEY = "AIzaSyCuD2dk_XFcn512V5JxAZbFlAK9dgNlQ9c";
-    public static final String ROOT_URL = "https://api-dot-bjorneparkappen.appspot.com/_ah/api/";
-
-    public static String sDefSystemLanguage;
+public class HomeActivity extends AppCompatActivity implements ListFragment.OnListFragmentInteractionListener, NavigationDrawerAdapter.INavigationDrawerListener {
 
     // Toolbar
     private Toolbar mToolbar;
@@ -44,8 +39,8 @@ public class HomeActivity extends AppCompatActivity implements SpeciesFragment.O
     private ActionBarDrawerToggle mDrawerToggle;
 
     // Navigation Drawer and options
-    private ListView mDrawerList;
-    private String[] mNavigationOptions;
+    private RecyclerView mDrawerList;
+    private NavigationDrawerItem[] mNavigationOptions;
 
     // Progress Wheel
     private ProgressBar mProgressBar;
@@ -55,13 +50,8 @@ public class HomeActivity extends AppCompatActivity implements SpeciesFragment.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        // If returning from a previous state, return
-        if (savedInstanceState != null) {
-            return;
-        }
-
         // Set language
-        sDefSystemLanguage = Locale.getDefault().getLanguage();
+        RequestsModule.LANGUAGE = Locale.getDefault().getLanguage();
 
         // Build toolbar
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -69,9 +59,12 @@ public class HomeActivity extends AppCompatActivity implements SpeciesFragment.O
 
         // Build navigation drawer
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mNavigationOptions = new String[]{getString(R.string.my_visit), getString(R.string.animals),
+
+        String[] options = {getString(R.string.my_visit), getString(R.string.animals),
                 getString(R.string.attractions), getString(R.string.amenities), getString(R.string.park_map),
                 getString(R.string.restaurant_menu), getString(R.string.settings), getString(R.string.contact)};
+
+        mNavigationOptions = NavigationDrawerItem.build(options);
 
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, mToolbar, R.string.drawer_open, R.string.drawer_close) {
 
@@ -92,72 +85,61 @@ public class HomeActivity extends AppCompatActivity implements SpeciesFragment.O
         mDrawerLayout.addDrawerListener(mDrawerToggle);
 
         // Build navigation drawer list items
-        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        mDrawerList = (RecyclerView) findViewById(R.id.left_drawer);
 
         // Set the adapter for the list view
-        mDrawerList.setAdapter(new ArrayAdapter<>(this,
-                R.layout.drawer_list_item, mNavigationOptions));
+        mDrawerList.setAdapter(new NavigationDrawerAdapter(this, R.layout.drawer_list_item, mNavigationOptions));
 
-        // Set the list's click listener
-        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+        mDrawerList.setLayoutManager(new LinearLayoutManager(this));
 
         // Build progress wheel
         mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
     }
 
     @Override
-    public void onListFragmentInteraction(Species item) {
+    public void onListFragmentInteraction(Parcelable item) {
 
     }
 
-    private class DrawerItemClickListener implements ListView.OnItemClickListener {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+    public void selectNavigationItem(int position){
 
-            selectNavigationItem(position);
-        }
-    }
-
-    private void selectNavigationItem(int position){
-
-        // Highlight the selected item
-        mDrawerList.setItemChecked(position, true);
-
-        GetAllTask task = new GetAllTask(this);
-        task.execute();
-
+        // Open the appropriate page
         switch (position){
 
             case 0: // If selection is 'My Visit'
-                setTitle(mNavigationOptions[0]);
+                setTitle(mNavigationOptions[0].name);
                 break;
 
             case 1: // If selection is 'Animals'
-                setTitle(mNavigationOptions[1]);
+                setTitle(mNavigationOptions[1].name);
+                GetAllSpecies getAllSpeciesTask = new GetAllSpecies(this);
+                getAllSpeciesTask.execute();
                 break;
 
             case 2: // If selection is 'Attractions'
-                setTitle(mNavigationOptions[2]);
+                setTitle(mNavigationOptions[2].name);
                 break;
 
             case 3: // If selection is 'Amenities'
-                setTitle(mNavigationOptions[3]);
+                setTitle(mNavigationOptions[3].name);
+                GetAllAmenities getAllAmenitiesTask = new GetAllAmenities(this);
+                getAllAmenitiesTask.execute();
                 break;
 
             case 4: // If selection is 'Park Map'
-                setTitle(mNavigationOptions[4]);
+                setTitle(mNavigationOptions[4].name);
                 break;
 
             case 5: // If selection is 'Restaurant Menu'
-                setTitle(mNavigationOptions[5]);
+                setTitle(mNavigationOptions[5].name);
                 break;
 
             case 6: // If selection is 'Settings'
-                setTitle(mNavigationOptions[6]);
+                setTitle(mNavigationOptions[6].name);
                 break;
 
             case 7: // If selection is 'Contact'
-                setTitle(mNavigationOptions[7]);
+                setTitle(mNavigationOptions[7].name);
                 break;
 
             default:
@@ -205,77 +187,29 @@ public class HomeActivity extends AppCompatActivity implements SpeciesFragment.O
         return super.onOptionsItemSelected(item);
     }
 
-    class GetAllTask extends AsyncTask<Void, Void, MainSpeciesListResponse> {
+    public void createFragment(ArrayList<Parcelable> listFromResponse){
 
-        HomeActivity activity;
+        ListFragment fragment = new ListFragment();
+        Bundle args = new Bundle();
 
-        GetAllTask(HomeActivity activity){
+        args.putParcelableArrayList(ListFragment.ARG_LIST, listFromResponse);
+        args.putInt(ListFragment.ARG_COLUMN_COUNT, 1);
 
-            this.activity = activity;
+        if (listFromResponse.size() > 0) {
+            args.putString(ListFragment.ARG_DATA_TYPE, listFromResponse.get(0).getClass().getSimpleName());
         }
 
-        @Override
-        protected MainSpeciesListResponse doInBackground(Void... params) {
+        fragment.setArguments(args);
 
-            BjorneparkappenApi.Builder builder = new BjorneparkappenApi.Builder(
-                    AndroidHttp.newCompatibleTransport(), new JacksonFactory(), null);
+        getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).addToBackStack(null).commit();
+    }
 
-            builder.setRootUrl(ROOT_URL);
+    public void updateProgress(boolean complete) {
 
-            MainSpeciesListResponse speciesListResponse = new MainSpeciesListResponse();
-
-            try {
-
-                speciesListResponse = builder.build().species().all(sDefSystemLanguage).setKey(API_KEY).execute();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-
-            return speciesListResponse;
-        }
-
-        @Override
-        protected void onPreExecute(){
-            updateProgress(false);
-        }
-
-        @Override
-        protected void onPostExecute(MainSpeciesListResponse response){
-
-            updateProgress(true);
-            createSpeciesFragment(response);
-        }
-
-        private void updateProgress(boolean complete){
-
-            if (complete){
-                mProgressBar.setVisibility(View.GONE);
-            } else {
-                mProgressBar.setVisibility(View.VISIBLE);
-            }
-        }
-
-        private void createSpeciesFragment(MainSpeciesListResponse response){
-
-            SpeciesFragment fragment = new SpeciesFragment();
-            Bundle args = new Bundle();
-
-            ArrayList<Species> species = new ArrayList<>();
-
-            if (response.getSpecies() != null){
-
-                for (MainSpeciesResponse speciesResponse : response.getSpecies()){
-
-                    species.add(new Species(speciesResponse.getCommonName(), speciesResponse.getLatin(), speciesResponse.getDescription()));
-                }
-            }
-            args.putParcelableArrayList(SpeciesFragment.ARG_SPECIES_LIST, species);
-            args.putInt(SpeciesFragment.ARG_COLUMN_COUNT, 1);
-            fragment.setArguments(args);
-
-            getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).addToBackStack(null).commit();
+        if (complete) {
+            mProgressBar.setVisibility(View.GONE);
+        } else {
+            mProgressBar.setVisibility(View.VISIBLE);
         }
     }
 }

@@ -1,7 +1,8 @@
-package com.callumveale.bjorneparken.activities;
+package com.callumveale.bjorneparken.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,9 +12,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.callumveale.bjorneparken.R;
-import com.callumveale.bjorneparken.models.Species;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A fragment representing a list of Items.
@@ -21,27 +22,30 @@ import java.util.ArrayList;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class SpeciesFragment extends Fragment {
+public class ListFragment extends Fragment {
 
-    public static final String ARG_SPECIES_LIST = "species-list";
+    public static final String ARG_LIST = "list";
     public static final String ARG_COLUMN_COUNT = "column-count";
+    public static final String ARG_DATA_TYPE = "data-type";
 
-    private ArrayList<Species> mSpeciesList = new ArrayList<>();
+    private ArrayList<Parcelable> mList = new ArrayList<>();
     private int mColumnCount = 1;
+    private String mDataType = "";
     private OnListFragmentInteractionListener mListener;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public SpeciesFragment() {
+    public ListFragment() {
     }
 
-    public static SpeciesFragment newInstance(Species[] species, int columnCount) {
-        SpeciesFragment fragment = new SpeciesFragment();
+    public static ListFragment newInstance(Parcelable[] items, int columnCount, String dataType) {
+        ListFragment fragment = new ListFragment();
         Bundle args = new Bundle();
-        args.putParcelableArray(ARG_SPECIES_LIST, species);
+        args.putParcelableArray(ARG_LIST, items);
         args.putInt(ARG_COLUMN_COUNT, columnCount);
+        args.putString(ARG_DATA_TYPE, dataType);
         fragment.setArguments(args);
         return fragment;
     }
@@ -52,14 +56,15 @@ public class SpeciesFragment extends Fragment {
 
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
-            mSpeciesList = getArguments().getParcelableArrayList(ARG_SPECIES_LIST);
+            mList = getArguments().getParcelableArrayList(ARG_LIST);
+            mDataType = getArguments().getString(ARG_DATA_TYPE);
         }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_species_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_list, container, false);
 
         // Set the adapter
         if (view instanceof RecyclerView) {
@@ -70,7 +75,18 @@ public class SpeciesFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new MySpeciesRecyclerViewAdapter(mSpeciesList, mListener));
+
+            Object viewAdapter = null;
+
+            try {
+                Class className = Class.forName("com.callumveale.bjorneparken.adapters." + mDataType + "RecyclerViewAdapter");
+                viewAdapter = className.getConstructor(List.class, OnListFragmentInteractionListener.class).newInstance(mList, mListener);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            recyclerView.setAdapter((RecyclerView.Adapter) viewAdapter);
         }
         return view;
     }
@@ -93,18 +109,9 @@ public class SpeciesFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onListFragmentInteraction(Species item);
+
+        void onListFragmentInteraction(Parcelable item);
     }
+
 }

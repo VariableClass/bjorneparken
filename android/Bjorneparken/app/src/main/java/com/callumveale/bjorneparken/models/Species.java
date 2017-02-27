@@ -3,37 +3,37 @@ package com.callumveale.bjorneparken.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import none.bjorneparkappen_api.model.MainSpeciesListResponse;
+import none.bjorneparkappen_api.model.MainSpeciesRequest;
+import none.bjorneparkappen_api.model.MainSpeciesResponse;
+
 /**
  * Created by callum on 27/02/2017.
  */
 
 public class Species implements Parcelable{
+    private long id;
     private String commonName;
     private String latin;
     private String description;
 
     // Constructor
-    public Species(String commonName, String latin, String description){
+    public Species(long id, String commonName, String latin, String description){
+        this.id = id;
         this.commonName = commonName;
         this.latin = latin;
         this.description = description;
     }
 
     // Getter and setter methods
+    public long getId(){ return id;}
+
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public String getCommonName() {
         return commonName;
-    }
-
-    public void setCommonName(String commonName) {
-        this.commonName = commonName;
     }
 
     public String getLatin() {
@@ -46,12 +46,13 @@ public class Species implements Parcelable{
 
     // Parcelling part
     public Species(Parcel in){
-        String[] data = new String[3];
+        String[] data = new String[4];
 
         in.readStringArray(data);
-        this.commonName = data[0];
-        this.latin = data[1];
-        this.description = data[2];
+        this.id = Long.parseLong(data[0]);
+        this.commonName = data[1];
+        this.latin = data[2];
+        this.description = data[3];
     }
 
     @Override
@@ -62,6 +63,7 @@ public class Species implements Parcelable{
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeStringArray(new String[] {
+                String.valueOf(this.id),
                 this.commonName,
                 this.latin,
                 this.description});

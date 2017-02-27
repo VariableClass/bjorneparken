@@ -1,4 +1,4 @@
-package com.callumveale.bjorneparken.activities;
+package com.callumveale.bjorneparken.adapters;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -7,6 +7,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.callumveale.bjorneparken.R;
+import com.callumveale.bjorneparken.fragments.ListFragment;
+import com.callumveale.bjorneparken.fragments.ListFragment.OnListFragmentInteractionListener;
 import com.callumveale.bjorneparken.models.Species;
 
 import java.util.List;
@@ -14,15 +16,14 @@ import java.util.List;
 /**
  * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
  * specified {@link OnListFragmentInteractionListener}.
- * TODO: Replace the implementation with code for your data type.
  */
-public class MySpeciesRecyclerViewAdapter extends RecyclerView.Adapter<MySpeciesRecyclerViewAdapter.ViewHolder> {
+public class SpeciesRecyclerViewAdapter extends RecyclerView.Adapter<SpeciesRecyclerViewAdapter.ViewHolder> {
 
     private final List<Species> mValues;
-    private final SpeciesFragment.OnListFragmentInteractionListener mListener;
+    private final ListFragment.OnListFragmentInteractionListener mListener;
 
-    public MySpeciesRecyclerViewAdapter(List<Species> items, SpeciesFragment.OnListFragmentInteractionListener listener) {
-        mValues = items;
+    public SpeciesRecyclerViewAdapter(List items, ListFragment.OnListFragmentInteractionListener listener) {
+        mValues = (List<Species>)items;
         mListener = listener;
     }
 
@@ -38,6 +39,12 @@ public class MySpeciesRecyclerViewAdapter extends RecyclerView.Adapter<MySpecies
         holder.mItem = mValues.get(position);
         holder.mCommonNameView.setText(mValues.get(position).getCommonName());
         holder.mLatinView.setText(mValues.get(position).getLatin());
+
+        String description = mValues.get(position).getDescription();
+        if (description.length() > 100){
+            description = description.substring(0, 95) + "...";
+        }
+        holder.mDescriptionView.setText(description);
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -60,13 +67,15 @@ public class MySpeciesRecyclerViewAdapter extends RecyclerView.Adapter<MySpecies
         public final View mView;
         public final TextView mCommonNameView;
         public final TextView mLatinView;
+        public final TextView mDescriptionView;
         public Species mItem;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            mCommonNameView = (TextView) view.findViewById(R.id.common_name);
-            mLatinView = (TextView) view.findViewById(R.id.latin);
+            mCommonNameView = (TextView) view.findViewById(R.id.species_common_name);
+            mLatinView = (TextView) view.findViewById(R.id.species_latin);
+            mDescriptionView = (TextView) view.findViewById(R.id.species_description);
         }
 
         @Override
