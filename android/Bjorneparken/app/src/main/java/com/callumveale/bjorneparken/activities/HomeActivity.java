@@ -1,5 +1,6 @@
 package com.callumveale.bjorneparken.activities;
 
+import android.content.Context;
 import android.content.res.Configuration;
 
 import android.os.Parcelable;
@@ -13,20 +14,29 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 
 import com.callumveale.bjorneparken.adapters.NavigationDrawerAdapter;
 import com.callumveale.bjorneparken.fragments.ListFragment;
 import com.callumveale.bjorneparken.models.NavigationDrawerItem;
+import com.callumveale.bjorneparken.models.Species;
+import com.callumveale.bjorneparken.models.Visitor;
 import com.callumveale.bjorneparken.requests.GetAllAmenities;
 import com.callumveale.bjorneparken.requests.GetAllSpecies;
 import com.callumveale.bjorneparken.R;
+import com.callumveale.bjorneparken.requests.GetVisitorId;
+import com.callumveale.bjorneparken.requests.GetVisitorItinerary;
 import com.callumveale.bjorneparken.requests.RequestsModule;
+import com.google.api.client.util.DateTime;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Locale;
 
 public class HomeActivity extends AppCompatActivity implements ListFragment.OnListFragmentInteractionListener, NavigationDrawerAdapter.INavigationDrawerListener {
@@ -45,9 +55,43 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
     // Progress Wheel
     private ProgressBar mProgressBar;
 
+    // Visitor Information
+    private Visitor mVisitor;
+    private DateTime mVisitStart;
+    private DateTime mVisitEnd;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Build and display UI components
+        buildUI();
+
+        mVisitStart = new DateTime(new Date());
+        mVisitEnd = new DateTime(new Date());
+
+        // Attempt to retrieve visitor ID from file
+        long visitorId = getIdFromFile();
+
+        // If found
+        if (visitorId != 0){
+
+            mVisitor = new Visitor(visitorId, mVisitStart, mVisitEnd, new Species[0]);
+
+            // Retrieve visitor itinerary from server
+            GetVisitorItinerary getVisitorItineraryTask = new GetVisitorItinerary(this, visitorId);
+            getVisitorItineraryTask.execute();
+
+        } else {
+
+            // Obtain a visitor ID from server
+            GetVisitorId getVisitorIdTask = new GetVisitorId(this, mVisitStart, mVisitEnd);
+            getVisitorIdTask.execute();
+        }
+    }
+
+    private void buildUI(){
+
         setContentView(R.layout.activity_home);
 
         // Set language
@@ -60,9 +104,17 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
         // Build navigation drawer
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
-        String[] options = {getString(R.string.my_visit), getString(R.string.animals),
-                getString(R.string.attractions), getString(R.string.amenities), getString(R.string.park_map),
-                getString(R.string.restaurant_menu), getString(R.string.settings), getString(R.string.contact)};
+        String[] options = {
+                getString(R.string.home),
+                getString(R.string.my_visit),
+                getString(R.string.animals),
+                getString(R.string.attractions),
+                getString(R.string.amenities),
+                getString(R.string.park_map),
+                getString(R.string.restaurant_menu),
+                getString(R.string.share),
+                getString(R.string.settings),
+                getString(R.string.help)};
 
         mNavigationOptions = NavigationDrawerItem.build(options);
 
@@ -103,43 +155,55 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
 
     public void selectNavigationItem(int position){
 
+        GetVisitorItinerary getVisitorItineraryTask = new GetVisitorItinerary(this, mVisitor.getId());
+
         // Open the appropriate page
         switch (position){
 
-            case 0: // If selection is 'My Visit'
-                setTitle(mNavigationOptions[0].name);
+            case 0: // If selection is 'Home'
+                setTitle(R.string.app_name);
+                getVisitorItineraryTask.execute();
                 break;
 
-            case 1: // If selection is 'Animals'
+            case 1: // If selection is 'My Visit'
                 setTitle(mNavigationOptions[1].name);
+                getVisitorItineraryTask.execute();
+                break;
+
+            case 2: // If selection is 'Animals'
+                setTitle(mNavigationOptions[2].name);
                 GetAllSpecies getAllSpeciesTask = new GetAllSpecies(this);
                 getAllSpeciesTask.execute();
                 break;
 
-            case 2: // If selection is 'Attractions'
-                setTitle(mNavigationOptions[2].name);
+            case 3: // If selection is 'Attractions'
+                setTitle(mNavigationOptions[3].name);
                 break;
 
-            case 3: // If selection is 'Amenities'
-                setTitle(mNavigationOptions[3].name);
+            case 4: // If selection is 'Amenities'
+                setTitle(mNavigationOptions[4].name);
                 GetAllAmenities getAllAmenitiesTask = new GetAllAmenities(this);
                 getAllAmenitiesTask.execute();
                 break;
 
-            case 4: // If selection is 'Park Map'
-                setTitle(mNavigationOptions[4].name);
-                break;
-
-            case 5: // If selection is 'Restaurant Menu'
+            case 5: // If selection is 'Park Map'
                 setTitle(mNavigationOptions[5].name);
                 break;
 
-            case 6: // If selection is 'Settings'
+            case 6: // If selection is 'Restaurant Menu'
                 setTitle(mNavigationOptions[6].name);
                 break;
 
-            case 7: // If selection is 'Contact'
+            case 7: // If selection is 'Share'
                 setTitle(mNavigationOptions[7].name);
+                break;
+
+            case 8: // If selection is 'Settings'
+                setTitle(mNavigationOptions[8].name);
+                break;
+
+            case 9: // If selection is 'Help'
+                setTitle(mNavigationOptions[9].name);
                 break;
 
             default:
@@ -187,7 +251,7 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
         return super.onOptionsItemSelected(item);
     }
 
-    public void createFragment(ArrayList<Parcelable> listFromResponse){
+    public void createListFragment(ArrayList<Parcelable> listFromResponse, Class dataType){
 
         ListFragment fragment = new ListFragment();
         Bundle args = new Bundle();
@@ -195,9 +259,7 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
         args.putParcelableArrayList(ListFragment.ARG_LIST, listFromResponse);
         args.putInt(ListFragment.ARG_COLUMN_COUNT, 1);
 
-        if (listFromResponse.size() > 0) {
-            args.putString(ListFragment.ARG_DATA_TYPE, listFromResponse.get(0).getClass().getSimpleName());
-        }
+        args.putString(ListFragment.ARG_DATA_TYPE, dataType.getSimpleName());
 
         fragment.setArguments(args);
 
@@ -211,5 +273,57 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
         } else {
             mProgressBar.setVisibility(View.VISIBLE);
         }
+    }
+
+    public long getIdFromFile(){
+
+        long idFromFile = 0;
+
+        try {
+            InputStream inputStream = getApplicationContext().openFileInput("visitor_id");
+
+            if (inputStream != null) {
+
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+                idFromFile = Long.parseLong(bufferedReader.readLine());
+
+                inputStream.close();
+            }
+        }
+        catch (FileNotFoundException fileNotFoundException) {
+            fileNotFoundException.printStackTrace();
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
+
+        return idFromFile;
+    }
+
+    public void setId(long visitorId){
+
+        String filename = "visitor_id";
+        String string = String.valueOf(visitorId);
+        FileOutputStream outputStream;
+
+        try {
+            outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
+            outputStream.write(string.getBytes());
+            outputStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        mVisitor = new Visitor(visitorId, mVisitStart, mVisitEnd, new Species[0]);
+
+        GetVisitorItinerary getVisitorItineraryTask = new GetVisitorItinerary(this, visitorId);
+        getVisitorItineraryTask.execute();
+    }
+
+    public void getNewId(){
+
+        GetVisitorId getVisitorIdTask = new GetVisitorId(this, mVisitStart, mVisitEnd);
+        getVisitorIdTask.execute();
     }
 }

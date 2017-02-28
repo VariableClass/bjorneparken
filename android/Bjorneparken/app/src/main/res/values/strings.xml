@@ -4,18 +4,14 @@
     <!-- Navigation Drawer -->
     <string name="drawer_open">Navigation drawer open</string>
     <string name="drawer_close">Navigation drawer closed</string>
+    <string name="home">Home</string>
     <string name="my_visit">My Visit</string>
     <string name="animals">Animals</string>
     <string name="attractions">Attractions</string>
     <string name="amenities">Amenities</string>
-    <string name="park_map">Park Map</string>
+    <string name="park_map">Map</string>
     <string name="restaurant_menu">Restaurant Menu</string>
+    <string name="share">Share</string>
     <string name="settings">Settings</string>
-    <string name="contact">Contact</string>
-
-    <!-- Home Activity -->
-    <string name="button_species">Get Species</string>
-    <string name="button_amenities">Get Amenities</string>
-    <string name="button_events">Get Events</string>
-    <string name="button_feedings">Get Feedings</string>
+    <string name="help">Help</string>
 </resources>

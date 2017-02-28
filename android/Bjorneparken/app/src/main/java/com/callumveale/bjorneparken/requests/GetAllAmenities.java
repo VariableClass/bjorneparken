@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 import android.os.Parcelable;
 
 import com.callumveale.bjorneparken.activities.HomeActivity;
+import com.callumveale.bjorneparken.models.Amenity;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.json.jackson2.JacksonFactory;
 
@@ -12,7 +13,6 @@ import java.util.ArrayList;
 
 import none.bjorneparkappen_api.BjorneparkappenApi;
 import none.bjorneparkappen_api.model.MainAreaListResponse;
-import none.bjorneparkappen_api.model.MainSpeciesListResponse;
 
 /**
  * Created by callum on 27/02/2017.
@@ -62,6 +62,6 @@ public class GetAllAmenities extends AsyncTask<Void, Void, MainAreaListResponse>
         activity.updateProgress(true);
 
         ArrayList<Parcelable> list = RequestsModule.convertListResponseToList(response);
-        activity.createFragment(list);
+        activity.createListFragment(list, Amenity.class);
     }
 }
