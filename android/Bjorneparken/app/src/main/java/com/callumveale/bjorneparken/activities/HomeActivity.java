@@ -22,6 +22,7 @@ import com.callumveale.bjorneparken.models.NavigationDrawerItem;
 import com.callumveale.bjorneparken.models.Species;
 import com.callumveale.bjorneparken.models.Visitor;
 import com.callumveale.bjorneparken.requests.GetAllAmenities;
+import com.callumveale.bjorneparken.requests.GetAllAttractions;
 import com.callumveale.bjorneparken.requests.GetAllSpecies;
 import com.callumveale.bjorneparken.R;
 import com.callumveale.bjorneparken.requests.GetVisitorId;
@@ -178,6 +179,8 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
 
             case 3: // If selection is 'Attractions'
                 setTitle(mNavigationOptions[3].name);
+                GetAllAttractions getAllAttractionsTask = new GetAllAttractions(this);
+                getAllAttractionsTask.execute();
                 break;
 
             case 4: // If selection is 'Amenities'

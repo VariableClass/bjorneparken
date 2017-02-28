@@ -45,7 +45,7 @@ public class GetVisitorItinerary extends AsyncTask<Void, Void, MainEventListResp
 
         try {
 
-            itineraryResponse = builder.build().visitors().itinerary(visitorId, RequestsModule.LANGUAGE).setKey(RequestsModule.API_KEY).execute();
+            itineraryResponse = builder.build().visitors().itinerary().get(visitorId, RequestsModule.LANGUAGE).setKey(RequestsModule.API_KEY).execute();
 
         } catch (IOException e) {
 
