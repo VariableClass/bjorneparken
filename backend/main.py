@@ -139,6 +139,7 @@ class EventRequest(messages.Message):
 class UpdateEventRequest(messages.Message):
     label = messages.MessageField(InternationalMessage, 1, repeated=True)
     description = messages.MessageField(InternationalMessage, 2, repeated=True)
+
     start_time = messages.StringField(3)
     end_time = messages.StringField(4)
     is_active = messages.BooleanField(5)
@@ -812,6 +813,7 @@ class AnimalsApi(remote.Service):
         for animal_reference in enclosure:
             if animal_reference.animal_id == request.animal_id and animal_reference.species_id == request.species_id:
                 enclosure.remove(animal_reference)
+                enclosure.put()
 
         # Retrieve all feedings which include the enclosure
         feedings = Feeding.get_all_for_enclosure(enclosure)
