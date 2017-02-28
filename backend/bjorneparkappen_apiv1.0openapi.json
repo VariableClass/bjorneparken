@@ -579,6 +579,38 @@
         ]
       }
     },
+    "/bjorneparkappen_api/v1.0/areas/amenities": {
+      "get": {
+        "operationId": "AreasApi_listAmenitiesOfType",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "amenity_type",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "language_code",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response",
+            "schema": {
+              "$ref": "#/definitions/MainAreaListResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
     "/bjorneparkappen_api/v1.0/areas/amenities/all": {
       "get": {
         "operationId": "AreasApi_listAmenities",
@@ -687,6 +719,22 @@
         ]
       }
     },
+    "/bjorneparkappen_api/v1.0/areas/enclosures/animals/add": {
+      "post": {
+        "operationId": "AreasApi_addAnimalToEnclosure",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "A successful response"
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
     "/bjorneparkappen_api/v1.0/areas/enclosures/create": {
       "post": {
         "operationId": "AreasApi_createEnclosure",
@@ -706,22 +754,6 @@
     "/bjorneparkappen_api/v1.0/areas/enclosures/update": {
       "post": {
         "operationId": "AreasApi_updateEnclosure",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "A successful response"
-          }
-        },
-        "security": [
-          {
-            "api_key": []
-          }
-        ]
-      }
-    },
-    "/bjorneparkappen_api/v1.0/areas/enclosures/update/animals/add": {
-      "post": {
-        "operationId": "AreasApi_addAnimalToEnclosure",
         "parameters": [],
         "responses": {
           "200": {
@@ -1209,6 +1241,38 @@
         ]
       }
     },
+    "/bjorneparkappen_api/v1.0/visitors/itinerary/add": {
+      "post": {
+        "operationId": "VisitorsApi_addEventToItinerary",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "A successful response"
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/bjorneparkappen_api/v1.0/visitors/itinerary/remove": {
+      "post": {
+        "operationId": "VisitorsApi_removeEventFromItinerary",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "A successful response"
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
     "/bjorneparkappen_api/v1.0/visitors/starred_species": {
       "get": {
         "operationId": "VisitorsApi_getStarredSpecies",
@@ -1242,55 +1306,7 @@
         ]
       }
     },
-    "/bjorneparkappen_api/v1.0/visitors/update": {
-      "post": {
-        "operationId": "VisitorsApi_updateVisitor",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "A successful response"
-          }
-        },
-        "security": [
-          {
-            "api_key": []
-          }
-        ]
-      }
-    },
-    "/bjorneparkappen_api/v1.0/visitors/update/itinerary/add": {
-      "post": {
-        "operationId": "VisitorsApi_addEventToItinerary",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "A successful response"
-          }
-        },
-        "security": [
-          {
-            "api_key": []
-          }
-        ]
-      }
-    },
-    "/bjorneparkappen_api/v1.0/visitors/update/itinerary/remove": {
-      "post": {
-        "operationId": "VisitorsApi_removeEventFromItinerary",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "A successful response"
-          }
-        },
-        "security": [
-          {
-            "api_key": []
-          }
-        ]
-      }
-    },
-    "/bjorneparkappen_api/v1.0/visitors/update/starred_species/add": {
+    "/bjorneparkappen_api/v1.0/visitors/starred_species/add": {
       "post": {
         "operationId": "VisitorsApi_addStarredSpecies",
         "parameters": [],
@@ -1306,9 +1322,25 @@
         ]
       }
     },
-    "/bjorneparkappen_api/v1.0/visitors/update/starred_species/remove": {
+    "/bjorneparkappen_api/v1.0/visitors/starred_species/remove": {
       "post": {
         "operationId": "VisitorsApi_removeStarredSpecies",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "A successful response"
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/bjorneparkappen_api/v1.0/visitors/update": {
+      "post": {
+        "operationId": "VisitorsApi_updateVisitor",
         "parameters": [],
         "responses": {
           "200": {
