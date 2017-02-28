@@ -2,6 +2,7 @@ package com.callumveale.bjorneparken.requests;
 
 import android.os.AsyncTask;
 import android.os.Parcelable;
+import android.support.v4.app.Fragment;
 
 import com.callumveale.bjorneparken.activities.HomeActivity;
 import com.callumveale.bjorneparken.models.Amenity;
@@ -22,10 +23,12 @@ import none.bjorneparkappen_api.model.MainAreaListResponse;
 public class GetAllAttractions extends AsyncTask<Void, Void, MainAreaListResponse> {
 
     private HomeActivity activity;
+    private Fragment fragment;
 
-    public GetAllAttractions(HomeActivity activity) {
+    public GetAllAttractions(HomeActivity activity, Fragment fragment) {
 
         this.activity = activity;
+        this.fragment = fragment;
     }
 
     @Override
@@ -62,6 +65,6 @@ public class GetAllAttractions extends AsyncTask<Void, Void, MainAreaListRespons
         activity.updateProgress(true);
 
         ArrayList<Parcelable> list = RequestsModule.convertListResponseToList(response);
-        activity.createListFragment(list, Amenity.class);
+        activity.createFragment(list, Amenity.class, fragment);
     }
 }

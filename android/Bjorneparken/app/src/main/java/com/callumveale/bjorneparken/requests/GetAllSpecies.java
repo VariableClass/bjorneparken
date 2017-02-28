@@ -2,6 +2,7 @@ package com.callumveale.bjorneparken.requests;
 
 import android.os.AsyncTask;
 import android.os.Parcelable;
+import android.support.v4.app.Fragment;
 
 import com.callumveale.bjorneparken.activities.HomeActivity;
 import com.callumveale.bjorneparken.models.Species;
@@ -22,10 +23,12 @@ import none.bjorneparkappen_api.model.MainSpeciesListResponse;
 public class GetAllSpecies extends AsyncTask<Void, Void, MainSpeciesListResponse> {
 
     private HomeActivity activity;
+    private Fragment fragment;
 
-    public GetAllSpecies(HomeActivity activity) {
+    public GetAllSpecies(HomeActivity activity, Fragment fragment) {
 
         this.activity = activity;
+        this.fragment = fragment;
     }
 
     @Override
@@ -62,6 +65,6 @@ public class GetAllSpecies extends AsyncTask<Void, Void, MainSpeciesListResponse
         activity.updateProgress(true);
 
         ArrayList<Parcelable> list = RequestsModule.convertListResponseToList(response);
-        activity.createListFragment(list, Species.class);
+        activity.createFragment(list, Species.class, fragment);
     }
 }

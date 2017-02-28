@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.Configuration;
 
 import android.os.Parcelable;
+import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -17,7 +18,9 @@ import android.view.View;
 import android.widget.ProgressBar;
 
 import com.callumveale.bjorneparken.adapters.NavigationDrawerAdapter;
+import com.callumveale.bjorneparken.fragments.HomeFragment;
 import com.callumveale.bjorneparken.fragments.ListFragment;
+import com.callumveale.bjorneparken.models.Event;
 import com.callumveale.bjorneparken.models.NavigationDrawerItem;
 import com.callumveale.bjorneparken.models.Species;
 import com.callumveale.bjorneparken.models.Visitor;
@@ -40,7 +43,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
-public class HomeActivity extends AppCompatActivity implements ListFragment.OnListFragmentInteractionListener, NavigationDrawerAdapter.INavigationDrawerListener {
+public class HomeActivity extends AppCompatActivity implements HomeFragment.OnFragmentInteractionListener, ListFragment.OnListFragmentInteractionListener, NavigationDrawerAdapter.INavigationDrawerListener {
 
     // Toolbar
     private Toolbar mToolbar;
@@ -63,6 +66,7 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(R.style.Bjorneparken);
         super.onCreate(savedInstanceState);
 
         // Build and display UI components
@@ -80,7 +84,7 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
             mVisitor = new Visitor(visitorId, mVisitStart, mVisitEnd, new Species[0]);
 
             // Retrieve visitor itinerary from server
-            GetVisitorItinerary getVisitorItineraryTask = new GetVisitorItinerary(this, visitorId);
+            GetVisitorItinerary getVisitorItineraryTask = new GetVisitorItinerary(this, visitorId, new HomeFragment());
             getVisitorItineraryTask.execute();
 
         } else {
@@ -156,36 +160,36 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
 
     public void selectNavigationItem(int position){
 
-        GetVisitorItinerary getVisitorItineraryTask = new GetVisitorItinerary(this, mVisitor.getId());
-
         // Open the appropriate page
         switch (position){
 
             case 0: // If selection is 'Home'
                 setTitle(R.string.app_name);
-                getVisitorItineraryTask.execute();
+                GetVisitorItinerary getVisitorItineraryHomeTask = new GetVisitorItinerary(this, mVisitor.getId(), new HomeFragment());
+                getVisitorItineraryHomeTask.execute();
                 break;
 
             case 1: // If selection is 'My Visit'
                 setTitle(mNavigationOptions[1].name);
-                getVisitorItineraryTask.execute();
+                GetVisitorItinerary getVisitorItineraryListTask = new GetVisitorItinerary(this, mVisitor.getId(), new ListFragment());
+                getVisitorItineraryListTask.execute();
                 break;
 
             case 2: // If selection is 'Animals'
                 setTitle(mNavigationOptions[2].name);
-                GetAllSpecies getAllSpeciesTask = new GetAllSpecies(this);
+                GetAllSpecies getAllSpeciesTask = new GetAllSpecies(this, new ListFragment());
                 getAllSpeciesTask.execute();
                 break;
 
             case 3: // If selection is 'Attractions'
                 setTitle(mNavigationOptions[3].name);
-                GetAllAttractions getAllAttractionsTask = new GetAllAttractions(this);
+                GetAllAttractions getAllAttractionsTask = new GetAllAttractions(this, new ListFragment());
                 getAllAttractionsTask.execute();
                 break;
 
             case 4: // If selection is 'Amenities'
                 setTitle(mNavigationOptions[4].name);
-                GetAllAmenities getAllAmenitiesTask = new GetAllAmenities(this);
+                GetAllAmenities getAllAmenitiesTask = new GetAllAmenities(this, new ListFragment());
                 getAllAmenitiesTask.execute();
                 break;
 
@@ -254,14 +258,33 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
         return super.onOptionsItemSelected(item);
     }
 
-    public void createListFragment(ArrayList<Parcelable> listFromResponse, Class dataType){
+    public void createFragment(ArrayList<Parcelable> listFromResponse, Class dataType, Fragment fragment){
 
-        ListFragment fragment = new ListFragment();
+        Bundle args = new Bundle();
+
+        if (fragment.getClass() == ListFragment.class) {
+
+            args.putParcelableArrayList(ListFragment.ARG_LIST, listFromResponse);
+            args.putInt(ListFragment.ARG_COLUMN_COUNT, 1);
+            args.putString(ListFragment.ARG_DATA_TYPE, dataType.getSimpleName());
+
+        } else if (fragment.getClass() == HomeFragment.class){
+
+            args.putParcelableArrayList(HomeFragment.ARG_LIST, listFromResponse);
+
+        }
+
+        fragment.setArguments(args);
+
+        getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).addToBackStack(null).commit();
+    }
+
+    public void createHomeFragment(ArrayList<Parcelable> listFromResponse, Class dataType){
+
+        HomeFragment fragment = new HomeFragment();
         Bundle args = new Bundle();
 
         args.putParcelableArrayList(ListFragment.ARG_LIST, listFromResponse);
-        args.putInt(ListFragment.ARG_COLUMN_COUNT, 1);
-
         args.putString(ListFragment.ARG_DATA_TYPE, dataType.getSimpleName());
 
         fragment.setArguments(args);
@@ -320,7 +343,7 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
 
         mVisitor = new Visitor(visitorId, mVisitStart, mVisitEnd, new Species[0]);
 
-        GetVisitorItinerary getVisitorItineraryTask = new GetVisitorItinerary(this, visitorId);
+        GetVisitorItinerary getVisitorItineraryTask = new GetVisitorItinerary(this, visitorId, new HomeFragment());
         getVisitorItineraryTask.execute();
     }
 
@@ -328,5 +351,10 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
 
         GetVisitorId getVisitorIdTask = new GetVisitorId(this, mVisitStart, mVisitEnd);
         getVisitorIdTask.execute();
+    }
+
+    @Override
+    public void onFragmentInteraction(Event event) {
+
     }
 }

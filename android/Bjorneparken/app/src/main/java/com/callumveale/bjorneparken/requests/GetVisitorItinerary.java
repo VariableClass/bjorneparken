@@ -3,6 +3,8 @@ package com.callumveale.bjorneparken.requests;
 import android.app.DownloadManager;
 import android.os.AsyncTask;
 import android.os.Parcelable;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.ListFragment;
 
 import com.callumveale.bjorneparken.activities.HomeActivity;
 import com.callumveale.bjorneparken.models.Event;
@@ -26,11 +28,13 @@ public class GetVisitorItinerary extends AsyncTask<Void, Void, MainEventListResp
 
     private HomeActivity activity;
     private long visitorId;
+    private Fragment fragment;
 
-    public GetVisitorItinerary(HomeActivity activity, long visitorId) {
+    public GetVisitorItinerary(HomeActivity activity, long visitorId, Fragment fragment) {
 
         this.activity = activity;
         this.visitorId = visitorId;
+        this.fragment = fragment;
     }
 
     @Override
@@ -70,7 +74,7 @@ public class GetVisitorItinerary extends AsyncTask<Void, Void, MainEventListResp
         if (response != null) {
 
             ArrayList<Parcelable> list = RequestsModule.convertListResponseToList(response);
-            activity.createListFragment(list, Event.class);
+            activity.createFragment(list, Event.class, fragment);
 
         } else {
 
