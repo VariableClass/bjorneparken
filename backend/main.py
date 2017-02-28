@@ -202,6 +202,9 @@ LANGUAGE_CODE_REQUEST = endpoints.ResourceContainer(
 ID_LANGUAGE_REQUEST = endpoints.ResourceContainer(
     language_code=messages.StringField(1, required=True),
     id=messages.IntegerField(2, required=True))
+AMENITY_LANGUAGE_REQUEST = endpoints.ResourceContainer(
+    language_code = messages.StringField(1, required=True),
+    amenity_type = messages.StringField(2, required=True))
 # [END list request resources]
 
 # [START get/delete request resources]
@@ -929,6 +932,48 @@ class AreasApi(remote.Service):
 
             # If area is an Amenity
             if type(area) is Amenity:
+
+                # Retrieve an amenity response
+                area_response = ApiHelper.get_amenity_response(area, request.language_code)
+
+                # Add area to return list
+                response.amenities.append(area_response)
+
+        return response
+
+    @endpoints.method(
+        AMENITY_LANGUAGE_REQUEST,
+        AreaListResponse,
+        path='amenities',
+        http_method='GET',
+        name='areas.amenities.type')
+    def list_amenities_of_type(self, request):
+
+        # Validate language code
+        ApiHelper.check_language(language_code=request.language_code)
+
+        # Validate AmenityType is existing AmenityType
+        if not Amenity.AmenityType.validate(request.amenity_type):
+
+            # Generate a string representation of the Amenity.AmenityType enum
+            amenity_types = [amenity_type.name for amenity_type in Amenity.AmenityType]
+            amenity_types.sort()
+            string_amenity_types = ', '.join(amenity_types)
+
+            # Raise BadRequestException
+            raise endpoints.BadRequestException("No AmenityType found by the name '" + request.amenity_type +
+                                                "'. Amenities may be any of the following: " + string_amenity_types)
+
+        # Retrieve all areas
+        areas = Area.get_all()
+
+        response = AreaListResponse()
+
+        # Build up response of all enclosures
+        for area in areas:
+
+            # If area is an Amenity of specified type
+            if type(area) is Amenity and area.amenity_type == request.amenity_type:
 
                 # Retrieve an amenity response
                 area_response = ApiHelper.get_amenity_response(area, request.language_code)
