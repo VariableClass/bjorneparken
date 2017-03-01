@@ -5,6 +5,7 @@ import android.content.res.Configuration;
 
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -56,6 +57,7 @@ public class HomeActivity extends AppCompatActivity implements HomeFragment.OnIt
     // Navigation Drawer and options
     private RecyclerView mDrawerList;
     private NavigationDrawerItem[] mNavigationOptions;
+    private int currentNavigationDrawerIndex = 0;
 
     // Progress Wheel
     private ProgressBar mProgressBar;
@@ -156,6 +158,14 @@ public class HomeActivity extends AppCompatActivity implements HomeFragment.OnIt
 
     public void selectNavigationItem(int position){
 
+        // If we are currently on that page
+        if (position == currentNavigationDrawerIndex){
+
+            // Close the drawer
+            mDrawerLayout.closeDrawer(mDrawerList);
+            return;
+        }
+
         // Open the appropriate page
         switch (position){
 
@@ -213,6 +223,9 @@ public class HomeActivity extends AppCompatActivity implements HomeFragment.OnIt
                 break;
         }
 
+        // Set new drawer index
+        currentNavigationDrawerIndex = position;
+
         // Close the drawer
         mDrawerLayout.closeDrawer(mDrawerList);
     }
@@ -267,7 +280,6 @@ public class HomeActivity extends AppCompatActivity implements HomeFragment.OnIt
         } else if (fragment.getClass() == HomeFragment.class) {
 
             args.putParcelableArrayList(HomeFragment.ARG_LIST, listFromResponse);
-
         }
 
         fragment.setArguments(args);
@@ -362,5 +374,30 @@ public class HomeActivity extends AppCompatActivity implements HomeFragment.OnIt
     @Override
     public void onItemStarred(Parcelable parcelable) {
 
+    }
+
+    @Override
+    public void onBackPressed(){
+
+        if (mDrawerLayout.isDrawerOpen(GravityCompat.START)){
+
+            // Close the drawer
+            mDrawerLayout.closeDrawer(mDrawerList);
+            
+        } else {
+
+            Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.content_frame);
+
+            if ((currentFragment.getClass() != DetailFragment.class)) {
+
+                setTitle(R.string.app_name);
+                GetVisitorItinerary getVisitorItineraryHomeTask = new GetVisitorItinerary(this, mVisitor.getId(), new HomeFragment());
+                getVisitorItineraryHomeTask.execute();
+
+            } else {
+
+                super.onBackPressed();
+            }
+        }
     }
 }
