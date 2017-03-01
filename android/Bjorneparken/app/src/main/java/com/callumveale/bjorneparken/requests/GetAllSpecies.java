@@ -5,6 +5,7 @@ import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 
 import com.callumveale.bjorneparken.activities.HomeActivity;
+import com.callumveale.bjorneparken.fragments.ListFragment;
 import com.callumveale.bjorneparken.models.Species;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.json.jackson2.JacksonFactory;
@@ -23,12 +24,16 @@ import none.bjorneparkappen_api.model.MainSpeciesListResponse;
 public class GetAllSpecies extends AsyncTask<Void, Void, MainSpeciesListResponse> {
 
     private HomeActivity activity;
-    private Fragment fragment;
 
-    public GetAllSpecies(HomeActivity activity, Fragment fragment) {
+    public GetAllSpecies(HomeActivity activity) {
 
         this.activity = activity;
-        this.fragment = fragment;
+    }
+
+    @Override
+    protected void onPreExecute() {
+
+        activity.updateProgress(false);
     }
 
     @Override
@@ -54,17 +59,9 @@ public class GetAllSpecies extends AsyncTask<Void, Void, MainSpeciesListResponse
     }
 
     @Override
-    protected void onPreExecute() {
-
-        activity.updateProgress(false);
-    }
-
-    @Override
     protected void onPostExecute(MainSpeciesListResponse response) {
 
+        activity.saveSpecies(response);
         activity.updateProgress(true);
-
-        ArrayList<Parcelable> list = RequestsModule.convertListResponseToList(response);
-        activity.createFragment(list, Species.class, fragment);
     }
 }

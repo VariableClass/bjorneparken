@@ -23,12 +23,16 @@ import none.bjorneparkappen_api.model.MainAreaListResponse;
 public class GetAllAttractions extends AsyncTask<Void, Void, MainAreaListResponse> {
 
     private HomeActivity activity;
-    private Fragment fragment;
 
-    public GetAllAttractions(HomeActivity activity, Fragment fragment) {
+    public GetAllAttractions(HomeActivity activity) {
 
         this.activity = activity;
-        this.fragment = fragment;
+    }
+
+    @Override
+    protected void onPreExecute() {
+
+        activity.updateProgress(false);
     }
 
     @Override
@@ -39,32 +43,24 @@ public class GetAllAttractions extends AsyncTask<Void, Void, MainAreaListRespons
 
         builder.setRootUrl(RequestsModule.ROOT_URL);
 
-        MainAreaListResponse areaListResponse = new MainAreaListResponse();
+        MainAreaListResponse attractionsResponse = new MainAreaListResponse();
 
         try {
 
-            areaListResponse = builder.build().areas().amenities().type("ATTRACTION", RequestsModule.LANGUAGE).setKey(RequestsModule.API_KEY).execute();
+            attractionsResponse = builder.build().areas().amenities().type("ATTRACTION", RequestsModule.LANGUAGE).setKey(RequestsModule.API_KEY).execute();
 
         } catch (IOException e) {
             e.printStackTrace();
         }
 
 
-        return areaListResponse;
+        return attractionsResponse;
     }
 
     @Override
-    protected void onPreExecute() {
+    protected void onPostExecute(MainAreaListResponse attractionsResponse) {
 
-        activity.updateProgress(false);
-    }
-
-    @Override
-    protected void onPostExecute(MainAreaListResponse response) {
-
+        activity.saveAttractions(attractionsResponse);
         activity.updateProgress(true);
-
-        ArrayList<Parcelable> list = RequestsModule.convertListResponseToList(response);
-        activity.createFragment(list, Amenity.class, fragment);
     }
 }

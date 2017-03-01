@@ -10,6 +10,7 @@ import com.google.api.client.util.DateTime;
 import java.io.IOException;
 
 import none.bjorneparkappen_api.BjorneparkappenApi;
+import none.bjorneparkappen_api.model.MainVersionResponse;
 import none.bjorneparkappen_api.model.MainVisitorRequest;
 import none.bjorneparkappen_api.model.MainVisitorResponse;
 
@@ -18,40 +19,35 @@ import none.bjorneparkappen_api.model.MainVisitorResponse;
  */
 
 
-public class GetVisitorId extends AsyncTask<Void, Void, MainVisitorResponse> {
+public class GetVersion extends AsyncTask<Void, Void, MainVersionResponse> {
 
     private HomeActivity activity;
-    private DateTime visitStart;
-    private DateTime visitEnd;
 
-    public GetVisitorId(HomeActivity activity, DateTime visitStart, DateTime visitEnd) {
+    public GetVersion(HomeActivity activity) {
 
         this.activity = activity;
-        this.visitStart = visitStart;
-        this.visitEnd = visitEnd;
     }
 
     @Override
-    protected MainVisitorResponse doInBackground(Void... params) {
+    protected MainVersionResponse doInBackground(Void... params) {
 
         BjorneparkappenApi.Builder builder = new BjorneparkappenApi.Builder(
                 AndroidHttp.newCompatibleTransport(), new JacksonFactory(), null);
 
         builder.setRootUrl(RequestsModule.ROOT_URL);
 
-        MainVisitorRequest visitorRequest = new MainVisitorRequest().setVisitStart(visitStart).setVisitEnd(visitEnd);
-        MainVisitorResponse visitorIdResponse = new MainVisitorResponse();
+        MainVersionResponse versionResponse = new MainVersionResponse();
 
         try {
 
-            visitorIdResponse = builder.build().visitors().create(visitorRequest).setKey(RequestsModule.API_KEY).execute();
+            versionResponse = builder.build().version().get().setKey(RequestsModule.API_KEY).execute();
 
         } catch (IOException e) {
             e.printStackTrace();
         }
 
 
-        return visitorIdResponse;
+        return versionResponse;
     }
 
     @Override
@@ -61,9 +57,8 @@ public class GetVisitorId extends AsyncTask<Void, Void, MainVisitorResponse> {
     }
 
     @Override
-    protected void onPostExecute(MainVisitorResponse response) {
+    protected void onPostExecute(MainVersionResponse response) {
 
-        activity.setId(response.getId());
-        activity.updateProgress(true);
+        activity.checkVersion(response.getVersion());
     }
 }

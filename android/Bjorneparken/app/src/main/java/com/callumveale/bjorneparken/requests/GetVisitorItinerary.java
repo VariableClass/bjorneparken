@@ -28,13 +28,17 @@ public class GetVisitorItinerary extends AsyncTask<Void, Void, MainEventListResp
 
     private HomeActivity activity;
     private long visitorId;
-    private Fragment fragment;
 
-    public GetVisitorItinerary(HomeActivity activity, long visitorId, Fragment fragment) {
+    public GetVisitorItinerary(HomeActivity activity, long visitorId) {
 
         this.activity = activity;
         this.visitorId = visitorId;
-        this.fragment = fragment;
+    }
+
+    @Override
+    protected void onPreExecute() {
+
+        activity.updateProgress(false);
     }
 
     @Override
@@ -61,24 +65,17 @@ public class GetVisitorItinerary extends AsyncTask<Void, Void, MainEventListResp
     }
 
     @Override
-    protected void onPreExecute() {
+    protected void onPostExecute(MainEventListResponse itineraryResponse) {
 
-        activity.updateProgress(false);
-    }
+        if (itineraryResponse != null) {
 
-    @Override
-    protected void onPostExecute(MainEventListResponse response) {
-
-        activity.updateProgress(true);
-
-        if (response != null) {
-
-            ArrayList<Parcelable> list = RequestsModule.convertListResponseToList(response);
-            activity.createFragment(list, Event.class, fragment);
+            activity.saveItinerary(itineraryResponse);
 
         } else {
 
             activity.getNewId();
         }
+
+        activity.updateProgress(true);
     }
 }

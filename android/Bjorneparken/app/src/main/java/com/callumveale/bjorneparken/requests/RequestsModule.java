@@ -35,7 +35,7 @@ public class RequestsModule {
 
     public static String LANGUAGE;
 
-    static ArrayList<Parcelable> convertListResponseToList(Object response){
+    public static ArrayList<Parcelable> convertListResponseToList(Object response){
 
         if (response == null){
 

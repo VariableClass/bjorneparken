@@ -1,6 +1,5 @@
 package com.callumveale.bjorneparken.activities;
 
-import android.content.Context;
 import android.content.res.Configuration;
 
 import android.os.Parcelable;
@@ -19,9 +18,11 @@ import android.view.View;
 import android.widget.ProgressBar;
 
 import com.callumveale.bjorneparken.adapters.NavigationDrawerAdapter;
+import com.callumveale.bjorneparken.file.FileWriter;
 import com.callumveale.bjorneparken.fragments.DetailFragment;
 import com.callumveale.bjorneparken.fragments.HomeFragment;
 import com.callumveale.bjorneparken.fragments.ListFragment;
+import com.callumveale.bjorneparken.models.Amenity;
 import com.callumveale.bjorneparken.models.Event;
 import com.callumveale.bjorneparken.models.NavigationDrawerItem;
 import com.callumveale.bjorneparken.models.Species;
@@ -30,20 +31,19 @@ import com.callumveale.bjorneparken.requests.GetAllAmenities;
 import com.callumveale.bjorneparken.requests.GetAllAttractions;
 import com.callumveale.bjorneparken.requests.GetAllSpecies;
 import com.callumveale.bjorneparken.R;
+import com.callumveale.bjorneparken.requests.GetVersion;
 import com.callumveale.bjorneparken.requests.GetVisitorId;
 import com.callumveale.bjorneparken.requests.GetVisitorItinerary;
 import com.callumveale.bjorneparken.requests.RequestsModule;
 import com.google.api.client.util.DateTime;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+
+import none.bjorneparkappen_api.model.MainAreaListResponse;
+import none.bjorneparkappen_api.model.MainEventListResponse;
+import none.bjorneparkappen_api.model.MainSpeciesListResponse;
 
 public class HomeActivity extends AppCompatActivity implements HomeFragment.OnItemSelectionListener, ListFragment.OnListItemSelectionListener, DetailFragment.OnItemStarredListener, NavigationDrawerAdapter.INavigationDrawerListener {
 
@@ -62,6 +62,12 @@ public class HomeActivity extends AppCompatActivity implements HomeFragment.OnIt
     // Progress Wheel
     private ProgressBar mProgressBar;
 
+    // File Writer
+    private FileWriter mFileWriter;
+
+    // Version Information
+    private DateTime mVersion;
+
     // Visitor Information
     private Visitor mVisitor;
     private DateTime mVisitStart;
@@ -75,26 +81,33 @@ public class HomeActivity extends AppCompatActivity implements HomeFragment.OnIt
         // Build and display UI components
         buildUI();
 
-        mVisitStart = new DateTime(new Date());
-        mVisitEnd = new DateTime(new Date());
+        mFileWriter = new FileWriter(getApplicationContext());
+
+        // Attempt to retrieve data version from file
+        mVersion = mFileWriter.getVersionFromFile();
+
+        // Get version to compare from server
+        GetVersion getVersionTask = new GetVersion(this);
+        getVersionTask.execute();
 
         // Attempt to retrieve visitor ID from file
-        long visitorId = getIdFromFile();
+        long visitorId = mFileWriter.getIdFromFile();
 
-        // If found
-        if (visitorId != 0){
+        // If not found
+        if (visitorId == 0){
 
-            mVisitor = new Visitor(visitorId, mVisitStart, mVisitEnd, new Species[0]);
-
-            // Retrieve visitor itinerary from server
-            GetVisitorItinerary getVisitorItineraryTask = new GetVisitorItinerary(this, visitorId, new HomeFragment());
-            getVisitorItineraryTask.execute();
-
-        } else {
+            mVisitStart = new DateTime(new Date());
+            mVisitEnd = new DateTime(new Date());
 
             // Obtain a visitor ID from server
             GetVisitorId getVisitorIdTask = new GetVisitorId(this, mVisitStart, mVisitEnd);
             getVisitorIdTask.execute();
+
+        } else {
+
+            // TODO Persist visitor data to file
+            mVisitor = new Visitor(visitorId, mVisitStart, mVisitEnd, new Species[0]);
+            createFragment((RequestsModule.convertListResponseToList(mFileWriter.getItineraryFromFile())), Event.class, new HomeFragment());
         }
     }
 
@@ -171,32 +184,32 @@ public class HomeActivity extends AppCompatActivity implements HomeFragment.OnIt
 
             case 0: // If selection is 'Home'
                 setTitle(R.string.app_name);
-                GetVisitorItinerary getVisitorItineraryHomeTask = new GetVisitorItinerary(this, mVisitor.getId(), new HomeFragment());
-                getVisitorItineraryHomeTask.execute();
+                MainEventListResponse homeItinerary = mFileWriter.getItineraryFromFile();
+                createFragment(RequestsModule.convertListResponseToList(homeItinerary), Event.class, new HomeFragment());
                 break;
 
             case 1: // If selection is 'My Visit'
                 setTitle(mNavigationOptions[1].name);
-                GetVisitorItinerary getVisitorItineraryListTask = new GetVisitorItinerary(this, mVisitor.getId(), new ListFragment());
-                getVisitorItineraryListTask.execute();
+                MainEventListResponse listItinerary = mFileWriter.getItineraryFromFile();
+                createFragment(RequestsModule.convertListResponseToList(listItinerary), Event.class, new ListFragment());
                 break;
 
             case 2: // If selection is 'Animals'
                 setTitle(mNavigationOptions[2].name);
-                GetAllSpecies getAllSpeciesTask = new GetAllSpecies(this, new ListFragment());
-                getAllSpeciesTask.execute();
+                MainSpeciesListResponse species = mFileWriter.getSpeciesFromFile();
+                createFragment(RequestsModule.convertListResponseToList(species), Species.class, new ListFragment());
                 break;
 
             case 3: // If selection is 'Attractions'
                 setTitle(mNavigationOptions[3].name);
-                GetAllAttractions getAllAttractionsTask = new GetAllAttractions(this, new ListFragment());
-                getAllAttractionsTask.execute();
+                MainAreaListResponse attractions = mFileWriter.getAttractionsFromFile();
+                createFragment(RequestsModule.convertListResponseToList(attractions), Amenity.class, new ListFragment());
                 break;
 
             case 4: // If selection is 'Amenities'
                 setTitle(mNavigationOptions[4].name);
-                GetAllAmenities getAllAmenitiesTask = new GetAllAmenities(this, new ListFragment());
-                getAllAmenitiesTask.execute();
+                MainAreaListResponse amenities = mFileWriter.getAmenitiesFromFile();
+                createFragment(RequestsModule.convertListResponseToList(amenities), Amenity.class, new ListFragment());
                 break;
 
             case 5: // If selection is 'Park Map'
@@ -247,9 +260,6 @@ public class HomeActivity extends AppCompatActivity implements HomeFragment.OnIt
     }
 
     @Override
-    /**
-     * Used to change app language if phone language changed
-     */
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         mDrawerToggle.onConfigurationChanged(newConfig);
@@ -296,50 +306,83 @@ public class HomeActivity extends AppCompatActivity implements HomeFragment.OnIt
         }
     }
 
-    public long getIdFromFile(){
-
-        long idFromFile = 0;
-
-        try {
-            InputStream inputStream = getApplicationContext().openFileInput("visitor_id");
-
-            if (inputStream != null) {
-
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-
-                idFromFile = Long.parseLong(bufferedReader.readLine());
-
-                inputStream.close();
-            }
-        }
-        catch (FileNotFoundException fileNotFoundException) {
-            fileNotFoundException.printStackTrace();
-        } catch (IOException ioException) {
-            ioException.printStackTrace();
-        }
-
-        return idFromFile;
-    }
-
     public void setId(long visitorId){
 
-        String filename = "visitor_id";
-        String string = String.valueOf(visitorId);
-        FileOutputStream outputStream;
+        // Store ID
+        mFileWriter.writeIdToFile(visitorId);
 
-        try {
-            outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
-            outputStream.write(string.getBytes());
-            outputStream.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        // Create new user
         mVisitor = new Visitor(visitorId, mVisitStart, mVisitEnd, new Species[0]);
 
-        GetVisitorItinerary getVisitorItineraryTask = new GetVisitorItinerary(this, visitorId, new HomeFragment());
-        getVisitorItineraryTask.execute();
+        // Fetch user data for ID
+        updateUserData();
+    }
+
+    public void checkVersion(DateTime version){
+
+        // If the versions do not match
+        if (mVersion != version){
+
+            // Perform update
+            updateParkData();
+
+            // Fetch user's data again, as some starred items may not currently be available
+            updateUserData();
+
+            // Update version number
+            mVersion = version;
+            mFileWriter.writeVersionToFile(mVersion);
+        }
+    }
+
+    public void updateParkData(){
+
+        // Fetch amenities
+        GetAllAmenities getAllAmenitiesTask = new GetAllAmenities(this);
+        getAllAmenitiesTask.execute();
+
+        // Fetch attractions
+        GetAllAttractions getAllAttractionsTask = new GetAllAttractions(this);
+        getAllAttractionsTask.execute();
+
+        // Fetch species
+        GetAllSpecies getAllSpeciesTask = new GetAllSpecies(this);
+        getAllSpeciesTask.execute();
+    }
+
+    public void saveSpecies(MainSpeciesListResponse response){
+
+        // Write response to file
+        mFileWriter.writeSpeciesToFile(response);
+    }
+
+    public void saveAmenities(MainAreaListResponse amenities){
+
+        // Write response to file
+        mFileWriter.writeAmenitiesToFile(amenities);
+    }
+
+    public void saveAttractions(MainAreaListResponse attractions){
+
+        // Write response to file
+        mFileWriter.writeAttractionsToFile(attractions);
+    }
+
+    public void saveItinerary(MainEventListResponse itinerary){
+
+        // Write response to file
+        mFileWriter.writeItineraryToFile(itinerary);
+    }
+
+    public void updateUserData(){
+
+        // If user initialised yet
+        if (mVisitor != null) {
+
+            // Update and display main page
+            GetVisitorItinerary getVisitorItineraryTask = new GetVisitorItinerary(this, mVisitor.getId());
+            getVisitorItineraryTask.execute();
+        }
     }
 
     public void getNewId(){
@@ -383,16 +426,14 @@ public class HomeActivity extends AppCompatActivity implements HomeFragment.OnIt
 
             // Close the drawer
             mDrawerLayout.closeDrawer(mDrawerList);
-            
+
         } else {
 
             Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.content_frame);
 
             if ((currentFragment.getClass() != DetailFragment.class)) {
 
-                setTitle(R.string.app_name);
-                GetVisitorItinerary getVisitorItineraryHomeTask = new GetVisitorItinerary(this, mVisitor.getId(), new HomeFragment());
-                getVisitorItineraryHomeTask.execute();
+                selectNavigationItem(0);
 
             } else {
 
