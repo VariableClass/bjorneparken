@@ -16,6 +16,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="1dp"
         android:textAppearance="?attr/textAppearanceListItem"
+        android:textColor="@color/primary"
         android:textStyle="bold"/>
 
     <TextView
@@ -23,7 +24,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="1dp"
-        android:textAppearance="?attr/textAppearanceListItem" />
+        android:textAppearance="?attr/textAppearanceListItem"
+        android:textColor="@color/secondary"/>
 
     <TextView
         android:id="@+id/event_times"
@@ -31,6 +33,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="1dp"
         android:textAppearance="?attr/textAppearanceListItem"
+        android:textColor="@color/secondary"
         android:textStyle="italic"/>
 
     <TextView
@@ -38,6 +41,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="1dp"
-        android:textAppearance="?attr/textAppearanceListItem" />
+        android:textAppearance="?attr/textAppearanceListItem"
+        android:textColor="@color/secondary"/>
 
 </LinearLayout>
