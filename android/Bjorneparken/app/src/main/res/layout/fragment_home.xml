@@ -80,7 +80,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="1dp"
                 android:textAppearance="?attr/textAppearanceListItem"
-                android:textColor="@color/secondary"/>
+                android:textColor="@android:color/black"/>
 
         </LinearLayout>
     </LinearLayout>
