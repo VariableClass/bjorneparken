@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.callumveale.bjorneparken.R;
-import com.callumveale.bjorneparken.fragments.ListFragment.OnListFragmentInteractionListener;
+import com.callumveale.bjorneparken.fragments.ListFragment.OnListItemSelectionListener;
 import com.callumveale.bjorneparken.models.Event;
 
 import java.util.List;
@@ -19,9 +19,9 @@ import java.util.List;
 public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecyclerViewAdapter.ViewHolder> {
 
     private final List<Event> mValues;
-    private final OnListFragmentInteractionListener mListener;
+    private final OnListItemSelectionListener mListener;
 
-    public EventRecyclerViewAdapter(List items, OnListFragmentInteractionListener listener) {
+    public EventRecyclerViewAdapter(List items, OnListItemSelectionListener listener) {
         mValues = (List<Event>)items;
         mListener = listener;
     }
@@ -55,7 +55,7 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
                 if (null != mListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    mListener.onListFragmentInteraction(holder.mItem);
+                    mListener.onListItemSelection(holder.mItem);
                 }
             }
         });

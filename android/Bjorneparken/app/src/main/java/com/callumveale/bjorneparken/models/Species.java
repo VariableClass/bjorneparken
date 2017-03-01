@@ -11,7 +11,7 @@ import none.bjorneparkappen_api.model.MainSpeciesResponse;
  * Created by callum on 27/02/2017.
  */
 
-public class Species implements Parcelable{
+public class Species implements IModel, Parcelable{
     private long id;
     private String commonName;
     private String latin;
@@ -28,8 +28,28 @@ public class Species implements Parcelable{
     // Getter and setter methods
     public long getId(){ return id;}
 
+    @Override
+    public String getHeader() {
+        return this.commonName;
+    }
+
+    @Override
+    public String getSubheader() {
+        return this.latin;
+    }
+
     public String getDescription() {
         return description;
+    }
+
+    @Override
+    public String getCaption() {
+        return null;
+    }
+
+    @Override
+    public String getSubcaption() {
+        return null;
     }
 
     public String getCommonName() {

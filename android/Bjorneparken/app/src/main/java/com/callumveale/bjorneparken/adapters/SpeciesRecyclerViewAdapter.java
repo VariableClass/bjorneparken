@@ -7,8 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.callumveale.bjorneparken.R;
-import com.callumveale.bjorneparken.fragments.ListFragment;
-import com.callumveale.bjorneparken.fragments.ListFragment.OnListFragmentInteractionListener;
+import com.callumveale.bjorneparken.fragments.ListFragment.OnListItemSelectionListener;
 import com.callumveale.bjorneparken.models.Species;
 
 import java.util.List;
@@ -20,9 +19,9 @@ import java.util.List;
 public class SpeciesRecyclerViewAdapter extends RecyclerView.Adapter<SpeciesRecyclerViewAdapter.ViewHolder> {
 
     private final List<Species> mValues;
-    private final ListFragment.OnListFragmentInteractionListener mListener;
+    private final OnListItemSelectionListener mListener;
 
-    public SpeciesRecyclerViewAdapter(List items, ListFragment.OnListFragmentInteractionListener listener) {
+    public SpeciesRecyclerViewAdapter(List items, OnListItemSelectionListener listener) {
         mValues = (List<Species>)items;
         mListener = listener;
     }
@@ -52,7 +51,7 @@ public class SpeciesRecyclerViewAdapter extends RecyclerView.Adapter<SpeciesRecy
                 if (null != mListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    mListener.onListFragmentInteraction(holder.mItem);
+                    mListener.onListItemSelection(holder.mItem);
                 }
             }
         });

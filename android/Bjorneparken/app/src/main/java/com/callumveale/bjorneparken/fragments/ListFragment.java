@@ -31,7 +31,7 @@ public class ListFragment extends Fragment {
     private ArrayList<Parcelable> mList = new ArrayList<>();
     private int mColumnCount = 1;
     private String mDataType = "";
-    private OnListFragmentInteractionListener mListener;
+    private OnListItemSelectionListener mListener;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -80,7 +80,7 @@ public class ListFragment extends Fragment {
 
             try {
                 Class className = Class.forName("com.callumveale.bjorneparken.adapters." + mDataType + "RecyclerViewAdapter");
-                viewAdapter = className.getConstructor(List.class, OnListFragmentInteractionListener.class).newInstance(mList, mListener);
+                viewAdapter = className.getConstructor(List.class, OnListItemSelectionListener.class).newInstance(mList, mListener);
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -95,8 +95,8 @@ public class ListFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnListFragmentInteractionListener) {
-            mListener = (OnListFragmentInteractionListener) context;
+        if (context instanceof OnListItemSelectionListener) {
+            mListener = (OnListItemSelectionListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnListFragmentInteractionListener");
@@ -109,9 +109,9 @@ public class ListFragment extends Fragment {
         mListener = null;
     }
 
-    public interface OnListFragmentInteractionListener {
+    public interface OnListItemSelectionListener {
 
-        void onListFragmentInteraction(Parcelable item);
+        void onListItemSelection(Parcelable item);
     }
 
 }

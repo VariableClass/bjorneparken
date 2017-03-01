@@ -7,7 +7,7 @@ import android.os.Parcelable;
  * Created by callum on 27/02/2017.
  */
 
-public class Event implements Parcelable{
+public class Event implements IModel, Parcelable{
 
     private long id;
     private String label;
@@ -39,8 +39,28 @@ public class Event implements Parcelable{
         return label;
     }
 
+    @Override
+    public String getHeader() {
+        return this.label;
+    }
+
+    @Override
+    public String getSubheader() {
+        return this.startTime + " - " + this.endTime;
+    }
+
     public String getDescription() {
         return description;
+    }
+
+    @Override
+    public String getCaption() {
+        return this.location.getLabel();
+    }
+
+    @Override
+    public String getSubcaption() {
+        return null;
     }
 
     public Area getLocation() {

@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.callumveale.bjorneparken.R;
@@ -31,7 +32,7 @@ public class HomeFragment extends Fragment {
 
     private List<Event> mItinerary;
 
-    private OnFragmentInteractionListener mListener;
+    private OnItemSelectionListener mListener;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -86,13 +87,15 @@ public class HomeFragment extends Fragment {
             TextView mDescriptionView = (TextView) view.findViewById(R.id.event_description);
             mDescriptionView.setText(description);
 
-            view.setOnClickListener(new View.OnClickListener() {
+            LinearLayout eventCard = (LinearLayout) view.findViewById(R.id.event_card);
+
+            eventCard.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (null != mListener) {
                         // Notify the active callbacks interface (the activity, if the
                         // fragment is attached to one) that an item has been selected.
-                        mListener.onFragmentInteraction(mItinerary.get(0));
+                        mListener.onItemSelection(mItinerary.get(0));
                     }
                 }
             });
@@ -101,18 +104,11 @@ public class HomeFragment extends Fragment {
         return view;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Event event) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(event);
-        }
-    }
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
+        if (context instanceof OnItemSelectionListener) {
+            mListener = (OnItemSelectionListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -135,8 +131,8 @@ public class HomeFragment extends Fragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Event event);
+    public interface OnItemSelectionListener {
+
+        void onItemSelection(Event event);
     }
 }

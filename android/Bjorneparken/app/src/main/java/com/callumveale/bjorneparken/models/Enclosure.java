@@ -7,7 +7,7 @@ import android.os.Parcelable;
  * Created by callum on 27/02/2017.
  */
 
-public class Enclosure extends Area implements Parcelable {
+public class Enclosure extends Area implements IModel, Parcelable {
     private Animal[] animals;
 
     // Constructor
@@ -61,4 +61,29 @@ public class Enclosure extends Area implements Parcelable {
             return new Enclosure[size];
         }
     };
+
+    @Override
+    public String getHeader() {
+        return this.getLabel();
+    }
+
+    @Override
+    public String getSubheader() {
+        return null;
+    }
+
+    @Override
+    public String getDescription() {
+        return this.getDescription();
+    }
+
+    @Override
+    public String getCaption() {
+        return null;
+    }
+
+    @Override
+    public String getSubcaption() {
+        return null;
+    }
 }

@@ -7,7 +7,7 @@ import android.os.Parcelable;
  * Created by callum on 27/02/2017.
  */
 
-public class Feeding extends Event implements Parcelable{
+public class Feeding extends Event implements IModel, Parcelable{
 
     private Keeper keeper;
 
@@ -65,4 +65,9 @@ public class Feeding extends Event implements Parcelable{
             return new Feeding[size];
         }
     };
+
+    @Override
+    public String getSubcaption(){
+        return this.keeper.getName();
+    }
 }

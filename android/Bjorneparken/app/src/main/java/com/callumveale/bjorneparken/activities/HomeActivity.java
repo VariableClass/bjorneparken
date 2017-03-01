@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 
 import com.callumveale.bjorneparken.adapters.NavigationDrawerAdapter;
+import com.callumveale.bjorneparken.fragments.DetailFragment;
 import com.callumveale.bjorneparken.fragments.HomeFragment;
 import com.callumveale.bjorneparken.fragments.ListFragment;
 import com.callumveale.bjorneparken.models.Event;
@@ -43,7 +44,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
-public class HomeActivity extends AppCompatActivity implements HomeFragment.OnFragmentInteractionListener, ListFragment.OnListFragmentInteractionListener, NavigationDrawerAdapter.INavigationDrawerListener {
+public class HomeActivity extends AppCompatActivity implements HomeFragment.OnItemSelectionListener, ListFragment.OnListItemSelectionListener, DetailFragment.OnItemStarredListener, NavigationDrawerAdapter.INavigationDrawerListener {
 
     // Toolbar
     private Toolbar mToolbar;
@@ -151,11 +152,6 @@ public class HomeActivity extends AppCompatActivity implements HomeFragment.OnFr
 
         // Build progress wheel
         mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
-    }
-
-    @Override
-    public void onListFragmentInteraction(Parcelable item) {
-
     }
 
     public void selectNavigationItem(int position){
@@ -341,7 +337,30 @@ public class HomeActivity extends AppCompatActivity implements HomeFragment.OnFr
     }
 
     @Override
-    public void onFragmentInteraction(Event event) {
+    public void onItemSelection(Event event) {
+
+        createDetailFragment(event);
+    }
+
+    @Override
+    public void onListItemSelection(Parcelable item) {
+
+        createDetailFragment(item);
+    }
+
+    private void createDetailFragment(Parcelable item){
+
+        DetailFragment fragment = new DetailFragment();
+
+        Bundle args = new Bundle();
+        args.putParcelable(DetailFragment.ARG_ITEM, item);
+        fragment.setArguments(args);
+
+        getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).addToBackStack(null).commit();
+    }
+
+    @Override
+    public void onItemStarred(Parcelable parcelable) {
 
     }
 }

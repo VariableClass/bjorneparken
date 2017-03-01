@@ -7,7 +7,7 @@ import android.os.Parcelable;
  * Created by callum on 27/02/2017.
  */
 
-public class Amenity extends Area implements Parcelable{
+public class Amenity extends Area implements IModel, Parcelable{
     private String description;
     private String amenityType;
 
@@ -18,9 +18,29 @@ public class Amenity extends Area implements Parcelable{
         this.amenityType = amenityType;
     }
 
+    @Override
+    public String getHeader() {
+        return this.getLabel();
+    }
+
+    @Override
+    public String getSubheader() {
+        return null;
+    }
+
     // Getter and setter methods
     public String getDescription() {
         return description;
+    }
+
+    @Override
+    public String getCaption() {
+        return null;
+    }
+
+    @Override
+    public String getSubcaption() {
+        return null;
     }
 
     public String getAmenityType() {
