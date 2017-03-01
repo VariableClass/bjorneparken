@@ -258,7 +258,7 @@ public class HomeActivity extends AppCompatActivity implements HomeFragment.OnFr
         return super.onOptionsItemSelected(item);
     }
 
-    public void createFragment(ArrayList<Parcelable> listFromResponse, Class dataType, Fragment fragment){
+    public void createFragment(ArrayList<Parcelable> listFromResponse, Class dataType, Fragment fragment) {
 
         Bundle args = new Bundle();
 
@@ -268,24 +268,11 @@ public class HomeActivity extends AppCompatActivity implements HomeFragment.OnFr
             args.putInt(ListFragment.ARG_COLUMN_COUNT, 1);
             args.putString(ListFragment.ARG_DATA_TYPE, dataType.getSimpleName());
 
-        } else if (fragment.getClass() == HomeFragment.class){
+        } else if (fragment.getClass() == HomeFragment.class) {
 
             args.putParcelableArrayList(HomeFragment.ARG_LIST, listFromResponse);
 
         }
-
-        fragment.setArguments(args);
-
-        getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).addToBackStack(null).commit();
-    }
-
-    public void createHomeFragment(ArrayList<Parcelable> listFromResponse, Class dataType){
-
-        HomeFragment fragment = new HomeFragment();
-        Bundle args = new Bundle();
-
-        args.putParcelableArrayList(ListFragment.ARG_LIST, listFromResponse);
-        args.putString(ListFragment.ARG_DATA_TYPE, dataType.getSimpleName());
 
         fragment.setArguments(args);
 
