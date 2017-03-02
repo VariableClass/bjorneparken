@@ -28,9 +28,11 @@ import com.callumveale.bjorneparken.fragments.HomeFragment;
 import com.callumveale.bjorneparken.fragments.ListFragment;
 import com.callumveale.bjorneparken.models.Amenity;
 import com.callumveale.bjorneparken.models.Event;
+import com.callumveale.bjorneparken.models.Feeding;
 import com.callumveale.bjorneparken.models.NavigationDrawerItem;
 import com.callumveale.bjorneparken.models.Species;
 import com.callumveale.bjorneparken.models.Visitor;
+import com.callumveale.bjorneparken.requests.AddToItinerary;
 import com.callumveale.bjorneparken.requests.GetAllAmenities;
 import com.callumveale.bjorneparken.requests.GetAllAttractions;
 import com.callumveale.bjorneparken.requests.GetAllSpecies;
@@ -39,6 +41,7 @@ import com.callumveale.bjorneparken.requests.GetVersion;
 import com.callumveale.bjorneparken.requests.GetVisitorId;
 import com.callumveale.bjorneparken.requests.GetVisitorItinerary;
 import com.callumveale.bjorneparken.requests.GetVisitorStarredSpecies;
+import com.callumveale.bjorneparken.requests.RemoveFromItinerary;
 import com.callumveale.bjorneparken.requests.RequestsModule;
 import com.callumveale.bjorneparken.requests.StarSpecies;
 import com.callumveale.bjorneparken.requests.UnstarSpecies;
@@ -51,6 +54,8 @@ import java.util.Locale;
 
 import none.bjorneparkappen_api.model.MainAreaListResponse;
 import none.bjorneparkappen_api.model.MainEventListResponse;
+import none.bjorneparkappen_api.model.MainEventResponse;
+import none.bjorneparkappen_api.model.MainFeedingResponse;
 import none.bjorneparkappen_api.model.MainSpeciesListResponse;
 import none.bjorneparkappen_api.model.MainSpeciesResponse;
 
@@ -198,7 +203,7 @@ public class HomeActivity extends AppCompatActivity implements HomeFragment.OnIt
             case 0: // If selection is 'Home'
                 setTitle(R.string.app_name);
                 MainEventListResponse homeItinerary = mFileWriter.getItineraryFromFile();
-                HomeFragment homeFragment = HomeFragment.newInstance(RequestsModule.convertListResponseToList(homeItinerary));
+                HomeFragment homeFragment = HomeFragment.newInstance(mVisitor.getParcelableItinerary());
                 getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, homeFragment).addToBackStack(null).commit();
                 break;
 
@@ -385,7 +390,7 @@ public class HomeActivity extends AppCompatActivity implements HomeFragment.OnIt
         if (getSupportFragmentManager().findFragmentById(R.id.content_frame) == null){
 
 
-            HomeFragment homeFragment = HomeFragment.newInstance(mVisitor.getParcelableItinerary());
+            HomeFragment homeFragment = HomeFragment.newInstance(RequestsModule.convertListResponseToList(itineraryResponse));
             getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, homeFragment).addToBackStack(null).commit();
         }
     }
@@ -426,9 +431,9 @@ public class HomeActivity extends AppCompatActivity implements HomeFragment.OnIt
     }
 
     @Override
-    public void onItemSelection(Event event) {
+    public void onItemSelection(Event event, boolean isStarred) {
 
-        DetailFragment fragment = DetailFragment.newInstance(event);
+        DetailFragment fragment = DetailFragment.newInstance(event, isStarred);
         getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).addToBackStack(null).commit();
     }
 
@@ -487,29 +492,49 @@ public class HomeActivity extends AppCompatActivity implements HomeFragment.OnIt
                 starSpeciesTask.execute();
             }
 
-            // TODO replace with integrated read/write of lists
-            MainSpeciesListResponse starredSpeciesResponse = new MainSpeciesListResponse();
-
-            List<MainSpeciesResponse> speciesToSet = new ArrayList<>();
-
-            for (Species species : mVisitor.getStarredSpecies()){
-
-                MainSpeciesResponse speciesResponse = new MainSpeciesResponse();
-                speciesResponse.setId(species.getId());
-                speciesResponse.setCommonName(species.getCommonName());
-                speciesResponse.setLatin(species.getLatin());
-                speciesResponse.setDescription(species.getDescription());
-
-                speciesToSet.add(speciesResponse);
-            }
-
-            starredSpeciesResponse.setSpecies(speciesToSet);
-            mFileWriter.writeStarredSpeciesToFile(starredSpeciesResponse);
+            // TODO Persist to file
 
         } else if (parcelable.getClass() == Event.class) {
 
-            // AddToItinerary addToItineraryTask = new AddToItinerary(mVisitor.getId(), (Event) parcelable);
-            // addToItineraryTask.execute();
+            // Retrieve visitor's itinerary
+            mVisitor.getItinerary();
+
+            int eventIndex = -1;
+
+            // Attempt to retrieve the index of the passed event
+            for (Event event : mVisitor.getItinerary()) {
+
+                if (event.getId() == ((Event)parcelable).getId()) {
+
+                    if (event.getLocation().getId() == ((Event)parcelable).getLocation().getId()) {
+
+                        eventIndex = mVisitor.getItinerary().indexOf(event);
+                        break;
+                    }
+                }
+            }
+
+            // If index was found
+            if (eventIndex != -1){
+
+                // Remove the event from the local itinerary
+                mVisitor.getItinerary().remove(eventIndex);
+
+                // Remove the event from the datastore itinerary
+                RemoveFromItinerary removeFromItineraryTask = new RemoveFromItinerary(this, mVisitor.getId(), (Event) parcelable);
+                removeFromItineraryTask.execute();
+
+            } else {
+
+                // Add the event to the local itinerary
+                mVisitor.getItinerary().add((Event) parcelable);
+
+                // Add the species to the datastore itinerary
+                AddToItinerary addToItineraryTask = new AddToItinerary(this, mVisitor.getId(), (Event) parcelable);
+                addToItineraryTask.execute();
+            }
+
+            // TODO Persist to file
         }
     }
 

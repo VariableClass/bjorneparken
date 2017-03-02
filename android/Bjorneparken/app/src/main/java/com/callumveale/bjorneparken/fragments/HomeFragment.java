@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.callumveale.bjorneparken.R;
+import com.callumveale.bjorneparken.activities.HomeActivity;
 import com.callumveale.bjorneparken.models.Event;
 
 import org.w3c.dom.Text;
@@ -106,7 +107,7 @@ public class HomeFragment extends Fragment {
                     if (null != mListener) {
                         // Notify the active callbacks interface (the activity, if the
                         // fragment is attached to one) that an item has been selected.
-                        mListener.onItemSelection(mItinerary.get(0));
+                        mListener.onItemSelection(mItinerary.get(0), isStarred());
                     }
                 }
             });
@@ -136,6 +137,24 @@ public class HomeFragment extends Fragment {
         mListener = null;
     }
 
+    private boolean isStarred(){
+
+        boolean isStarred = false;
+
+        for (Event starredEvent : mItinerary){
+
+            // If the event is starred
+            if ((starredEvent.getId() == mItinerary.get(0).getId()) &&
+                    (starredEvent.getLocation().getId() == mItinerary.get(0).getLocation().getId())){
+
+                isStarred = true;
+                break;
+            }
+        }
+
+        return isStarred;
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -148,6 +167,6 @@ public class HomeFragment extends Fragment {
      */
     public interface OnItemSelectionListener {
 
-        void onItemSelection(Event event);
+        void onItemSelection(Event event, boolean isStarred);
     }
 }

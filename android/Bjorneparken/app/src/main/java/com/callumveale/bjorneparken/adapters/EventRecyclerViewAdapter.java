@@ -85,9 +85,17 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
         holder.mStarredButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (null != mItemSelectedListener) {
+                if (null != mItemStarredListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
+                    if (isStarred(position)){
+
+                        holder.mStarredButton.setText(R.string.unstarred);
+
+                    } else {
+
+                        holder.mStarredButton.setText(R.string.starred);
+                    }
                     mItemStarredListener.onItemStarred(holder.mItem);
                 }
             }
