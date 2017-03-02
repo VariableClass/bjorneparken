@@ -15,6 +15,10 @@
     <string name="settings">Settings</string>
     <string name="help">Help</string>
 
+    <!-- Lists -->
+    <string name="starred">Starred</string>
+    <string name="unstarred">Unstarred</string>
+
     <!-- Home Activity -->
     <string name="up_next">Up Next:</string>
 

@@ -130,7 +130,7 @@ public class ListFragment extends Fragment {
 
     public interface OnListItemSelectionListener {
 
-        void onListItemSelection(Parcelable item);
+        void onListItemSelection(Parcelable item, View selectedListItem);
     }
 
 }

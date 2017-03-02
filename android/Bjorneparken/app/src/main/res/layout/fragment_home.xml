@@ -21,13 +21,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/empty_itinerary"
-            android:shadowColor="@color/secondary"
+            android:shadowColor="@color/textTertiary"
             android:textAlignment="center"
-            android:shadowDx="3"
-            android:shadowDy="3"
-            android:shadowRadius="3"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="2"
             android:textSize="20sp"
-            android:textColor="@color/secondaryExtraDark"/>
+            android:textStyle="bold"
+            android:textColor="@android:color/black"/>
 
     </LinearLayout>
 
@@ -78,7 +79,7 @@
             android:layout_marginBottom="65dp"
             android:layout_marginRight="20dp"
             android:orientation="vertical"
-            android:background="@drawable/list_item">
+            android:background="@drawable/list_item_unselected">
 
             <TextView
                 android:id="@+id/event_label"

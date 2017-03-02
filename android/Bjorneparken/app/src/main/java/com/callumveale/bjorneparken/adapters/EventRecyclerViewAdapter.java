@@ -1,7 +1,6 @@
 package com.callumveale.bjorneparken.adapters;
 
 import android.app.Activity;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,7 +32,7 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_event, parent, false);
+                .inflate(R.layout.fragment_list_item, parent, false);
 
         return new ViewHolder(view);
     }
@@ -60,7 +59,7 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
                 if (null != mListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    mListener.onListItemSelection(holder.mItem);
+                    mListener.onListItemSelection(holder.mItem, holder.mView);
                 }
             }
         });
@@ -88,10 +87,12 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            mLabelView = (TextView) view.findViewById(R.id.event_label);
-            mDescriptionView = (TextView) view.findViewById(R.id.event_description);
-            mLocationView = (TextView) view.findViewById(R.id.event_location);
-            mTimesView = (TextView) view.findViewById(R.id.event_times);
+            mLabelView = (TextView) view.findViewById(R.id.header_heading);
+            mLocationView = (TextView) view.findViewById(R.id.header_subheading);
+            mLocationView.setVisibility(View.VISIBLE);
+            mTimesView = (TextView) view.findViewById(R.id.header_important_subheading);
+            mTimesView.setVisibility(View.VISIBLE);
+            mDescriptionView = (TextView) view.findViewById(R.id.body);
 
         }
 

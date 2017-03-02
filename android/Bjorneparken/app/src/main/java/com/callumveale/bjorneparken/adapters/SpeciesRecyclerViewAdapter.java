@@ -1,9 +1,10 @@
 package com.callumveale.bjorneparken.adapters;
 
 import android.app.Activity;
-import android.support.v7.app.AppCompatActivity;
+import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -33,7 +34,7 @@ public class SpeciesRecyclerViewAdapter extends RecyclerView.Adapter<SpeciesRecy
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_species, parent, false);
+                .inflate(R.layout.fragment_list_item, parent, false);
 
         return new ViewHolder(view);
     }
@@ -56,7 +57,7 @@ public class SpeciesRecyclerViewAdapter extends RecyclerView.Adapter<SpeciesRecy
                 if (null != mListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    mListener.onListItemSelection(holder.mItem);
+                    mListener.onListItemSelection(holder.mItem, holder.mView);
                 }
             }
         });
@@ -82,9 +83,11 @@ public class SpeciesRecyclerViewAdapter extends RecyclerView.Adapter<SpeciesRecy
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            mCommonNameView = (TextView) view.findViewById(R.id.species_common_name);
-            mLatinView = (TextView) view.findViewById(R.id.species_latin);
-            mDescriptionView = (TextView) view.findViewById(R.id.species_description);
+            mCommonNameView = (TextView) view.findViewById(R.id.header_heading);
+            mLatinView = (TextView) view.findViewById(R.id.header_subheading);
+            mLatinView.setTypeface(mLatinView.getTypeface(), Typeface.ITALIC);
+            mLatinView.setVisibility(View.VISIBLE);
+            mDescriptionView = (TextView) view.findViewById(R.id.body);
         }
 
         @Override

@@ -1,8 +1,6 @@
 package com.callumveale.bjorneparken.adapters;
 
 import android.app.Activity;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.callumveale.bjorneparken.R;
-import com.callumveale.bjorneparken.activities.HomeActivity;
 import com.callumveale.bjorneparken.fragments.ListFragment.OnListItemSelectionListener;
 import com.callumveale.bjorneparken.models.Amenity;
 
@@ -35,7 +32,7 @@ public class AmenityRecyclerViewAdapter extends RecyclerView.Adapter<AmenityRecy
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_amenity, parent, false);
+                .inflate(R.layout.fragment_list_item, parent, false);
 
         return new ViewHolder(view);
     }
@@ -52,7 +49,7 @@ public class AmenityRecyclerViewAdapter extends RecyclerView.Adapter<AmenityRecy
                 if (null != mListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    mListener.onListItemSelection(holder.mItem);
+                    mListener.onListItemSelection(holder.mItem, holder.mView);
                 }
             }
         });
@@ -77,8 +74,8 @@ public class AmenityRecyclerViewAdapter extends RecyclerView.Adapter<AmenityRecy
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            mLabelView = (TextView) view.findViewById(R.id.amenity_label);
-            mDescriptionView = (TextView) view.findViewById(R.id.amenity_description);
+            mLabelView = (TextView) view.findViewById(R.id.header_heading);
+            mDescriptionView = (TextView) view.findViewById(R.id.body);
         }
 
         @Override

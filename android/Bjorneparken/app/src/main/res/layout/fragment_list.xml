@@ -2,8 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="match_parent"
     android:layout_width="match_parent"
-    android:orientation="vertical"
-    android:weightSum="1">
+    android:orientation="horizontal">
 
     <android.support.v7.widget.RecyclerView
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -20,13 +19,15 @@
         android:id="@+id/list_empty"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:paddingLeft="35dp"
+        android:paddingRight="35dp"
         android:gravity="center"
-        android:layout_weight="0.8"
-        android:shadowColor="@color/secondary"
+        android:shadowColor="@color/textTertiary"
         android:textAlignment="center"
-        android:shadowDx="3"
-        android:shadowDy="3"
-        android:shadowRadius="3"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="2"
         android:textSize="20sp"
-        android:textColor="@color/secondaryExtraDark"/>
+        android:textStyle="bold"
+        android:textColor="@android:color/black"/>
 </LinearLayout>

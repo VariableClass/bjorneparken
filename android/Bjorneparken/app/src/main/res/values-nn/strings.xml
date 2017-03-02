@@ -15,6 +15,10 @@
     <string name="settings">Innstillinger</string>
     <string name="help">Hjelp</string>
 
+    <!-- Lists -->
+    <string name="starred">Stjernet</string>
+    <string name="unstarred">Ustjernet</string>
+
     <!-- Home Activity -->
     <string name="up_next">Neste:</string>
 

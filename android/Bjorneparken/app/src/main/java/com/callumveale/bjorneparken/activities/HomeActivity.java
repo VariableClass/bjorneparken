@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import com.callumveale.bjorneparken.adapters.NavigationDrawerAdapter;
@@ -438,8 +439,9 @@ public class HomeActivity extends AppCompatActivity implements HomeFragment.OnIt
     }
 
     @Override
-    public void onListItemSelection(Parcelable item) {
+    public void onListItemSelection(Parcelable item, View selectedListItem) {
 
+        selectedListItem.setPressed(true);
         createDetailFragment(item);
     }
 
