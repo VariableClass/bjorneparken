@@ -21,11 +21,11 @@ public class AmenityRecyclerViewAdapter extends RecyclerView.Adapter<AmenityRecy
 
     private static final int EMPTY_TEXT_RESOURCE = R.string.no_amenities;
 
-    private final List<Amenity> mValues;
+    private final List<Amenity> mAmenities;
     private final OnListItemSelectionListener mListener;
 
     public AmenityRecyclerViewAdapter(List items, OnListItemSelectionListener listener) {
-        mValues = (List<Amenity>)items;
+        mAmenities = (List<Amenity>)items;
         mListener = listener;
     }
 
@@ -39,9 +39,9 @@ public class AmenityRecyclerViewAdapter extends RecyclerView.Adapter<AmenityRecy
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mItem = mValues.get(position);
-        holder.mLabelView.setText(mValues.get(position).getLabel());
-        holder.mDescriptionView.setText(mValues.get(position).getDescription());
+        holder.mItem = mAmenities.get(position);
+        holder.mLabelView.setText(mAmenities.get(position).getLabel());
+        holder.mDescriptionView.setText(mAmenities.get(position).getDescription());
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -49,7 +49,8 @@ public class AmenityRecyclerViewAdapter extends RecyclerView.Adapter<AmenityRecy
                 if (null != mListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    mListener.onListItemSelection(holder.mItem, holder.mView);
+                    holder.mView.setPressed(true);
+                    mListener.onListItemSelection(holder.mItem);
                 }
             }
         });
@@ -57,7 +58,7 @@ public class AmenityRecyclerViewAdapter extends RecyclerView.Adapter<AmenityRecy
 
     @Override
     public int getItemCount() {
-        return mValues.size();
+        return mAmenities.size();
     }
 
     public String getEmptyText(Activity activity){

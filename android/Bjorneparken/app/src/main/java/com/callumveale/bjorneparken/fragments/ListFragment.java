@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.callumveale.bjorneparken.R;
+import com.callumveale.bjorneparken.activities.HomeActivity;
 import com.callumveale.bjorneparken.adapters.IListAdapter;
 
 import java.util.ArrayList;
@@ -29,11 +30,14 @@ public class ListFragment extends Fragment {
     public static final String ARG_LIST = "list";
     public static final String ARG_COLUMN_COUNT = "column-count";
     public static final String ARG_DATA_TYPE = "data-type";
+    public static final String ARG_STARRABLE = "starrable";
 
-    private ArrayList<Parcelable> mList = new ArrayList<>();
-    private int mColumnCount = 1;
-    private String mDataType = "";
-    private OnListItemSelectionListener mListener;
+    private ArrayList<Parcelable> mList;
+    private boolean isStarrable;
+    private int mColumnCount;
+    private String mDataType;
+    private OnListItemSelectionListener mSelectedListener;
+    private DetailFragment.OnItemStarredListener mStarredListener;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -42,12 +46,24 @@ public class ListFragment extends Fragment {
     public ListFragment() {
     }
 
-    public static ListFragment newInstance(Parcelable[] items, int columnCount, String dataType) {
+    public static ListFragment newInstance(ArrayList<Parcelable> items, int columnCount, String dataType, boolean isStarrable) {
         ListFragment fragment = new ListFragment();
         Bundle args = new Bundle();
-        args.putParcelableArray(ARG_LIST, items);
+        args.putParcelableArrayList(ARG_LIST, items);
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         args.putString(ARG_DATA_TYPE, dataType);
+        args.putBoolean(ARG_STARRABLE, isStarrable);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static ListFragment newInstance(ArrayList<Parcelable> items, int columnCount, String dataType) {
+        ListFragment fragment = new ListFragment();
+        Bundle args = new Bundle();
+        args.putParcelableArrayList(ARG_LIST, items);
+        args.putInt(ARG_COLUMN_COUNT, columnCount);
+        args.putString(ARG_DATA_TYPE, dataType);
+        args.putBoolean(ARG_STARRABLE, false);
         fragment.setArguments(args);
         return fragment;
     }
@@ -60,6 +76,7 @@ public class ListFragment extends Fragment {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
             mList = getArguments().getParcelableArrayList(ARG_LIST);
             mDataType = getArguments().getString(ARG_DATA_TYPE);
+            isStarrable = getArguments().getBoolean(ARG_STARRABLE);
         }
     }
 
@@ -72,7 +89,15 @@ public class ListFragment extends Fragment {
 
         try {
             Class className = Class.forName("com.callumveale.bjorneparken.adapters." + mDataType + "RecyclerViewAdapter");
-            viewAdapter = className.getConstructor(List.class, OnListItemSelectionListener.class).newInstance(mList, mListener);
+
+            if (isStarrable) {
+
+                viewAdapter = className.getConstructor(HomeActivity.class, List.class, OnListItemSelectionListener.class, DetailFragment.OnItemStarredListener.class).newInstance(getActivity(), mList, mSelectedListener, mStarredListener);
+
+            } else {
+
+                viewAdapter = className.getConstructor(List.class, OnListItemSelectionListener.class).newInstance(mList, mSelectedListener);
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -110,27 +135,36 @@ public class ListFragment extends Fragment {
         return view;
     }
 
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof OnListItemSelectionListener) {
-            mListener = (OnListItemSelectionListener) context;
+            mSelectedListener = (OnListItemSelectionListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnListFragmentInteractionListener");
+        }
+
+        if (context instanceof DetailFragment.OnItemStarredListener){
+            mStarredListener = (DetailFragment.OnItemStarredListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnItemStarredListener");
         }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        mSelectedListener = null;
+        mStarredListener = null;
     }
 
     public interface OnListItemSelectionListener {
 
-        void onListItemSelection(Parcelable item, View selectedListItem);
+        void onListItemSelection(Parcelable item);
+
+        void onStarredListItemSelection(Parcelable item, Boolean isStarred);
     }
 
 }

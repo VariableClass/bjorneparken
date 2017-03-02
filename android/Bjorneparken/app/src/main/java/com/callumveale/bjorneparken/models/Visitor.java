@@ -68,6 +68,18 @@ public class Visitor {
         return starredSpecies;
     }
 
+    public ArrayList<Parcelable> getParcelableStarredSpecies(){
+
+        ArrayList<Parcelable> returnList = new ArrayList<>();
+
+        for (Species species : starredSpecies){
+
+            returnList.add(species);
+        }
+
+        return returnList;
+    }
+
     public void setVisitStart(DateTime visitStart) {
         this.visitStart = visitStart;
     }

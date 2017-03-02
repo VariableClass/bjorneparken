@@ -1,5 +1,6 @@
 package com.callumveale.bjorneparken.activities;
 
+import android.app.DownloadManager;
 import android.content.res.Configuration;
 
 import android.os.Parcel;
@@ -39,6 +40,8 @@ import com.callumveale.bjorneparken.requests.GetVisitorId;
 import com.callumveale.bjorneparken.requests.GetVisitorItinerary;
 import com.callumveale.bjorneparken.requests.GetVisitorStarredSpecies;
 import com.callumveale.bjorneparken.requests.RequestsModule;
+import com.callumveale.bjorneparken.requests.StarSpecies;
+import com.callumveale.bjorneparken.requests.UnstarSpecies;
 import com.google.api.client.util.DateTime;
 
 import java.util.ArrayList;
@@ -49,6 +52,7 @@ import java.util.Locale;
 import none.bjorneparkappen_api.model.MainAreaListResponse;
 import none.bjorneparkappen_api.model.MainEventListResponse;
 import none.bjorneparkappen_api.model.MainSpeciesListResponse;
+import none.bjorneparkappen_api.model.MainSpeciesResponse;
 
 public class HomeActivity extends AppCompatActivity implements HomeFragment.OnItemSelectionListener, ListFragment.OnListItemSelectionListener, DetailFragment.OnItemStarredListener, NavigationDrawerAdapter.INavigationDrawerListener {
 
@@ -114,7 +118,9 @@ public class HomeActivity extends AppCompatActivity implements HomeFragment.OnIt
             List starredSpecies = RequestsModule.convertListResponseToList(mFileWriter.getStarredSpeciesFromFile());
             mVisitor = new Visitor(visitorId, mVisitStart, mVisitEnd, itinerary, starredSpecies);
 
-            createFragment(mVisitor.getParcelableItinerary(), Event.class, new HomeFragment());
+            // Display home fragment
+            HomeFragment homeFragment = HomeFragment.newInstance(mVisitor.getParcelableItinerary());
+            getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, homeFragment).addToBackStack(null).commit();
         }
     }
 
@@ -192,31 +198,36 @@ public class HomeActivity extends AppCompatActivity implements HomeFragment.OnIt
             case 0: // If selection is 'Home'
                 setTitle(R.string.app_name);
                 MainEventListResponse homeItinerary = mFileWriter.getItineraryFromFile();
-                createFragment(RequestsModule.convertListResponseToList(homeItinerary), Event.class, new HomeFragment());
+                HomeFragment homeFragment = HomeFragment.newInstance(RequestsModule.convertListResponseToList(homeItinerary));
+                getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, homeFragment).addToBackStack(null).commit();
                 break;
 
             case 1: // If selection is 'My Visit'
                 setTitle(mNavigationOptions[1].name);
                 MainEventListResponse listItinerary = mFileWriter.getItineraryFromFile();
-                createFragment(RequestsModule.convertListResponseToList(listItinerary), Event.class, new ListFragment());
+                ListFragment itineraryFragment = ListFragment.newInstance(RequestsModule.convertListResponseToList(listItinerary), 1, Event.class.getSimpleName(), true);
+                getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, itineraryFragment).addToBackStack(null).commit();
                 break;
 
             case 2: // If selection is 'Animals'
                 setTitle(mNavigationOptions[2].name);
                 MainSpeciesListResponse species = mFileWriter.getSpeciesFromFile();
-                createFragment(RequestsModule.convertListResponseToList(species), Species.class, new ListFragment());
+                ListFragment speciesFragment = ListFragment.newInstance(RequestsModule.convertListResponseToList(species), 1, Species.class.getSimpleName(), true);
+                getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, speciesFragment).addToBackStack(null).commit();
                 break;
 
             case 3: // If selection is 'Attractions'
                 setTitle(mNavigationOptions[3].name);
                 MainAreaListResponse attractions = mFileWriter.getAttractionsFromFile();
-                createFragment(RequestsModule.convertListResponseToList(attractions), Amenity.class, new ListFragment());
+                ListFragment attractionsFragment = ListFragment.newInstance(RequestsModule.convertListResponseToList(attractions), 1, Amenity.class.getSimpleName());
+                getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, attractionsFragment).addToBackStack(null).commit();
                 break;
 
             case 4: // If selection is 'Amenities'
                 setTitle(mNavigationOptions[4].name);
                 MainAreaListResponse amenities = mFileWriter.getAmenitiesFromFile();
-                createFragment(RequestsModule.convertListResponseToList(amenities), Amenity.class, new ListFragment());
+                ListFragment amenitiesFragment = ListFragment.newInstance(RequestsModule.convertListResponseToList(amenities), 1, Amenity.class.getSimpleName());
+                getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, amenitiesFragment).addToBackStack(null).commit();
                 break;
 
             case 5: // If selection is 'Park Map'
@@ -282,26 +293,6 @@ public class HomeActivity extends AppCompatActivity implements HomeFragment.OnIt
         // Handle your other action bar items...
 
         return super.onOptionsItemSelected(item);
-    }
-
-    public void createFragment(ArrayList<Parcelable> listFromResponse, Class dataType, Fragment fragment) {
-
-        Bundle args = new Bundle();
-
-        if (fragment.getClass() == ListFragment.class) {
-
-            args.putParcelableArrayList(ListFragment.ARG_LIST, listFromResponse);
-            args.putInt(ListFragment.ARG_COLUMN_COUNT, 1);
-            args.putString(ListFragment.ARG_DATA_TYPE, dataType.getSimpleName());
-
-        } else if (fragment.getClass() == HomeFragment.class) {
-
-            args.putParcelableArrayList(HomeFragment.ARG_LIST, listFromResponse);
-        }
-
-        fragment.setArguments(args);
-
-        getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).addToBackStack(null).commit();
     }
 
     public void updateProgress(boolean complete) {
@@ -393,7 +384,9 @@ public class HomeActivity extends AppCompatActivity implements HomeFragment.OnIt
         // If no current fragment, display new Home Fragment
         if (getSupportFragmentManager().findFragmentById(R.id.content_frame) == null){
 
-            createFragment(mVisitor.getParcelableItinerary(), Event.class, new HomeFragment());
+
+            HomeFragment homeFragment = HomeFragment.newInstance(mVisitor.getParcelableItinerary());
+            getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, homeFragment).addToBackStack(null).commit();
         }
     }
 
@@ -401,7 +394,7 @@ public class HomeActivity extends AppCompatActivity implements HomeFragment.OnIt
 
         // Cache response
         List starredSpecies = RequestsModule.convertListResponseToList(starredSpeciesResponse);
-        mVisitor.setItinerary(starredSpecies);
+        mVisitor.setStarredSpecies(starredSpecies);
 
         // Write response to file
         mFileWriter.writeStarredSpeciesToFile(starredSpeciesResponse);
@@ -435,30 +428,89 @@ public class HomeActivity extends AppCompatActivity implements HomeFragment.OnIt
     @Override
     public void onItemSelection(Event event) {
 
-        createDetailFragment(event);
+        DetailFragment fragment = DetailFragment.newInstance(event);
+        getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).addToBackStack(null).commit();
     }
 
     @Override
-    public void onListItemSelection(Parcelable item, View selectedListItem) {
+    public void onListItemSelection(Parcelable item) {
 
-        selectedListItem.setPressed(true);
-        createDetailFragment(item);
+        DetailFragment fragment = DetailFragment.newInstance(item);
+        getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).addToBackStack(null).commit();
     }
 
-    private void createDetailFragment(Parcelable item){
+    @Override
+    public void onStarredListItemSelection(Parcelable item, Boolean isStarred){
 
-        DetailFragment fragment = new DetailFragment();
-
-        Bundle args = new Bundle();
-        args.putParcelable(DetailFragment.ARG_ITEM, item);
-        fragment.setArguments(args);
-
+        DetailFragment fragment = DetailFragment.newInstance(item, isStarred);
         getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).addToBackStack(null).commit();
     }
 
     @Override
     public void onItemStarred(Parcelable parcelable) {
 
+        // If star action was against a species
+        if (parcelable.getClass() == Species.class){
+
+            // Retrieve visitor's list of starred species
+            mVisitor.getStarredSpecies();
+
+            int speciesIndex = -1;
+
+            // Attempt to retrieve the index of the passed species
+            for (Species species : mVisitor.getStarredSpecies()) {
+
+                if (species.getId() == ((Species)parcelable).getId()) {
+
+                    speciesIndex = mVisitor.getStarredSpecies().indexOf(species);
+                    break;
+                }
+            }
+
+            // If index was found
+            if (speciesIndex != -1){
+
+                // Remove the species from the local starred species list
+                mVisitor.getStarredSpecies().remove(speciesIndex);
+
+                // Remove the species from the datastore starred species list
+                UnstarSpecies unstarSpeciesTask = new UnstarSpecies(this, mVisitor.getId(), (Species) parcelable);
+                unstarSpeciesTask.execute();
+
+            } else {
+
+                // Add the species to the local starred species list
+                mVisitor.getStarredSpecies().add((Species) parcelable);
+
+                // Add the species to the datastore starred species list
+                StarSpecies starSpeciesTask = new StarSpecies(this, mVisitor.getId(), (Species) parcelable);
+                starSpeciesTask.execute();
+            }
+
+            // TODO replace with integrated read/write of lists
+            MainSpeciesListResponse starredSpeciesResponse = new MainSpeciesListResponse();
+
+            List<MainSpeciesResponse> speciesToSet = new ArrayList<>();
+
+            for (Species species : mVisitor.getStarredSpecies()){
+
+                MainSpeciesResponse speciesResponse = new MainSpeciesResponse();
+                speciesResponse.setId(species.getId());
+                speciesResponse.setCommonName(species.getCommonName());
+                speciesResponse.setLatin(species.getLatin());
+                speciesResponse.setDescription(species.getDescription());
+
+                speciesToSet.add(speciesResponse);
+            }
+
+            starredSpeciesResponse.setSpecies(speciesToSet);
+            mFileWriter.writeStarredSpeciesToFile(starredSpeciesResponse);
+
+        } else if (parcelable.getClass() == Event.class) {
+
+            // AddToItinerary addToItineraryTask = new AddToItinerary(mVisitor.getId(), (Event) parcelable);
+            // addToItineraryTask.execute();
+        }
     }
 
     @Override
@@ -482,5 +534,10 @@ public class HomeActivity extends AppCompatActivity implements HomeFragment.OnIt
                 super.onBackPressed();
             }
         }
+    }
+
+    public Visitor getVisitor(){
+
+        return mVisitor;
     }
 }

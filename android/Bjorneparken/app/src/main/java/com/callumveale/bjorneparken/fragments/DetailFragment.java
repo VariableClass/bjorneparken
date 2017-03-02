@@ -1,13 +1,14 @@
 package com.callumveale.bjorneparken.fragments;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.callumveale.bjorneparken.R;
@@ -24,8 +25,10 @@ import com.callumveale.bjorneparken.models.IModel;
 public class DetailFragment extends Fragment {
 
     public static final String ARG_ITEM = "item";
+    public static final String ARG_STARRED = "starred";
 
     private Parcelable mItem;
+    private Boolean isStarred;
 
     private OnItemStarredListener mListener;
 
@@ -40,7 +43,20 @@ public class DetailFragment extends Fragment {
      * @param param1 Parameter 1.
      * @return A new instance of fragment DetailFragment.
      */
+    public static DetailFragment newInstance(Parcelable item, boolean starred) {
+
+
+        DetailFragment fragment = new DetailFragment();
+        Bundle args = new Bundle();
+        args.putParcelable(ARG_ITEM, item);
+        args.putBooleanArray(ARG_STARRED, new boolean[]{starred});
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     public static DetailFragment newInstance(Parcelable item) {
+
+
         DetailFragment fragment = new DetailFragment();
         Bundle args = new Bundle();
         args.putParcelable(ARG_ITEM, item);
@@ -53,6 +69,11 @@ public class DetailFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mItem = getArguments().getParcelable(ARG_ITEM);
+            boolean[] starredArray = getArguments().getBooleanArray(ARG_STARRED);
+            if (starredArray != null){
+                isStarred = starredArray[0];
+            }
+
         }
     }
 
@@ -63,6 +84,23 @@ public class DetailFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
 
         IModel item = (IModel) mItem;
+
+        final Button star = (Button) view.findViewById(R.id.detail_star);
+
+        if (isStarred == null){
+
+            star.setVisibility(View.GONE);
+        } else {
+
+            if (isStarred) {
+
+                star.setText(R.string.starred);
+
+            } else {
+
+                star.setText(R.string.unstarred);
+            }
+        }
 
         TextView mHeaderView = (TextView) view.findViewById(R.id.detail_header);
         mHeaderView.setText(item.getHeader());
@@ -91,25 +129,27 @@ public class DetailFragment extends Fragment {
             mSubcaptionView.setVisibility(View.VISIBLE);
         }
 
-        view.setOnClickListener(new View.OnClickListener() {
+        star.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 if (null != mListener) {
+
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
+                    isStarred = !isStarred;
+                    if (isStarred) {
+                        star.setText(R.string.starred);
+
+                    } else {
+
+                        star.setText(R.string.unstarred);
+                    }
                     mListener.onItemStarred(mItem);
                 }
             }
         });
 
         return view;
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Parcelable parcelable) {
-        if (mListener != null) {
-            mListener.onItemStarred(parcelable);
-        }
     }
 
     @Override
@@ -119,7 +159,7 @@ public class DetailFragment extends Fragment {
             mListener = (OnItemStarredListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement OnItemStarredListener");
         }
     }
 
@@ -140,6 +180,7 @@ public class DetailFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnItemStarredListener {
+
         void onItemStarred(Parcelable parcelable);
     }
 }
