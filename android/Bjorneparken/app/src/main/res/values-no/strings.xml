@@ -17,4 +17,17 @@
 
     <!-- Home Activity -->
     <string name="up_next">Neste:</string>
+
+    <!-- My Visit Fragment -->
+    <string name="empty_itinerary">Du har ingen favoritter for øyeblikket. Gå til \'Dyr\'-fanen for å velge noe favorittfôringer!</string>
+
+    <!-- Animals Fragment -->
+    <string name="no_species">Ingen dyr funnet.</string>
+
+    <!-- Attractions Fragment -->
+    <string name="no_attractions">Ingen attraksjoner funnet.</string>
+
+    <!-- Amenities Fragment -->
+    <string name="no_amenities">Ingen fasiliteter funnet.</string>
+
 </resources>

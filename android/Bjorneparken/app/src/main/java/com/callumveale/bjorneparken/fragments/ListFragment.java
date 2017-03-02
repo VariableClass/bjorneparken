@@ -10,8 +10,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.callumveale.bjorneparken.R;
+import com.callumveale.bjorneparken.adapters.IListAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,28 +68,45 @@ public class ListFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_list, container, false);
 
-        // Set the adapter
-        if (view instanceof RecyclerView) {
-            Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
-            if (mColumnCount <= 1) {
-                recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            } else {
-                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
-            }
+        Object viewAdapter = null;
 
-            Object viewAdapter = null;
+        try {
+            Class className = Class.forName("com.callumveale.bjorneparken.adapters." + mDataType + "RecyclerViewAdapter");
+            viewAdapter = className.getConstructor(List.class, OnListItemSelectionListener.class).newInstance(mList, mListener);
 
-            try {
-                Class className = Class.forName("com.callumveale.bjorneparken.adapters." + mDataType + "RecyclerViewAdapter");
-                viewAdapter = className.getConstructor(List.class, OnListItemSelectionListener.class).newInstance(mList, mListener);
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            recyclerView.setAdapter((RecyclerView.Adapter) viewAdapter);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
+        // Retrieve empty text
+        TextView emptyTextView = (TextView) view.findViewById(R.id.list_empty);
+
+        // If list has items
+        if (mList.size() != 0) {
+
+            // Hide empty text
+            emptyTextView.setVisibility(View.GONE);
+
+            RecyclerView list = (RecyclerView) view.findViewById(R.id.list);
+
+            // Set the adapter
+            Context context = view.getContext();
+            if (mColumnCount <= 1) {
+                list.setLayoutManager(new LinearLayoutManager(context));
+            } else {
+                list.setLayoutManager(new GridLayoutManager(context, mColumnCount));
+            }
+
+            list.setAdapter((RecyclerView.Adapter) viewAdapter);
+
+            list.setVisibility(View.VISIBLE);
+
+        } else {
+
+            String emptyText = ((IListAdapter)viewAdapter).getEmptyText(getActivity());
+            emptyTextView.setText(emptyText);
+        }
+
         return view;
     }
 

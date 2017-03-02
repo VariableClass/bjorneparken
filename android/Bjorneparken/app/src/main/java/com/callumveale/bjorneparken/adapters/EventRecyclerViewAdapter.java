@@ -1,5 +1,7 @@
 package com.callumveale.bjorneparken.adapters;
 
+import android.app.Activity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,7 +18,9 @@ import java.util.List;
  * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
  * specified {@link OnListFragmentInteractionListener}.
  */
-public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecyclerViewAdapter.ViewHolder> {
+public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecyclerViewAdapter.ViewHolder> implements IListAdapter{
+
+    private static final int EMPTY_TEXT_RESOURCE = R.string.empty_itinerary;
 
     private final List<Event> mValues;
     private final OnListItemSelectionListener mListener;
@@ -30,6 +34,7 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.fragment_event, parent, false);
+
         return new ViewHolder(view);
     }
 
@@ -64,6 +69,11 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
     @Override
     public int getItemCount() {
         return mValues.size();
+    }
+
+    public String getEmptyText(Activity activity){
+
+        return activity.getString(EMPTY_TEXT_RESOURCE);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

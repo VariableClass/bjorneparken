@@ -17,4 +17,17 @@
 
     <!-- Home Activity -->
     <string name="up_next">Up Next:</string>
+
+    <!-- My Visit Fragment -->
+    <string name="empty_itinerary">You don\'t currently have any favourites. Go to the \'Animals\' tab to favourite some feedings!</string>
+
+    <!-- Animals Fragment -->
+    <string name="no_species">No animals found.</string>
+
+    <!-- Attractions Fragment -->
+    <string name="no_attractions">No attractions found.</string>
+
+    <!-- Amenities Fragment -->
+    <string name="no_amenities">No amenities found.</string>
+
 </resources>

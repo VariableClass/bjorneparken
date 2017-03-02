@@ -60,5 +60,6 @@ public class GetVersion extends AsyncTask<Void, Void, MainVersionResponse> {
     protected void onPostExecute(MainVersionResponse response) {
 
         activity.checkVersion(response.getVersion());
+        activity.updateProgress(true);
     }
 }

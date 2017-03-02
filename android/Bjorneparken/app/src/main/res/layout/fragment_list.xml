@@ -1,10 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/list"
-    android:name="com.callumveale.bjorneparken.activities.ListFragment"
-    android:layout_width="match_parent"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="match_parent"
-    app:layoutManager="LinearLayoutManager"
-    tools:context="com.callumveale.bjorneparken.fragments.ListFragment" />
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:weightSum="1">
+
+    <android.support.v7.widget.RecyclerView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/list"
+        android:name="com.callumveale.bjorneparken.activities.ListFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layoutManager="LinearLayoutManager"
+        tools:context="com.callumveale.bjorneparken.fragments.ListFragment"
+        android:visibility="gone"/>
+
+    <TextView
+        android:id="@+id/list_empty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:layout_weight="0.8"
+        android:shadowColor="@color/secondary"
+        android:textAlignment="center"
+        android:shadowDx="3"
+        android:shadowDy="3"
+        android:shadowRadius="3"
+        android:textSize="20sp"
+        android:textColor="@color/secondaryExtraDark"/>
+</LinearLayout>

@@ -4,6 +4,7 @@
     <color name="primaryDark">#880e4f</color>
     <color name="secondary">#616161</color>
     <color name="secondaryDark">#424242</color>
+    <color name="secondaryExtraDark">#212121</color>
     <color name="textMain">#ffffff</color>
     <color name="textSecondary">#bdbdbd</color>
     <color name="textTertiary">#9e9e9e</color>

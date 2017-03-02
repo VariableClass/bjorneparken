@@ -26,6 +26,7 @@ public class FileWriter {
 
     private static final String VISITOR_ID_FILE = "visitor_id";
     private static final String ITINERARY_FILE = "itinerary";
+    private static final String STARRED_SPECIES_FILE = "starred_species";
     private static final String VERSION_FILE = "version";
     private static final String SPECIES_FILE = "species";
     private static final String AMENITIES_FILE = "amenities";
@@ -225,6 +226,33 @@ public class FileWriter {
         }
 
         return itinerary;
+    }
+
+    public void writeStarredSpeciesToFile(MainSpeciesListResponse starredSpeciesJson){
+
+        writeJsonToFile(starredSpeciesJson, STARRED_SPECIES_FILE);
+    }
+
+    public MainSpeciesListResponse getStarredSpeciesFromFile(){
+
+        MainSpeciesListResponse starredSpecies = new MainSpeciesListResponse();
+
+        try {
+            InputStream inputStream = context.openFileInput(STARRED_SPECIES_FILE);
+
+            if (inputStream != null) {
+
+                starredSpecies = new JacksonFactory().fromInputStream(inputStream, MainSpeciesListResponse.class);
+                inputStream.close();
+            }
+        }
+        catch (FileNotFoundException fileNotFoundException) {
+            fileNotFoundException.printStackTrace();
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
+
+        return starredSpecies;
     }
 
     private void writeJsonToFile(GenericJson jsonToWrite, String filename){

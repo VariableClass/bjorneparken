@@ -68,8 +68,14 @@ public class HomeFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
+        TextView emptyView = (TextView) view.findViewById(R.id.home_empty);
+
         if (mItinerary.size() > 0) {
 
+            // Hide the empty text label
+            emptyView.setVisibility(View.GONE);
+
+            // Create up next card
             TextView mLabelView = (TextView) view.findViewById(R.id.event_label);
             mLabelView.setText(mItinerary.get(0).getLabel());
 
@@ -87,6 +93,11 @@ public class HomeFragment extends Fragment {
             TextView mDescriptionView = (TextView) view.findViewById(R.id.event_description);
             mDescriptionView.setText(description);
 
+            // Show the up next view
+            LinearLayout upNextView = (LinearLayout) view.findViewById(R.id.up_next_view);
+            upNextView.setVisibility(View.VISIBLE);
+
+            // Set listener for interaction with card
             LinearLayout eventCard = (LinearLayout) view.findViewById(R.id.event_card);
 
             eventCard.setOnClickListener(new View.OnClickListener() {
@@ -99,6 +110,10 @@ public class HomeFragment extends Fragment {
                     }
                 }
             });
+
+        } else {
+
+
         }
 
         return view;
