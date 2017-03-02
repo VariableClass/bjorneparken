@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Bjorneparken</string>
+    <string name="app_name">Bjørneparken</string>
 
     <!-- Navigation Drawer -->
     <string name="drawer_open">Navigation drawer open</string>
