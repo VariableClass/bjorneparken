@@ -17,7 +17,6 @@ import com.callumveale.bjorneparken.activities.HomeActivity;
 import com.callumveale.bjorneparken.adapters.IListAdapter;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A fragment representing a list of Items.
@@ -27,17 +26,27 @@ import java.util.List;
  */
 public class ListFragment extends Fragment {
 
+    //region Constants
+
     public static final String ARG_LIST = "list";
     public static final String ARG_COLUMN_COUNT = "column-count";
     public static final String ARG_DATA_TYPE = "data-type";
     public static final String ARG_STARRABLE = "starrable";
 
-    private ArrayList<Parcelable> mList;
+    //endregion Constants
+
+    //region Properties
+
+    private ArrayList<? extends Parcelable> mList;
     private boolean isStarrable;
     private int mColumnCount;
     private String mDataType;
     private OnListItemSelectionListener mSelectedListener;
     private DetailFragment.OnItemStarredListener mStarredListener;
+
+    //endregion Properties
+
+    //region Constructors
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -46,7 +55,11 @@ public class ListFragment extends Fragment {
     public ListFragment() {
     }
 
-    public static ListFragment newInstance(ArrayList<Parcelable> items, int columnCount, String dataType, boolean isStarrable) {
+    //endregion Constructors
+
+    //region Methods
+
+    public static ListFragment newInstance(ArrayList<? extends Parcelable> items, int columnCount, String dataType, boolean isStarrable) {
         ListFragment fragment = new ListFragment();
         Bundle args = new Bundle();
         args.putParcelableArrayList(ARG_LIST, items);
@@ -57,7 +70,7 @@ public class ListFragment extends Fragment {
         return fragment;
     }
 
-    public static ListFragment newInstance(ArrayList<Parcelable> items, int columnCount, String dataType) {
+    public static ListFragment newInstance(ArrayList<? extends Parcelable> items, int columnCount, String dataType) {
         ListFragment fragment = new ListFragment();
         Bundle args = new Bundle();
         args.putParcelableArrayList(ARG_LIST, items);
@@ -67,6 +80,8 @@ public class ListFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
+
+    //region Fragment Overridden Methods
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -83,20 +98,28 @@ public class ListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_list, container, false);
 
+        // Retrieve the list adapter
         Object viewAdapter = null;
 
         try {
+
+            // Retrieve adapter class name
             Class className = Class.forName("com.callumveale.bjorneparken.adapters." + mDataType + "RecyclerViewAdapter");
 
+            // If class is starrable
             if (isStarrable) {
 
-                viewAdapter = className.getConstructor(HomeActivity.class, List.class, OnListItemSelectionListener.class, DetailFragment.OnItemStarredListener.class).newInstance(getActivity(), mList, mSelectedListener, mStarredListener);
+                // Create a new starrable view adapter
+                viewAdapter = className.getConstructor(HomeActivity.class, ArrayList.class, OnListItemSelectionListener.class, DetailFragment.OnItemStarredListener.class).newInstance(getActivity(), mList, mSelectedListener, mStarredListener);
 
             } else {
 
-                viewAdapter = className.getConstructor(List.class, OnListItemSelectionListener.class).newInstance(mList, mSelectedListener);
+                // Create a new non-starrable view adapter
+                viewAdapter = className.getConstructor(ArrayList.class, OnListItemSelectionListener.class).newInstance(mList, mSelectedListener);
             }
 
         } catch (Exception e) {
@@ -112,22 +135,31 @@ public class ListFragment extends Fragment {
             // Hide empty text
             emptyTextView.setVisibility(View.GONE);
 
+            // Retrieve list
             RecyclerView list = (RecyclerView) view.findViewById(R.id.list);
 
-            // Set the adapter
+            // Set layout manager
             Context context = view.getContext();
             if (mColumnCount <= 1) {
+
+                // If column count less than or equal to 1, set linear layout manager
                 list.setLayoutManager(new LinearLayoutManager(context));
+
             } else {
+
+                // Else, set a grid layout manager
                 list.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
 
+            // Set view adapter
             list.setAdapter((RecyclerView.Adapter) viewAdapter);
 
+            // Show list
             list.setVisibility(View.VISIBLE);
 
         } else {
 
+            // Retrieve and show empty text for list
             String emptyText = ((IListAdapter)viewAdapter).getEmptyText(getActivity());
             emptyTextView.setText(emptyText);
         }
@@ -145,7 +177,7 @@ public class ListFragment extends Fragment {
                     + " must implement OnListFragmentInteractionListener");
         }
 
-        if (context instanceof DetailFragment.OnItemStarredListener){
+        if (context instanceof DetailFragment.OnItemStarredListener) {
             mStarredListener = (DetailFragment.OnItemStarredListener) context;
         } else {
             throw new RuntimeException(context.toString()
@@ -160,11 +192,18 @@ public class ListFragment extends Fragment {
         mStarredListener = null;
     }
 
+    //endregion Fragment Overridden Methods
+
+    //endregion Methods
+
+    //region Interfaces
+
     public interface OnListItemSelectionListener {
 
-        void onListItemSelection(Parcelable item);
+        void onItemSelection(Parcelable item);
 
-        void onStarredListItemSelection(Parcelable item, Boolean isStarred);
+        void onStarredItemSelection(Parcelable item, Boolean isStarred);
     }
 
+    //endregion Interfaces
 }

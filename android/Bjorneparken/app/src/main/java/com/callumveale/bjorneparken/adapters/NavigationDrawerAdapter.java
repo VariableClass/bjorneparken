@@ -4,40 +4,57 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.callumveale.bjorneparken.R;
 import com.callumveale.bjorneparken.models.NavigationDrawerItem;
 
-public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDrawerAdapter.ViewHolder> {
-    private final INavigationDrawerListener mListener;
-    private final int layoutResourceId;
-    private NavigationDrawerItem items[] = null;
+public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDrawerItemViewHolder> {
 
-    public NavigationDrawerAdapter(INavigationDrawerListener listener, int layoutResourceId, NavigationDrawerItem[] items) {
-        this.mListener = listener;
-        this.layoutResourceId = layoutResourceId;
-        this.items = items;
+
+    //region Properties
+
+    private NavigationDrawerItem mItems[];
+    private final INavigationDrawerListener mListener;
+
+    //endregion Properties
+
+    //region Constructors
+
+    public NavigationDrawerAdapter(NavigationDrawerItem[] items, INavigationDrawerListener listener) {
+        mItems = items;
+        mListener = listener;
     }
 
+    //endregion Constructors
+
+    //region Methods
+
+    //region RecyclerView.Adapter<NavigationDrawerItemViewHolder> Overridden Methods
+
     @Override
-    public NavigationDrawerAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public NavigationDrawerItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.drawer_list_item, parent, false);
-        return new ViewHolder(view);
+
+        return new NavigationDrawerItemViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(final NavigationDrawerAdapter.ViewHolder holder, int position) {
-        holder.mItem = items[position];
-        holder.mNameView.setText(items[position].name);
+    public void onBindViewHolder(final NavigationDrawerItemViewHolder holder, int position) {
 
+        // Set item
+        holder.mItem = mItems[position];
+
+        // Set label
+        holder.mNameView.setText(mItems[position].name);
+
+        // Add selected listener
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (null != mListener) {
 
-                    mListener.selectNavigationItem(holder.getAdapterPosition());
+                    mListener.navigateToPosition(holder.getAdapterPosition());
                 }
             }
         });
@@ -45,28 +62,19 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
 
     @Override
     public int getItemCount() {
-        return items.length;
+        return mItems.length;
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        public final View mView;
-        public final TextView mNameView;
-        public NavigationDrawerItem mItem;
+    //endregion RecyclerView.Adapter<NavigationDrawerItemViewHolder> Overridden Methods
 
-        public ViewHolder(View view) {
-            super(view);
-            mView = view;
-            mNameView = (TextView) view.findViewById(R.id.drawer_itemName);
-        }
+    //endregion Methods
 
-        @Override
-        public String toString() {
-            return super.toString() + " '" + mNameView.getText() + "'";
-        }
-    }
+    //region Interfaces
 
     public interface INavigationDrawerListener {
 
-        void selectNavigationItem(int position);
+        void navigateToPosition(int position);
     }
+
+    //endregion Interfaces
 }

@@ -56,7 +56,7 @@
             android:layout_marginBottom="65dp"
             android:layout_marginRight="20dp"
             android:orientation="vertical"
-            android:background="@drawable/list_item_unselected">
+            android:background="@drawable/list_item">
 
             <TextView
                 android:id="@+id/event_label"
@@ -64,7 +64,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="1dp"
                 android:textAppearance="?attr/textAppearanceListItem"
-                android:textColor="@color/primary"
+                android:textColor="@color/selector_pink_white"
                 android:textStyle="bold"/>
 
             <TextView
@@ -73,7 +73,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="1dp"
                 android:textAppearance="?attr/textAppearanceListItem"
-                android:textColor="@color/secondary"/>
+                android:textColor="@color/selector_grey_white"/>
 
             <TextView
                 android:id="@+id/event_description"
@@ -81,7 +81,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="1dp"
                 android:textAppearance="?attr/textAppearanceListItem"
-                android:textColor="@android:color/black"/>
+                android:textColor="@color/selector_black_white"/>
 
         </LinearLayout>
 

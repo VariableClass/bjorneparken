@@ -16,6 +16,7 @@
     <string name="help">Hjelp</string>
 
     <!-- Lists -->
+    <string name="list_empty">Ingen elementer funnet.</string>
     <string name="starred">Stjernet</string>
     <string name="unstarred">Ustjernet</string>
 

@@ -9,40 +9,74 @@ import android.os.Parcelable;
 
 public class Feeding extends Event implements IModel, Parcelable{
 
+    //region Constants
+
+    public static final Creator CREATOR = new Creator() {
+
+        public Feeding createFromParcel(Parcel in) {
+            return new Feeding(in);
+        }
+
+        public Feeding[] newArray(int size) {
+            return new Feeding[size];
+        }
+    };
+
+    //endregion Constants
+
+    //region Properties
+
     private Keeper keeper;
 
-    // Constructor
+    //endregion Properties
+
+    //region Constructors
+
     public Feeding(long id, String label, String description, Enclosure location, String startTime, String endTime, boolean isActive, Keeper keeper){
         super(id, label, description, location, startTime, endTime, isActive);
         this.keeper = keeper;
     }
 
-    // Getter and setter methods
+    // Parcelling part
+    public Feeding(Parcel in){
+
+        setId(in.readLong());
+
+        String[] data = new String[4];
+        in.readStringArray(data);
+        setLabel(data[0]);
+        setDescription(data[1]);
+        setStartTime(data[2]);
+        setEndTime(data[3]);
+
+        setLocation((Area)in.readParcelable(Enclosure.class.getClassLoader()));
+
+        boolean[] boolArray = new boolean[1];
+        in.readBooleanArray(boolArray);
+        setActive(boolArray[0]);
+
+        keeper = in.readParcelable(Keeper.class.getClassLoader());
+    }
+
+    //endregion Constructors
+
+    //region Methods
+
     public Keeper getKeeper(){
 
         return this.keeper;
     }
 
-    // Parcelling part
-    public Feeding(Parcel in){
+    //region IModel Overridden Methods
 
-        super.setId(in.readLong());
-
-        String[] data = new String[4];
-        in.readStringArray(data);
-        super.setLabel(data[0]);
-        super.setDescription(data[1]);
-        super.setStartTime(data[2]);
-        super.setEndTime(data[3]);
-
-        super.setLocation((Area)in.readParcelable(Enclosure.class.getClassLoader()));
-
-        boolean[] boolArray = new boolean[1];
-        in.readBooleanArray(boolArray);
-        super.setActive(boolArray[0]);
-
-        this.keeper = in.readParcelable(Keeper.class.getClassLoader());
+    @Override
+    public String getSubcaption(){
+        return this.keeper.getName();
     }
+
+    //endregion IModel Overridden Methods
+
+    //region Parcelable Overridden Methods
 
     @Override
     public int describeContents(){
@@ -56,18 +90,8 @@ public class Feeding extends Event implements IModel, Parcelable{
         dest.writeParcelable((Enclosure)this.getLocation(), 0);
         dest.writeBooleanArray(new boolean[]{this.isActive()});
     }
-    public static final Creator CREATOR = new Creator() {
-        public Feeding createFromParcel(Parcel in) {
-            return new Feeding(in);
-        }
 
-        public Feeding[] newArray(int size) {
-            return new Feeding[size];
-        }
-    };
+    //endregion Parcelable Overridden Methods
 
-    @Override
-    public String getSubcaption(){
-        return this.keeper.getName();
-    }
+    //endregion Methods
 }

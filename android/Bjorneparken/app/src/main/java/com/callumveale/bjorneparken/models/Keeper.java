@@ -7,27 +7,37 @@ import android.os.Parcelable;
  * Created by callum on 27/02/2017.
  */
 
-public class Keeper implements Parcelable{
+public class Keeper implements IModel, Parcelable{
+
+    //region Constants
+
+    public static final Creator CREATOR = new Creator() {
+
+        public Keeper createFromParcel(Parcel in) {
+            return new Keeper(in);
+        }
+
+        public Keeper[] newArray(int size) {
+            return new Keeper[size];
+        }
+    };
+
+    //endregion Constants
+
+    //region Properties
+
     private long id;
     private String name;
     private String bio;
 
-    // Constructor
+    //endregion Properties
+
+    //region Constructors
+
     public Keeper(long id, String name, String bio){
         this.id = id;
         this.name = name;
         this.bio = bio;
-    }
-
-    // Getter and setter methods
-    public long getId(){ return id;}
-
-    public String getName() {
-        return name;
-    }
-
-    public String getBio() {
-        return bio;
     }
 
     // Parcelling part
@@ -40,6 +50,51 @@ public class Keeper implements Parcelable{
         this.name = data[0];
         this.bio = data[1];
     }
+
+    //endregion Constructors
+
+    //region Methods
+
+    public long getId(){ return id;}
+
+    public String getName() {
+        return name;
+    }
+
+    public String getBio() {
+        return bio;
+    }
+
+    //region IModel Overridden Methods
+
+    @Override
+    public String getHeader() {
+        return name;
+    }
+
+    @Override
+    public String getSubheader() {
+        return null;
+    }
+
+    @Override
+    public String getDescription() {
+        return bio;
+    }
+
+    @Override
+    public String getCaption() {
+        return null;
+    }
+
+    @Override
+    public String getSubcaption() {
+        return null;
+    }
+
+    //endregion IModel Overridden Methods
+
+    //region Parcelable Overridden Methods
 
     @Override
     public int describeContents(){
@@ -54,13 +109,8 @@ public class Keeper implements Parcelable{
                 this.name,
                 this.bio});
     }
-    public static final Creator CREATOR = new Creator() {
-        public Keeper createFromParcel(Parcel in) {
-            return new Keeper(in);
-        }
 
-        public Keeper[] newArray(int size) {
-            return new Keeper[size];
-        }
-    };
+    //endregion Parcelable Overridden Methods
+
+    //endregion Methods
 }

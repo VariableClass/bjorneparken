@@ -9,6 +9,23 @@ import android.os.Parcelable;
 
 public class Event implements IModel, Parcelable{
 
+    //region Constants
+
+    public static final Creator CREATOR = new Creator() {
+
+        public Event createFromParcel(Parcel in) {
+            return new Event(in);
+        }
+
+        public Event[] newArray(int size) {
+            return new Event[size];
+        }
+    };
+
+    //endregion Constants
+
+    //region Properties
+
     private long id;
     private String label;
     private String description;
@@ -17,7 +34,10 @@ public class Event implements IModel, Parcelable{
     private String endTime;
     private boolean isActive;
 
-    // Constructor
+    //endregion Properties
+
+    //region Constructors
+
     public Event(long id, String label, String description, Area location, String startTime, String endTime, boolean isActive){
         this.id = id;
         this.label = label;
@@ -28,9 +48,31 @@ public class Event implements IModel, Parcelable{
         this.isActive = isActive;
     }
 
+    // Parcelling part
+    public Event(Parcel in){
+
+        this.id = in.readLong();
+
+        String[] data = new String[4];
+        in.readStringArray(data);
+        this.label = data[0];
+        this.description = data[1];
+        this.startTime = data[2];
+        this.endTime = data[3];
+
+        this.location = in.readParcelable(Amenity.class.getClassLoader());
+
+        boolean[] boolArray = new boolean[1];
+        in.readBooleanArray(boolArray);
+        this.isActive = boolArray[0];
+    }
+
     public Event(){}
 
-    // Getter and setter methods
+    //endregion Constructors
+
+    //region Methods
+
     public long getId() {
         return id;
     }
@@ -39,28 +81,8 @@ public class Event implements IModel, Parcelable{
         return label;
     }
 
-    @Override
-    public String getHeader() {
-        return this.label;
-    }
-
-    @Override
-    public String getSubheader() {
-        return this.startTime + " - " + this.endTime;
-    }
-
     public String getDescription() {
         return description;
-    }
-
-    @Override
-    public String getCaption() {
-        return this.location.getLabel();
-    }
-
-    @Override
-    public String getSubcaption() {
-        return null;
     }
 
     public Area getLocation() {
@@ -107,24 +129,31 @@ public class Event implements IModel, Parcelable{
         isActive = active;
     }
 
-    // Parcelling part
-    public Event(Parcel in){
+    //region IModel Overridden Methods
 
-        this.id = in.readLong();
-
-        String[] data = new String[4];
-        in.readStringArray(data);
-        this.label = data[0];
-        this.description = data[1];
-        this.startTime = data[2];
-        this.endTime = data[3];
-
-        this.location = in.readParcelable(Amenity.class.getClassLoader());
-
-        boolean[] boolArray = new boolean[1];
-        in.readBooleanArray(boolArray);
-        this.isActive = boolArray[0];
+    @Override
+    public String getHeader() {
+        return this.label;
     }
+
+    @Override
+    public String getSubheader() {
+        return this.startTime + " - " + this.endTime;
+    }
+
+    @Override
+    public String getCaption() {
+        return this.location.getLabel();
+    }
+
+    @Override
+    public String getSubcaption() {
+        return null;
+    }
+
+    //endregion IModel Overridden Methods
+
+    //region Parcelable Overridden Methods
 
     @Override
     public int describeContents(){
@@ -147,13 +176,8 @@ public class Event implements IModel, Parcelable{
 
         dest.writeBooleanArray(new boolean[]{this.isActive});
     }
-    public static final Creator CREATOR = new Creator() {
-        public Event createFromParcel(Parcel in) {
-            return new Event(in);
-        }
 
-        public Event[] newArray(int size) {
-            return new Event[size];
-        }
-    };
+    //endregion Parcelable Overridden Methods
+
+    //endregion Methods
 }

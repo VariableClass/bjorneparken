@@ -16,6 +16,7 @@
     <string name="help">Help</string>
 
     <!-- Lists -->
+    <string name="list_empty">No items found.</string>
     <string name="starred">Starred</string>
     <string name="unstarred">Unstarred</string>
 

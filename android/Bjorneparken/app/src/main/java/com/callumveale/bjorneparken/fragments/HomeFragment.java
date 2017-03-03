@@ -14,10 +14,7 @@ import com.callumveale.bjorneparken.R;
 import com.callumveale.bjorneparken.activities.HomeActivity;
 import com.callumveale.bjorneparken.models.Event;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -29,15 +26,29 @@ import java.util.List;
  */
 public class HomeFragment extends Fragment {
 
+    //region Constants
+
     public static final String ARG_LIST = "list";
 
-    private List<Event> mItinerary;
+    //endregion Constants
 
-    private OnItemSelectionListener mListener;
+    //region Properties
+
+    private ArrayList<? extends Parcelable> mItinerary;
+    private ListFragment.OnListItemSelectionListener mSelectedListener;
+    private DetailFragment.OnItemStarredListener mStarredListener;
+
+    //endregion Properties
+
+    //region Constructors
 
     public HomeFragment() {
         // Required empty public constructor
     }
+
+    //endregion Constructors
+
+    //region Methods
 
     /**
      * Use this factory method to create a new instance of
@@ -46,7 +57,7 @@ public class HomeFragment extends Fragment {
      * @param itinerary List of events
      * @return A new instance of fragment HomeFragment.
      */
-    public static HomeFragment newInstance(ArrayList<Parcelable> itinerary) {
+    public static HomeFragment newInstance(ArrayList<? extends Parcelable> itinerary) {
 
         HomeFragment fragment = new HomeFragment();
         Bundle args = new Bundle();
@@ -54,6 +65,8 @@ public class HomeFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
+
+    //region Fragment Overridden Methods
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -66,33 +79,38 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
-        TextView emptyView = (TextView) view.findViewById(R.id.home_empty);
-
+        // If itinerary has items
         if (mItinerary.size() > 0) {
 
-            // Hide the empty text label
-            emptyView.setVisibility(View.GONE);
+            final Event event = (Event) mItinerary.get(0);
 
-            // Create up next card
+            // Retrieve and set the label text view
             TextView mLabelView = (TextView) view.findViewById(R.id.event_label);
-            mLabelView.setText(mItinerary.get(0).getLabel());
+            mLabelView.setText(event.getLabel());
 
+            // Retrieve and set the location text view
             TextView mLocationView = (TextView) view.findViewById(R.id.event_location);
-            mLocationView.setText(mItinerary.get(0).getLocation().getLabel());
+            mLocationView.setText(event.getLocation().getLabel());
 
+            // Retrieve and set the time text view
             TextView mTimesView = (TextView) view.findViewById(R.id.event_start_time);
-            mTimesView.setText(mItinerary.get(0).getStartTime());
+            mTimesView.setText(event.getStartTime());
 
-            String description = mItinerary.get(0).getDescription();
+            // Retrieve and set the description text view
+            String description = event.getDescription();
             if (description.length() > 100) {
                 description = description.substring(0, 95) + "...";
             }
-
             TextView mDescriptionView = (TextView) view.findViewById(R.id.event_description);
             mDescriptionView.setText(description);
+
+            // Retrieve and hide the no events text view
+            TextView noEvents = (TextView) view.findViewById(R.id.home_empty);
+            noEvents.setVisibility(View.GONE);
 
             // Show the up next view
             LinearLayout upNextView = (LinearLayout) view.findViewById(R.id.up_next_view);
@@ -101,19 +119,17 @@ public class HomeFragment extends Fragment {
             // Set listener for interaction with card
             LinearLayout eventCard = (LinearLayout) view.findViewById(R.id.event_card);
 
+            // Add selected listener
             eventCard.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (null != mListener) {
+                    if (null != mSelectedListener) {
                         // Notify the active callbacks interface (the activity, if the
                         // fragment is attached to one) that an item has been selected.
-                        mListener.onItemSelection(mItinerary.get(0), isStarred());
+                        mSelectedListener.onStarredItemSelection(event, ((HomeActivity) getActivity()).isInItinerary(event));
                     }
                 }
             });
-
-        } else {
-
 
         }
 
@@ -123,50 +139,23 @@ public class HomeFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnItemSelectionListener) {
-            mListener = (OnItemSelectionListener) context;
+        if (context instanceof ListFragment.OnListItemSelectionListener && context instanceof DetailFragment.OnItemStarredListener) {
+            mSelectedListener = (ListFragment.OnListItemSelectionListener) context;
+            mStarredListener = (DetailFragment.OnItemStarredListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement OnFragmentInteractionListener and OnItemStarredListener");
         }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        mSelectedListener = null;
+        mStarredListener = null;
     }
 
-    private boolean isStarred(){
+    //endregion Fragment Overridden Methods
 
-        boolean isStarred = false;
-
-        for (Event starredEvent : mItinerary){
-
-            // If the event is starred
-            if ((starredEvent.getId() == mItinerary.get(0).getId()) &&
-                    (starredEvent.getLocation().getId() == mItinerary.get(0).getLocation().getId())){
-
-                isStarred = true;
-                break;
-            }
-        }
-
-        return isStarred;
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnItemSelectionListener {
-
-        void onItemSelection(Event event, boolean isStarred);
-    }
+    //endregion Methods
 }

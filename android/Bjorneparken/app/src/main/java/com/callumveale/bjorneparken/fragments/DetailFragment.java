@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,17 +23,30 @@ import com.callumveale.bjorneparken.models.IModel;
  */
 public class DetailFragment extends Fragment {
 
+    //region Constants
+
     public static final String ARG_ITEM = "item";
     public static final String ARG_STARRED = "starred";
 
+    //endregion Constants
+
+    //region Properties
+
     private Parcelable mItem;
     private Boolean isStarred;
-
     private OnItemStarredListener mListener;
+
+    //endregion Properties
+
+    //region Constructors
 
     public DetailFragment() {
         // Required empty public constructor
     }
+
+    //endregion Constructors
+
+    //region Methods
 
     /**
      * Use this factory method to create a new instance of
@@ -44,7 +56,6 @@ public class DetailFragment extends Fragment {
      * @return A new instance of fragment DetailFragment.
      */
     public static DetailFragment newInstance(Parcelable item, boolean starred) {
-
 
         DetailFragment fragment = new DetailFragment();
         Bundle args = new Bundle();
@@ -64,6 +75,8 @@ public class DetailFragment extends Fragment {
         return fragment;
     }
 
+    //region Fragment Overridden Methods
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,55 +93,72 @@ public class DetailFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
 
+        // Retrieve item from which to populate the view
         IModel item = (IModel) mItem;
 
         final Button star = (Button) view.findViewById(R.id.detail_star);
 
+        // If no value for is starred
         if (isStarred == null){
 
+            // Hide the star
             star.setVisibility(View.GONE);
+
         } else {
 
+            // Else, if item is starred
             if (isStarred) {
 
+                // Set text to starred
                 star.setText(R.string.starred);
 
             } else {
 
+                // Set text to unstarred
                 star.setText(R.string.unstarred);
             }
         }
 
+        // Retrieve and set header text view
         TextView mHeaderView = (TextView) view.findViewById(R.id.detail_header);
         mHeaderView.setText(item.getHeader());
 
+        // Retrieve and set description text view
         TextView mDescriptionView = (TextView) view.findViewById(R.id.detail_description);
         mDescriptionView.setText(item.getDescription());
 
+        // If item has a subheader
         if (item.getSubheader() != null){
 
+            // Retrieve, set and show subheader text view
             TextView mSubheaderView = (TextView) view.findViewById(R.id.detail_subheader);
             mSubheaderView.setText(item.getSubheader());
             mSubheaderView.setVisibility(View.VISIBLE);
         }
 
+        // If item has a caption
         if (item.getCaption() != null){
 
+            // Retrieve, set and show caption text view
             TextView mCaptionView = (TextView) view.findViewById(R.id.detail_caption);
             mCaptionView.setText(item.getCaption());
             mCaptionView.setVisibility(View.VISIBLE);
         }
 
+        // If item has a subcaption
         if (item.getSubcaption() != null){
 
+            // Retrieve, set and show subcaption text view
             TextView mSubcaptionView = (TextView) view.findViewById(R.id.detail_subcaption);
             mSubcaptionView.setText(item.getSubcaption());
             mSubcaptionView.setVisibility(View.VISIBLE);
         }
 
+        // Add starred listener
         star.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -169,18 +199,16 @@ public class DetailFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
+    //endregion Fragment Overridden Methods
+
+    //endregion Methods
+
+    //region Interfaces
+
     public interface OnItemStarredListener {
 
         void onItemStarred(Parcelable parcelable);
     }
+
+    //endregion Interfaces
 }

@@ -1,132 +1,138 @@
 package com.callumveale.bjorneparken.requests;
 
-import android.os.Parcelable;
+import android.util.Log;
 
-import com.callumveale.bjorneparken.models.Amenity;
-import com.callumveale.bjorneparken.models.Animal;
-import com.callumveale.bjorneparken.models.Enclosure;
+import com.callumveale.bjorneparken.activities.HomeActivity;
 import com.callumveale.bjorneparken.models.Event;
-import com.callumveale.bjorneparken.models.Feeding;
-import com.callumveale.bjorneparken.models.Keeper;
 import com.callumveale.bjorneparken.models.Species;
+import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.util.DateTime;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Locale;
 
-import none.bjorneparkappen_api.model.MainAmenityResponse;
-import none.bjorneparkappen_api.model.MainAnimalResponse;
-import none.bjorneparkappen_api.model.MainAreaListResponse;
-import none.bjorneparkappen_api.model.MainEnclosureResponse;
-import none.bjorneparkappen_api.model.MainEventListResponse;
-import none.bjorneparkappen_api.model.MainEventResponse;
-import none.bjorneparkappen_api.model.MainFeedingResponse;
-import none.bjorneparkappen_api.model.MainSpeciesListResponse;
-import none.bjorneparkappen_api.model.MainSpeciesResponse;
+import none.bjorneparkappen_api.BjorneparkappenApi;
 
 /**
  * Created by callum on 27/02/2017.
  */
-
 public class RequestsModule {
 
+    //region Constants
+
+    private static final String ROOT_URL = "https://api-dot-bjorneparkappen.appspot.com/_ah/api/";
+
+    //region Request Constants
 
     static final String API_KEY = "AIzaSyCuD2dk_XFcn512V5JxAZbFlAK9dgNlQ9c";
-    static final String ROOT_URL = "https://api-dot-bjorneparkappen.appspot.com/_ah/api/";
 
-    public static String LANGUAGE;
+    static final String EVENT_ID = "event_id";
+    static final String LOCATION_ID = "location_id";
+    static final String SPECIES_ID = "species_id";
+    static final String VISITOR_ID = "visitor_id";
 
-    public static ArrayList<Parcelable> convertListResponseToList(Object response){
+    //endregion Request Constants
 
-        if (response == null){
+    //endregion Constants
 
-            throw new NullPointerException("Unable to process null response");
-        }
+    //region Properties
 
-        ArrayList<Parcelable> returnList = new ArrayList<>();
+    private BjorneparkappenApi.Builder mBuilder;
+    private HomeActivity mActivity;
+    private String mLanguage;
 
-        if (response.getClass() == MainSpeciesListResponse.class){
+    //endregion Properties
 
-            if (((MainSpeciesListResponse) response).getSpecies() != null) {
+    //region Constructors
 
-                for (MainSpeciesResponse speciesResponse : ((MainSpeciesListResponse) response).getSpecies()){
+    public RequestsModule(String applicationName, HomeActivity activity){
 
-                    Species species = new Species(speciesResponse.getId(), speciesResponse.getCommonName(), speciesResponse.getLatin(), speciesResponse.getDescription());
-                    returnList.add(species);
-                }
-            }
+        mBuilder = new BjorneparkappenApi.Builder(
+                AndroidHttp.newCompatibleTransport(), new JacksonFactory(), null);
+        mBuilder.setRootUrl(RequestsModule.ROOT_URL);
+        mBuilder.setApplicationName(applicationName);
 
-            return returnList;
-
-        } else if (response.getClass() == MainAreaListResponse.class){
-
-            if (((MainAreaListResponse) response).getAmenities() != null) {
-
-                for (MainAmenityResponse amenityResponse : ((MainAreaListResponse) response).getAmenities()){
-
-                    List<String> coordinatesList = amenityResponse.getCoordinates();
-                    String[] coordinates = coordinatesList.toArray(new String[coordinatesList.size()]);
-
-                    Amenity amenity = new Amenity(amenityResponse.getId(), amenityResponse.getLabel(), amenityResponse.getVisitorDestination(), coordinates, amenityResponse.getDescription(), amenityResponse.getAmenityType());
-                    returnList.add(amenity);
-                }
-            }
-
-            return returnList;
-
-        } else if (response.getClass() == MainEventListResponse.class){
-
-            if (((MainEventListResponse) response).getEvents() != null) {
-
-                for (MainEventResponse eventResponse : ((MainEventListResponse) response).getEvents()){
-
-                    MainAmenityResponse locationResponse = eventResponse.getLocation();
-
-                    List<String> coordinatesList = locationResponse.getCoordinates();
-                    String[] coordinates = coordinatesList.toArray(new String[coordinatesList.size()]);
-
-                    Amenity location = new Amenity(locationResponse.getId(), locationResponse.getLabel(), locationResponse.getVisitorDestination(), coordinates, locationResponse.getDescription(), locationResponse.getAmenityType());
-
-                    Event event = new Event(eventResponse.getId(), eventResponse.getLabel(), eventResponse.getDescription(), location, eventResponse.getStartTime(), eventResponse.getEndTime(), eventResponse.getIsActive());
-                    returnList.add(event);
-                }
-            }
-
-            if (((MainEventListResponse) response).getFeedings() != null) {
-
-                for (MainFeedingResponse feedingResponse : ((MainEventListResponse) response).getFeedings()){
-
-                    MainEnclosureResponse locationResponse = feedingResponse.getLocation();
-
-                    // Get co-ordinates
-                    List<String> coordinatesList = locationResponse.getCoordinates();
-                    String[] coordinates = coordinatesList.toArray(new String[coordinatesList.size()]);
-
-                    // Create animals
-                    List<MainAnimalResponse> animalsList = locationResponse.getAnimals();
-                    Animal[] animals = new Animal[animalsList.size()];
-                    for (int i = 0; i < animalsList.size() - 1; i++){
-
-                        MainSpeciesResponse speciesResponse = animalsList.get(i).getSpecies();
-                        Species species = new Species(speciesResponse.getId(), speciesResponse.getCommonName(), speciesResponse.getLatin(), speciesResponse.getDescription());
-
-                        animals[i] = new Animal(animalsList.get(i).getId(), animalsList.get(i).getName(), species, animalsList.get(i).getDescription(), animalsList.get(i).getIsAvailable());
-                    }
-
-                    // Create enclosure, passing in animals
-                    Enclosure location = new Enclosure(locationResponse.getId(), locationResponse.getLabel(), locationResponse.getVisitorDestination(), coordinates, animals);
-
-                    // Create keeper
-                    Keeper keeper = new Keeper(feedingResponse.getKeeper().getId(), feedingResponse.getKeeper().getName(), feedingResponse.getKeeper().getBio());
-
-                    // Create feeding, passing in co-ordinates, enclosure and keeper
-                    Feeding feeding = new Feeding(feedingResponse.getId(), feedingResponse.getLabel(), feedingResponse.getDescription(), location, feedingResponse.getStartTime(), feedingResponse.getEndTime(), feedingResponse.getIsActive(), keeper);
-                    returnList.add(feeding);
-                }
-            }
-
-            return returnList;
-        }
-
-        return returnList;
+        mActivity = activity;
+        mLanguage = Locale.getDefault().getLanguage();
     }
+
+    //endregion Constructors
+
+    //region Methods
+
+    //region GET Requests
+
+    public void getAllAmenities(){
+
+        GetAllAmenitiesTask getAllAmenities = new GetAllAmenitiesTask(mBuilder, mActivity, mLanguage);
+        getAllAmenities.execute();
+    }
+
+    public void getAllAttractions(){
+
+        GetAllAttractionsTask getAllAttractions = new GetAllAttractionsTask(mBuilder, mActivity, mLanguage);
+        getAllAttractions.execute();
+    }
+
+    public void getAllSpecies(){
+
+        GetAllSpeciesTask getAllSpecies = new GetAllSpeciesTask(mBuilder, mActivity, mLanguage);
+        getAllSpecies.execute();
+    }
+
+    public void getVersion(){
+
+        GetVersionTask getVersion = new GetVersionTask(mBuilder, mActivity);
+        getVersion.execute();
+    }
+
+    public void getVisitorId(DateTime visitStart, DateTime visitEnd){
+
+        GetVisitorIdTask getVisitorId = new GetVisitorIdTask(mBuilder, mActivity, visitStart, visitEnd);
+        getVisitorId.execute();
+    }
+
+    public void getItinerary(long visitorId){
+
+        GetVisitorItineraryTask getVisitorItinerary = new GetVisitorItineraryTask(mBuilder, mActivity, mLanguage, visitorId);
+        getVisitorItinerary.execute();
+    }
+
+    public void getStarredSpecies(long visitorId){
+
+        GetVisitorStarredSpeciesTask getVisitorStarredSpecies = new GetVisitorStarredSpeciesTask(mBuilder, mActivity, mLanguage, visitorId);
+        getVisitorStarredSpecies.execute();
+    }
+
+    //endregion GET Requests
+
+    //region POST Requests
+
+    public void addToItinerary(long visitorId, Event event){
+
+        AddToItineraryTask addToItinerary = new AddToItineraryTask(mBuilder, mActivity, visitorId, event);
+        addToItinerary.execute();
+    }
+
+    public void removeFromItinerary(long visitorId, Event event){
+
+        RemoveFromItineraryTask removeFromItinerary = new RemoveFromItineraryTask(mBuilder, mActivity, visitorId, event);
+        removeFromItinerary.execute();
+    }
+
+    public void starSpecies(long visitorId, Species species){
+
+        StarSpeciesTask starSpecies = new StarSpeciesTask(mBuilder, mActivity, visitorId, species);
+        starSpecies.execute();
+    }
+
+    public void unstarSpecies(long visitorId, Species species){
+
+        UnstarSpeciesTask unstarSpecies = new UnstarSpeciesTask(mBuilder, mActivity, visitorId, species);
+        unstarSpecies.execute();
+    }
+
+    //endregion POST Requests
+
+    //endregion Methods
 }

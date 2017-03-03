@@ -2,71 +2,78 @@ package com.callumveale.bjorneparken.adapters;
 
 import android.app.Activity;
 import android.graphics.Typeface;
+import android.os.Parcelable;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.TextView;
 
 import com.callumveale.bjorneparken.R;
 import com.callumveale.bjorneparken.activities.HomeActivity;
 import com.callumveale.bjorneparken.fragments.DetailFragment;
 import com.callumveale.bjorneparken.fragments.ListFragment.OnListItemSelectionListener;
 import com.callumveale.bjorneparken.models.Species;
-import com.callumveale.bjorneparken.models.Visitor;
 
-import java.util.List;
+import java.util.ArrayList;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
  * specified {@link OnListFragmentInteractionListener}.
  */
-public class SpeciesRecyclerViewAdapter extends RecyclerView.Adapter<SpeciesRecyclerViewAdapter.ViewHolder> implements IListAdapter{
+public class SpeciesRecyclerViewAdapter extends RecyclerViewAdapter {
+
+    //region Constants
 
     private static final int EMPTY_TEXT_RESOURCE = R.string.no_species;
 
-    private final List<Species> mSpecies;
-    private final HomeActivity mActivity;
-    private final OnListItemSelectionListener mItemSelectedListener;
-    private final DetailFragment.OnItemStarredListener mItemStarredListener;
+    //endregion Constants
 
-    public SpeciesRecyclerViewAdapter(HomeActivity activity, List species, OnListItemSelectionListener selectedListener, DetailFragment.OnItemStarredListener starredListener) {
-        mSpecies = (List<Species>)species;
-        mActivity = activity;
-        mItemSelectedListener = selectedListener;
-        mItemStarredListener = starredListener;
+    //region Constructors
+
+    public SpeciesRecyclerViewAdapter(HomeActivity activity, ArrayList<? extends Parcelable> species, OnListItemSelectionListener selectedListener, DetailFragment.OnItemStarredListener starredListener) {
+        super(activity, species, selectedListener, starredListener);
+
     }
 
-    @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_list_item, parent, false);
+    //endregion Constructors
 
-        return new ViewHolder(view);
-    }
+    //region Methods
+
+    //region RecyclerViewAdapter Overridden Methods
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, final int position) {
-        holder.mItem = mSpecies.get(position);
-        holder.mCommonNameView.setText(mSpecies.get(position).getCommonName());
-        holder.mLatinView.setText(mSpecies.get(position).getLatin());
+    public void onBindViewHolder(final ListItemViewHolder holder, final int position) {
 
-        if (isStarred(position)){
+        final Species species = (Species) mItems.get(position);
 
-            holder.mStarredButton.setText(R.string.starred);
+        // Set list view item
+        holder.mItem = species;
+
+        // Set header
+        holder.mHeaderView.setText(species.getCommonName());
+
+        // Set subheading
+        holder.mSubheadingView.setText(species.getLatin());
+        holder.mSubheadingView.setTypeface(holder.mSubheadingView.getTypeface(), Typeface.ITALIC);
+        holder.mSubheadingView.setVisibility(View.VISIBLE);
+
+        // Set star button
+        if (mActivity.isStarred(species)){
+
+            holder.mStarButton.setText(R.string.starred);
 
         } else {
 
-            holder.mStarredButton.setText(R.string.unstarred);
+            holder.mStarButton.setText(R.string.unstarred);
         }
+        holder.mStarButton.setVisibility(View.VISIBLE);
 
-        String description = mSpecies.get(position).getDescription();
+        // Set body
+        String description = species.getDescription();
         if (description.length() > 100){
             description = description.substring(0, 95) + "...";
         }
-        holder.mDescriptionView.setText(description);
+        holder.mBodyView.setText(description);
 
+        // Add selected listener
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -74,24 +81,25 @@ public class SpeciesRecyclerViewAdapter extends RecyclerView.Adapter<SpeciesRecy
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
                     holder.mView.setPressed(true);
-                    mItemSelectedListener.onStarredListItemSelection(holder.mItem, isStarred(position));
+                    mItemSelectedListener.onStarredItemSelection(holder.mItem, mActivity.isStarred(species));
                 }
             }
         });
 
-        holder.mStarredButton.setOnClickListener(new View.OnClickListener() {
+        // Add starred listener
+        holder.mStarButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (null != mItemSelectedListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    if (isStarred(position)){
+                    if (mActivity.isStarred(species)){
 
-                        holder.mStarredButton.setText(R.string.unstarred);
+                        holder.mStarButton.setText(R.string.unstarred);
 
                     } else {
 
-                        holder.mStarredButton.setText(R.string.starred);
+                        holder.mStarButton.setText(R.string.starred);
                     }
                     mItemStarredListener.onItemStarred(holder.mItem);
                 }
@@ -99,55 +107,13 @@ public class SpeciesRecyclerViewAdapter extends RecyclerView.Adapter<SpeciesRecy
         });
     }
 
+    @Override
     public String getEmptyText(Activity activity){
 
         return activity.getString(EMPTY_TEXT_RESOURCE);
     }
 
-    private boolean isStarred(int position){
+    //endregion RecyclerViewAdapter Overridden Methods
 
-        boolean isStarred = false;
-
-        for (Species starredSpecies : mActivity.getVisitor().getStarredSpecies()){
-
-            if (starredSpecies.getId() == mSpecies.get(position).getId()){
-
-                isStarred = true;
-                break;
-            }
-        }
-
-        return isStarred;
-    }
-
-    @Override
-    public int getItemCount() {
-        return mSpecies.size();
-    }
-
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        public final View mView;
-        public final TextView mCommonNameView;
-        public final TextView mLatinView;
-        public final TextView mDescriptionView;
-        public final Button mStarredButton;
-        public Species mItem;
-
-        public ViewHolder(View view) {
-            super(view);
-            mView = view;
-            mCommonNameView = (TextView) view.findViewById(R.id.header_heading);
-            mLatinView = (TextView) view.findViewById(R.id.header_subheading);
-            mLatinView.setTypeface(mLatinView.getTypeface(), Typeface.ITALIC);
-            mLatinView.setVisibility(View.VISIBLE);
-            mDescriptionView = (TextView) view.findViewById(R.id.body);
-            mStarredButton = (Button) view.findViewById(R.id.list_star);
-            mStarredButton.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        public String toString() {
-            return super.toString() + " '" + mCommonNameView.getText() + "'";
-        }
-    }
+    //endregion Methods
 }

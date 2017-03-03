@@ -1,87 +1,73 @@
 package com.callumveale.bjorneparken.adapters;
 
 import android.app.Activity;
+import android.os.Parcelable;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.callumveale.bjorneparken.R;
 import com.callumveale.bjorneparken.fragments.ListFragment.OnListItemSelectionListener;
 import com.callumveale.bjorneparken.models.Amenity;
 
-import java.util.List;
+import java.util.ArrayList;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
  * specified {@link OnListFragmentInteractionListener}.
  */
-public class AmenityRecyclerViewAdapter extends RecyclerView.Adapter<AmenityRecyclerViewAdapter.ViewHolder> implements IListAdapter {
+public class AmenityRecyclerViewAdapter extends RecyclerViewAdapter {
+
+    //region Constants
 
     private static final int EMPTY_TEXT_RESOURCE = R.string.no_amenities;
 
-    private final List<Amenity> mAmenities;
-    private final OnListItemSelectionListener mListener;
+    //endregion Constants
 
-    public AmenityRecyclerViewAdapter(List items, OnListItemSelectionListener listener) {
-        mAmenities = (List<Amenity>)items;
-        mListener = listener;
+    //region Constructors
+
+    public AmenityRecyclerViewAdapter(ArrayList<? extends Parcelable> amenities, OnListItemSelectionListener listener) {
+        super(amenities, listener);
     }
 
-    @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_list_item, parent, false);
+    //endregion Constructors
 
-        return new ViewHolder(view);
-    }
+    //region Methods
+
+    //region RecyclerViewAdapter Overridden Methods
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mItem = mAmenities.get(position);
-        holder.mLabelView.setText(mAmenities.get(position).getLabel());
-        holder.mDescriptionView.setText(mAmenities.get(position).getDescription());
+    public void onBindViewHolder(final ListItemViewHolder holder, int position) {
+
+        Amenity amenity = (Amenity) mItems.get(position);
+
+        holder.mItem = amenity;
+        holder.mHeaderView.setText(amenity.getLabel());
+        holder.mBodyView.setText(amenity.getDescription());
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (null != mListener) {
+                if (null != mItemSelectedListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
                     holder.mView.setPressed(true);
-                    mListener.onListItemSelection(holder.mItem);
+                    mItemSelectedListener.onItemSelection(holder.mItem);
                 }
             }
         });
     }
 
-    @Override
-    public int getItemCount() {
-        return mAmenities.size();
-    }
+    //endregion RecyclerViewAdapter Overridden Methods
 
+    //region IListAdapter Overridden Methods
+
+    @Override
     public String getEmptyText(Activity activity){
 
         return activity.getString(EMPTY_TEXT_RESOURCE);
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        public final View mView;
-        public final TextView mLabelView;
-        public final TextView mDescriptionView;
-        public Amenity mItem;
+    //endregion IListAdapter Overridden Methods
 
-        public ViewHolder(View view) {
-            super(view);
-            mView = view;
-            mLabelView = (TextView) view.findViewById(R.id.header_heading);
-            mDescriptionView = (TextView) view.findViewById(R.id.body);
-        }
-
-        @Override
-        public String toString() {
-            return super.toString() + " '" + mLabelView.getText() + "'";
-        }
-    }
+    //endregion Methods
 }

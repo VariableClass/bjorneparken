@@ -3,20 +3,74 @@ package com.callumveale.bjorneparken.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
+
 /**
  * Created by callum on 27/02/2017.
  */
 
 public class Amenity extends Area implements IModel, Parcelable{
+
+    //region Constants
+
+    public static final Creator CREATOR = new Creator() {
+
+        public Amenity createFromParcel(Parcel in) {
+            return new Amenity(in);
+        }
+
+        public Amenity[] newArray(int size) {
+            return new Amenity[size];
+        }
+    };
+
+    //endregion Constants
+
+    //region Properties
+
     private String description;
     private String amenityType;
 
-    // Constructor
-    public Amenity(long id, String label, String visitorDestination, String[] coordinates, String description, String amenityType){
+    //endregion Properties
+
+    //region Constructors
+
+    public Amenity(long id, String label, String visitorDestination, ArrayList<String> coordinates, String description, String amenityType){
         super(id, label, visitorDestination, coordinates);
         this.description = description;
         this.amenityType = amenityType;
     }
+
+    // Parcelling part
+    public Amenity(Parcel in){
+
+        setId(in.readLong());
+
+        String[] data = new String[4];
+        in.readStringArray(data);
+        setLabel(data[0]);
+        setVisitorDestination(data[1]);
+        description = data[2];
+        amenityType = data[3];
+
+        ArrayList<String> coordinates = new ArrayList<>();
+        in.readStringList(coordinates);
+        setCoordinates(coordinates);
+    }
+
+    //endregion Constructors
+
+    //region Methods
+
+    public String getAmenityType() {
+        return amenityType;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    //region IModel Overridden Methods
 
     @Override
     public String getHeader() {
@@ -26,11 +80,6 @@ public class Amenity extends Area implements IModel, Parcelable{
     @Override
     public String getSubheader() {
         return null;
-    }
-
-    // Getter and setter methods
-    public String getDescription() {
-        return description;
     }
 
     @Override
@@ -43,24 +92,9 @@ public class Amenity extends Area implements IModel, Parcelable{
         return null;
     }
 
-    public String getAmenityType() {
-        return amenityType;
-    }
+    //endregion IModel Overridden Methods
 
-    // Parcelling part
-    public Amenity(Parcel in){
-
-        super.setId(in.readLong());
-
-        String[] data = new String[5];
-        in.readStringArray(data);
-        super.setLabel(data[0]);
-        super.setVisitorDestination(data[1]);
-        super.setCoordinates(data[2].split(","));
-
-        this.description = data[3];
-        this.amenityType = data[4];
-    }
+    //region Parcelable Overridden Methods
 
     @Override
     public int describeContents(){
@@ -70,22 +104,18 @@ public class Amenity extends Area implements IModel, Parcelable{
     @Override
     public void writeToParcel(Parcel dest, int flags) {
 
-        dest.writeLong(super.getId());
+        dest.writeLong(getId());
 
         dest.writeStringArray(new String[] {
-                super.getLabel(),
-                super.getVisitorDestination(),
-                super.getCoordinates().toString(),
-                this.description,
-                this.amenityType});
-    }
-    public static final Creator CREATOR = new Creator() {
-        public Amenity createFromParcel(Parcel in) {
-            return new Amenity(in);
-        }
+                getLabel(),
+                getVisitorDestination(),
+                description,
+                amenityType});
 
-        public Amenity[] newArray(int size) {
-            return new Amenity[size];
-        }
-    };
+        dest.writeStringList(getCoordinates());
+    }
+
+    //endregion Parcelable Overridden Methods
+
+    //endregion Methods
 }

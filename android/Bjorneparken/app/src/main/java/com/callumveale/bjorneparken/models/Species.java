@@ -3,65 +3,43 @@ package com.callumveale.bjorneparken.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import none.bjorneparkappen_api.model.MainSpeciesListResponse;
-import none.bjorneparkappen_api.model.MainSpeciesRequest;
-import none.bjorneparkappen_api.model.MainSpeciesResponse;
-
 /**
  * Created by callum on 27/02/2017.
  */
 
 public class Species implements IModel, Parcelable{
+
+    //region Constants
+
+    public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+
+        public Species createFromParcel(Parcel in) {
+            return new Species(in);
+        }
+
+        public Species[] newArray(int size) {
+            return new Species[size];
+        }
+    };
+
+    //endregion Constants
+
+    //region Properties
+
     private long id;
     private String commonName;
     private String latin;
     private String description;
 
-    // Constructor
+    //endregion Properties
+
+    //region Constructors
+
     public Species(long id, String commonName, String latin, String description){
         this.id = id;
         this.commonName = commonName;
         this.latin = latin;
         this.description = description;
-    }
-
-    // Getter and setter methods
-    public long getId(){ return id;}
-
-    @Override
-    public String getHeader() {
-        return this.commonName;
-    }
-
-    @Override
-    public String getSubheader() {
-        return this.latin;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    @Override
-    public String getCaption() {
-        return null;
-    }
-
-    @Override
-    public String getSubcaption() {
-        return null;
-    }
-
-    public String getCommonName() {
-        return commonName;
-    }
-
-    public String getLatin() {
-        return latin;
-    }
-
-    public void setLatin(String latin) {
-        this.latin = latin;
     }
 
     // Parcelling part
@@ -74,6 +52,50 @@ public class Species implements IModel, Parcelable{
         this.latin = data[2];
         this.description = data[3];
     }
+
+    //endregion Constructors
+
+    //region Methods
+
+    public long getId(){ return id;}
+
+    public String getCommonName() {
+        return commonName;
+    }
+
+    public String getLatin() {
+        return latin;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    //region IModel Overridden Methods
+
+    @Override
+    public String getHeader() {
+        return this.commonName;
+    }
+
+    @Override
+    public String getSubheader() {
+        return this.latin;
+    }
+
+    @Override
+    public String getCaption() {
+        return null;
+    }
+
+    @Override
+    public String getSubcaption() {
+        return null;
+    }
+
+    //endregion IModel Overridden Methods
+
+    //region Parcelable Overridden Methods
 
     @Override
     public int describeContents(){
@@ -88,13 +110,8 @@ public class Species implements IModel, Parcelable{
                 this.latin,
                 this.description});
     }
-    public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
-        public Species createFromParcel(Parcel in) {
-            return new Species(in);
-        }
 
-        public Species[] newArray(int size) {
-            return new Species[size];
-        }
-    };
+    //endregion Parcelable Overridden Methods
+
+    //endregion Methods
 }

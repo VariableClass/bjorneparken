@@ -1,7 +1,6 @@
 package com.callumveale.bjorneparken.models;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import java.util.ArrayList;
 
 /**
  * Created by callum on 28/02/2017.
@@ -9,12 +8,18 @@ import android.os.Parcelable;
 
 public class Area {
 
+    //region Properties
+
     private long id;
     private String label;
     private String visitorDestination;
-    private String[] coordinates;
+    private ArrayList<String> coordinates;
 
-    public Area(long id, String label, String visitorDestination, String[] coordinates){
+    //endregion Properties
+
+    //region Constructors
+
+    public Area(long id, String label, String visitorDestination, ArrayList<String> coordinates){
         this.id = id;
         this.label = label;
         this.visitorDestination = visitorDestination;
@@ -23,7 +28,10 @@ public class Area {
 
     public Area(){}
 
-    // Getter and setter methods
+    //endregion Constructors
+
+    //region Methods
+
     public long getId() {
         return id;
     }
@@ -36,7 +44,7 @@ public class Area {
         return visitorDestination;
     }
 
-    public String[] getCoordinates() {
+    public ArrayList<String> getCoordinates() {
         return coordinates;
     }
 
@@ -52,7 +60,9 @@ public class Area {
         this.visitorDestination = visitorDestination;
     }
 
-    public void setCoordinates(String[] coordinates) {
+    public void setCoordinates(ArrayList<String> coordinates) {
         this.coordinates = coordinates;
     }
+
+    //endregion Methods
 }

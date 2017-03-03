@@ -5,13 +5,23 @@ package com.callumveale.bjorneparken.models;
  */
 public class NavigationDrawerItem {
 
+    //region Properties
+
     public int icon;
     public String name;
+
+    //endregion Properties
+
+    //region Constructors
 
     public NavigationDrawerItem(String name)
     {
         this.name = name;
     }
+
+    //endregion Constructors
+
+    //region Methods
 
     public static NavigationDrawerItem[] build(String[] options){
 
@@ -24,5 +34,7 @@ public class NavigationDrawerItem {
 
         return drawerItems;
     }
+
+    //endregion Methods
 }
 
