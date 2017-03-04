@@ -8,17 +8,19 @@ import com.callumveale.bjorneparken.models.Event;
 import java.io.IOException;
 
 import none.bjorneparkappen_api.BjorneparkappenApi;
+import none.bjorneparkappen_api.model.MainEventListResponse;
 import none.bjorneparkappen_api.model.ProtorpcMessagesCombinedContainer;
 
 /**
  * Created by callum on 27/02/2017.
  */
-public class AddToItineraryTask extends AsyncTask<Void, Void, Void> {
+public class AddToItineraryTask extends AsyncTask<Void, Void, MainEventListResponse> {
 
     //region Properties
 
     private BjorneparkappenApi.Builder mBuilder;
     private HomeActivity mActivity;
+    private String mLanguage;
     private long mVisitorId;
     private Event mEvent;
 
@@ -26,10 +28,11 @@ public class AddToItineraryTask extends AsyncTask<Void, Void, Void> {
 
     //region Constructors
 
-    public AddToItineraryTask(BjorneparkappenApi.Builder builder, HomeActivity activity, long visitorId, Event event) {
+    public AddToItineraryTask(BjorneparkappenApi.Builder builder, HomeActivity activity, String language, long visitorId, Event event) {
 
         mBuilder = builder;
         mActivity = activity;
+        mLanguage = language;
         mVisitorId = visitorId;
         mEvent = event;
     }
@@ -38,7 +41,7 @@ public class AddToItineraryTask extends AsyncTask<Void, Void, Void> {
 
     //region Methods
 
-    //region AsyncTask<Void, Void, Void> Overridden Methods
+    //region AsyncTask<Void, Void, MainEventListResponse> Overridden Methods
 
     @Override
     protected void onPreExecute() {
@@ -47,32 +50,44 @@ public class AddToItineraryTask extends AsyncTask<Void, Void, Void> {
     }
 
     @Override
-    protected Void doInBackground(Void... params) {
+    protected MainEventListResponse doInBackground(Void... params) {
 
         ProtorpcMessagesCombinedContainer request = new ProtorpcMessagesCombinedContainer();
         request.set(RequestsModule.VISITOR_ID, this.mVisitorId);
         request.set(RequestsModule.EVENT_ID, this.mEvent.getId());
         request.set(RequestsModule.LOCATION_ID, this.mEvent.getLocation().getId());
+        request.set(RequestsModule.LANGUAGE_CODE, mLanguage);
+
+        MainEventListResponse itineraryResponse = new MainEventListResponse();
 
         try {
 
-            mBuilder.build().visitors().itinerary().add(request).setKey(RequestsModule.API_KEY).execute();
+            itineraryResponse = mBuilder.build().visitors().itinerary().add(request).setKey(RequestsModule.API_KEY).execute();
 
         } catch (IOException e) {
 
             e.printStackTrace();
         }
 
-        return null;
+        return itineraryResponse;
     }
 
     @Override
-    protected void onPostExecute(Void param) {
+    protected void onPostExecute(MainEventListResponse itineraryResponse) {
+
+        if (itineraryResponse != null) {
+
+            mActivity.saveItinerary(itineraryResponse);
+
+        } else {
+
+            mActivity.getNewId();
+        }
 
         mActivity.updateProgress(true);
     }
 
-    //endregion AsyncTask<Void, Void, Void> Overridden Methods
+    //endregion AsyncTask<Void, Void, MainEventListResponse> Overridden Methods
 
     //endregion Methods
 }

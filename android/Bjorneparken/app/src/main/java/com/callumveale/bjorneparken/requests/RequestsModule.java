@@ -1,7 +1,5 @@
 package com.callumveale.bjorneparken.requests;
 
-import android.util.Log;
-
 import com.callumveale.bjorneparken.activities.HomeActivity;
 import com.callumveale.bjorneparken.models.Event;
 import com.callumveale.bjorneparken.models.Species;
@@ -27,6 +25,7 @@ public class RequestsModule {
     static final String API_KEY = "AIzaSyCuD2dk_XFcn512V5JxAZbFlAK9dgNlQ9c";
 
     static final String EVENT_ID = "event_id";
+    static final String LANGUAGE_CODE = "language_code";
     static final String LOCATION_ID = "location_id";
     static final String SPECIES_ID = "species_id";
     static final String VISITOR_ID = "visitor_id";
@@ -110,25 +109,25 @@ public class RequestsModule {
 
     public void addToItinerary(long visitorId, Event event){
 
-        AddToItineraryTask addToItinerary = new AddToItineraryTask(mBuilder, mActivity, visitorId, event);
+        AddToItineraryTask addToItinerary = new AddToItineraryTask(mBuilder, mActivity, mLanguage, visitorId, event);
         addToItinerary.execute();
     }
 
     public void removeFromItinerary(long visitorId, Event event){
 
-        RemoveFromItineraryTask removeFromItinerary = new RemoveFromItineraryTask(mBuilder, mActivity, visitorId, event);
+        RemoveFromItineraryTask removeFromItinerary = new RemoveFromItineraryTask(mBuilder, mActivity, mLanguage, visitorId, event);
         removeFromItinerary.execute();
     }
 
     public void starSpecies(long visitorId, Species species){
 
-        StarSpeciesTask starSpecies = new StarSpeciesTask(mBuilder, mActivity, visitorId, species);
+        StarSpeciesTask starSpecies = new StarSpeciesTask(mBuilder, mActivity, mLanguage, visitorId, species);
         starSpecies.execute();
     }
 
     public void unstarSpecies(long visitorId, Species species){
 
-        UnstarSpeciesTask unstarSpecies = new UnstarSpeciesTask(mBuilder, mActivity, visitorId, species);
+        UnstarSpeciesTask unstarSpecies = new UnstarSpeciesTask(mBuilder, mActivity, mLanguage, visitorId, species);
         unstarSpecies.execute();
     }
 
