@@ -11,17 +11,48 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/detail_header"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true"
             android:layout_toStartOf="@+id/detail_star"
             android:layout_toLeftOf="@+id/detail_star"
-            android:textStyle="bold"
-            android:textSize="25sp"
-            android:textColor="@android:color/white"/>
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/detail_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:textSize="25sp"
+                android:textColor="@android:color/white"/>
+
+            <TextView
+                android:id="@+id/detail_subheader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="italic"
+                android:textSize="20sp"
+                android:textColor="@android:color/white"
+                android:visibility="gone"
+                android:paddingTop="10dp"/>
+
+            <TextView
+                android:id="@+id/detail_caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:paddingTop="10dp"
+                android:visibility="gone"/>
+
+            <TextView
+                android:id="@+id/detail_subcaption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"/>
+
+        </LinearLayout>
 
         <ImageView
             android:id="@+id/detail_star"
@@ -33,35 +64,11 @@
     </RelativeLayout>
 
     <TextView
-        android:id="@+id/detail_subheader"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textStyle="italic"
-        android:textSize="20sp"
-        android:textColor="@android:color/white"
-        android:visibility="gone"
-        android:paddingTop="10dp"/>
-
-    <TextView
-        android:id="@+id/detail_caption"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:textSize="20sp"
-        android:paddingTop="10dp"/>
-
-    <TextView
         android:id="@+id/detail_description"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingTop="30dp"
         android:textSize="15sp"
         android:textColor="@android:color/white"/>
-
-    <TextView
-        android:id="@+id/detail_subcaption"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="invisible"/>
 
 </LinearLayout>
