@@ -79,6 +79,12 @@ public class RequestsModule {
         getAllSpecies.execute();
     }
 
+    public void getAllFeedings(){
+
+        GetAllFeedingsTask getAllFeedings = new GetAllFeedingsTask(mBuilder, mActivity, mLanguage);
+        getAllFeedings.execute();
+    }
+
     public void getVersion(){
 
         GetVersionTask getVersion = new GetVersionTask(mBuilder, mActivity);

@@ -67,7 +67,6 @@ public class DetailFragment extends Fragment {
 
     public static DetailFragment newInstance(Parcelable item) {
 
-
         DetailFragment fragment = new DetailFragment();
         Bundle args = new Bundle();
         args.putParcelable(ARG_ITEM, item);
@@ -168,6 +167,7 @@ public class DetailFragment extends Fragment {
                     // fragment is attached to one) that an item has been selected.
                     isStarred = !isStarred;
                     if (isStarred) {
+
                         star.setText(R.string.starred);
 
                     } else {

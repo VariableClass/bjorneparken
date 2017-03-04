@@ -330,7 +330,7 @@ public class ResponseConverter {
         return new Feeding(response.getId(), response.getLabel(), response.getDescription(), location, response.getStartTime(), response.getEndTime(), response.getIsActive(), keeper);
     }
 
-    private static ArrayList<Feeding> convertFeedingListResponse(MainEventListResponse response){
+    public static ArrayList<Feeding> convertFeedingListResponse(MainEventListResponse response){
 
         // Create new list to return
         ArrayList<Feeding> returnList = new ArrayList<>();

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Bjorneparken</string>
+    <string name="app_name">Bjørneparken</string>
 
     <!-- Navigation Drawer -->
     <string name="drawer_open">Navigasjonsmenyen åpen</string>
@@ -23,8 +23,12 @@
     <!-- Home Activity -->
     <string name="up_next">Neste:</string>
 
+    <!-- Select Feeding Dialog -->
+    <string name="select_feeding">Velg en fôring:</string>
+    <string name="close_dialog">OK</string>
+
     <!-- My Visit Fragment -->
-    <string name="empty_itinerary">Du har ingen favoritter for øyeblikket. Gå til \'Dyr\'-fanen for å velge noe favorittfôringer!</string>
+    <string name="empty_itinerary">Du har ingen favoritter for øyeblikket. Gå til \'Dyr\'-fanen for å velge noen favorittfôringer!</string>
 
     <!-- Animals Fragment -->
     <string name="no_species">Ingen dyr funnet.</string>

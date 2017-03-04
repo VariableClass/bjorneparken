@@ -21,10 +21,14 @@ import com.callumveale.bjorneparken.adapters.NavigationDrawerAdapter;
 import com.callumveale.bjorneparken.file.FileWriter;
 import com.callumveale.bjorneparken.file.ResponseConverter;
 import com.callumveale.bjorneparken.fragments.DetailFragment;
+import com.callumveale.bjorneparken.fragments.DialogListFragment;
 import com.callumveale.bjorneparken.fragments.HomeFragment;
 import com.callumveale.bjorneparken.fragments.ListFragment;
 import com.callumveale.bjorneparken.models.Amenity;
+import com.callumveale.bjorneparken.models.Animal;
+import com.callumveale.bjorneparken.models.Enclosure;
 import com.callumveale.bjorneparken.models.Event;
+import com.callumveale.bjorneparken.models.Feeding;
 import com.callumveale.bjorneparken.models.NavigationDrawerItem;
 import com.callumveale.bjorneparken.models.Species;
 import com.callumveale.bjorneparken.R;
@@ -83,6 +87,7 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
     // Park Data
     private ArrayList<Amenity> mAmenities;
     private ArrayList<Amenity> mAttractions;
+    private ArrayList<Feeding> mFeedings;
     private ArrayList<Species> mSpecies;
 
     //endregion Data Retrieval
@@ -189,14 +194,7 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
         // Attempt to retrieve visitor ID from file
         mVisitorId = mFileWriter.getIdFromFile();
 
-        // Attempt to retrieve amenities from file
-        mAmenities = mFileWriter.getAmenitiesFromFile();
-
-        // Attempt to retrieve attractions from file
-        mAttractions = mFileWriter.getAttractionsFromFile();
-
-        // Attempt to retrieve species from file
-        mSpecies = mFileWriter.getSpeciesFromFile();
+        getParkDataFromFile();
     }
 
     //endregion Initialisation
@@ -238,6 +236,9 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
         // Fetch attractions
         mRequester.getAllAttractions();
 
+        // Fetch feedings
+        mRequester.getAllFeedings();
+
         // Fetch species
         mRequester.getAllSpecies();
     }
@@ -246,7 +247,28 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
 
         mAmenities = mFileWriter.getAmenitiesFromFile();
         mAttractions = mFileWriter.getAttractionsFromFile();
+        mFeedings = mFileWriter.getFeedingsFromFile();
         mSpecies = mFileWriter.getSpeciesFromFile();
+    }
+
+    private ArrayList<Feeding> getFeedingsForSpecies(Species species){
+
+        ArrayList<Feeding> returnList = new ArrayList<>();
+
+        //TODO Amend backend to add feedings to Species return list
+        for (Feeding feeding : mFeedings){
+
+            for (Animal animal : ((Enclosure) feeding.getLocation()).getAnimals()){
+
+                if (animal.getSpecies().getId() == species.getId()){
+
+                    returnList.add(feeding);
+                    break;
+                }
+            }
+        }
+
+        return returnList;
     }
 
     public void saveAmenities(MainAreaListResponse amenities){
@@ -265,6 +287,15 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
 
         // Write response to file
         mFileWriter.writeAttractionsToFile(attractions);
+    }
+
+    public void saveFeedings(MainEventListResponse feedings){
+
+        // Cache response
+        mFeedings = ResponseConverter.convertFeedingListResponse(feedings);
+
+        // Write response to file
+        mFileWriter.writeFeedingsToFile(feedings);
     }
 
     public void saveSpecies(MainSpeciesListResponse species){
@@ -322,6 +353,8 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
 
         mItinerary = mFileWriter.getItineraryFromFile();
         mStarredSpecies = mFileWriter.getStarredSpeciesFromFile();
+
+        onVisitorInitialise();
     }
 
     private void getVisitorDataFromServer(){
@@ -331,6 +364,8 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
 
         // Update starred species
         mRequester.getStarredSpecies(mVisitorId);
+
+        onVisitorInitialise();
     }
 
     public void saveItinerary(MainEventListResponse itineraryResponse){
@@ -340,9 +375,6 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
 
         // Write response to file
         mFileWriter.writeItineraryToFile(itineraryResponse);
-
-        // Perform visitor initialise action
-        onVisitorInitialise();
     }
 
     public void saveStarredSpecies(MainSpeciesListResponse starredSpeciesResponse){
@@ -552,7 +584,7 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
             // Perform species starred action
             onSpeciesStarred((Species) parcelable);
 
-        } else if (parcelable.getClass() == Event.class) {
+        } else if (parcelable.getClass() == Event.class || parcelable.getClass().getSuperclass() == Event.class) {
 
             // Perform event starred action
             onEventStarred((Event) parcelable);
@@ -587,11 +619,20 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
             // Add the species to the local starred species list
             mStarredSpecies.add(speciesToStar);
 
+            // Retrieve feedings for the species
+            ArrayList<Feeding> feedings = getFeedingsForSpecies(speciesToStar);
+
+            // If there are feedings to show
+            if (feedings.size() > 0) {
+
+                // Display a dialog box to select them
+                DialogListFragment options = DialogListFragment.newInstance(feedings);
+                options.show(getSupportFragmentManager(), "DialogListFragment");
+            }
+
             // Add the species to the datastore starred species list
             mRequester.starSpecies(mVisitorId, speciesToStar);
         }
-
-        // TODO Persist to file
     }
 
     private void onEventStarred(Event eventToStar){
@@ -628,8 +669,6 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
             // Add the species to the datastore itinerary
             mRequester.addToItinerary(mVisitorId, eventToStar);
         }
-
-        // TODO Persist to file
     }
 
     //endregion Fragment Listener Methods

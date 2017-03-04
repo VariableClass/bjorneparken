@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.callumveale.bjorneparken.models.Amenity;
 import com.callumveale.bjorneparken.models.Event;
+import com.callumveale.bjorneparken.models.Feeding;
 import com.callumveale.bjorneparken.models.Species;
 import com.google.api.client.json.GenericJson;
 import com.google.api.client.json.jackson2.JacksonFactory;
@@ -31,6 +32,7 @@ public class FileWriter {
 
     private static final String AMENITIES_FILE = "amenities";
     private static final String ATTRACTIONS_FILE = "attractions";
+    private static final String FEEDINGS_FILE = "feedings";
     private static final String ITINERARY_FILE = "itinerary";
     private static final String SPECIES_FILE = "species";
     private static final String STARRED_SPECIES_FILE = "starred_species";
@@ -238,6 +240,41 @@ public class FileWriter {
     }
 
     //endregion Species
+
+    //region Events
+
+    //region Feedings
+
+    public void writeFeedingsToFile(MainEventListResponse feedingsJson){
+
+        writeJsonToFile(feedingsJson, FEEDINGS_FILE);
+    }
+
+    public ArrayList<Feeding> getFeedingsFromFile(){
+
+        MainEventListResponse feedings = new MainEventListResponse();
+
+        try {
+            InputStream inputStream = mContext.openFileInput(FEEDINGS_FILE);
+
+            if (inputStream != null) {
+
+                feedings = new JacksonFactory().fromInputStream(inputStream, MainEventListResponse.class);
+                inputStream.close();
+            }
+        }
+        catch (FileNotFoundException fileNotFoundException) {
+            fileNotFoundException.printStackTrace();
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
+
+        return ResponseConverter.convertFeedingListResponse(feedings);
+    }
+
+    //endregion Feedings
+
+    //endregion Events
 
     //region Areas
 
