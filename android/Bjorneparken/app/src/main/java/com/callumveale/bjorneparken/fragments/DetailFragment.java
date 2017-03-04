@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.callumveale.bjorneparken.R;
@@ -99,7 +100,7 @@ public class DetailFragment extends Fragment {
         // Retrieve item from which to populate the view
         IModel item = (IModel) mItem;
 
-        final Button star = (Button) view.findViewById(R.id.detail_star);
+        final ImageView star = (ImageView) view.findViewById(R.id.detail_star);
 
         // If no value for is starred
         if (isStarred == null){
@@ -112,13 +113,15 @@ public class DetailFragment extends Fragment {
             // Else, if item is starred
             if (isStarred) {
 
-                // Set text to starred
-                star.setText(R.string.starred);
+                // Set image to starred
+                star.setImageResource(R.drawable.star_selected);
+                star.setContentDescription(getString(R.string.starred));
 
             } else {
 
-                // Set text to unstarred
-                star.setText(R.string.unstarred);
+                // Set image to unstarred
+                star.setImageResource(R.drawable.star_unselected);
+                star.setContentDescription(getString(R.string.unstarred));
             }
         }
 
@@ -168,11 +171,15 @@ public class DetailFragment extends Fragment {
                     isStarred = !isStarred;
                     if (isStarred) {
 
-                        star.setText(R.string.starred);
+                        // Set image to starred
+                        star.setImageResource(R.drawable.star_selected);
+                        star.setContentDescription(getString(R.string.starred));
 
                     } else {
 
-                        star.setText(R.string.unstarred);
+                        // Set image to unstarred
+                        star.setImageResource(R.drawable.star_unselected);
+                        star.setContentDescription(getString(R.string.unstarred));
                     }
                     mListener.onItemStarred(mItem);
                 }

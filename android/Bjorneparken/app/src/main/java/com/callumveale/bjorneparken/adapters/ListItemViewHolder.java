@@ -4,6 +4,7 @@ import android.os.Parcelable;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.callumveale.bjorneparken.R;
@@ -21,7 +22,7 @@ class ListItemViewHolder extends RecyclerView.ViewHolder {
     final TextView mSubheadingView;
     final TextView mImportantSubheadingView;
     final TextView mBodyView;
-    final Button mStarButton;
+    final ImageView mStarView;
 
     Parcelable mItem;
 
@@ -36,7 +37,7 @@ class ListItemViewHolder extends RecyclerView.ViewHolder {
         mSubheadingView = (TextView) view.findViewById(R.id.header_subheading);
         mImportantSubheadingView = (TextView) view.findViewById(R.id.header_important_subheading);
         mBodyView = (TextView) view.findViewById(R.id.body);
-        mStarButton = (Button) view.findViewById(R.id.list_star);
+        mStarView = (ImageView) view.findViewById(R.id.list_star);
 
     }
 

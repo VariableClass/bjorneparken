@@ -27,13 +27,14 @@
             android:textColor="@color/selector_pink_white"
             android:textStyle="bold"/>
 
-        <Button
+        <ImageView
             android:id="@+id/list_star"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            android:visibility="gone"/>
+            android:visibility="gone"
+            android:contentDescription="@string/unstarred"/>
 
     </RelativeLayout>
 

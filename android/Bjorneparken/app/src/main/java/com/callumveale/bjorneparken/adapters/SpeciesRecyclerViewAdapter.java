@@ -55,16 +55,21 @@ public class SpeciesRecyclerViewAdapter extends RecyclerViewAdapter {
         holder.mSubheadingView.setTypeface(holder.mSubheadingView.getTypeface(), Typeface.ITALIC);
         holder.mSubheadingView.setVisibility(View.VISIBLE);
 
-        // Set star button
+        // Set star image
         if (mActivity.isStarred(species)){
 
-            holder.mStarButton.setText(R.string.starred);
+            // Set image to starred
+            holder.mStarView.setImageResource(R.drawable.star_selected);
+            holder.mStarView.setContentDescription(mActivity.getString(R.string.starred));
 
         } else {
 
-            holder.mStarButton.setText(R.string.unstarred);
+            // Set image to unstarred
+            holder.mStarView.setImageResource(R.drawable.star_unselected);
+            holder.mStarView.setContentDescription(mActivity.getString(R.string.unstarred));
+
         }
-        holder.mStarButton.setVisibility(View.VISIBLE);
+        holder.mStarView.setVisibility(View.VISIBLE);
 
         // Set body
         String description = species.getDescription();
@@ -87,7 +92,7 @@ public class SpeciesRecyclerViewAdapter extends RecyclerViewAdapter {
         });
 
         // Add starred listener
-        holder.mStarButton.setOnClickListener(new View.OnClickListener() {
+        holder.mStarView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (null != mItemSelectedListener) {
@@ -95,11 +100,15 @@ public class SpeciesRecyclerViewAdapter extends RecyclerViewAdapter {
                     // fragment is attached to one) that an item has been selected.
                     if (mActivity.isStarred(species)){
 
-                        holder.mStarButton.setText(R.string.unstarred);
+                        // Set image to unstarred
+                        holder.mStarView.setImageResource(R.drawable.star_unselected);
+                        holder.mStarView.setContentDescription(mActivity.getString(R.string.unstarred));
 
                     } else {
 
-                        holder.mStarButton.setText(R.string.starred);
+                        // Set image to starred
+                        holder.mStarView.setImageResource(R.drawable.star_selected);
+                        holder.mStarView.setContentDescription(mActivity.getString(R.string.starred));
                     }
                     mItemStarredListener.onItemStarred(holder.mItem);
                 }
