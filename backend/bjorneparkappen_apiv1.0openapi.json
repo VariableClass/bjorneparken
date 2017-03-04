@@ -1247,7 +1247,10 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "A successful response"
+            "description": "A successful response",
+            "schema": {
+              "$ref": "#/definitions/MainEventListResponse"
+            }
           }
         },
         "security": [
@@ -1263,7 +1266,10 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "A successful response"
+            "description": "A successful response",
+            "schema": {
+              "$ref": "#/definitions/MainEventListResponse"
+            }
           }
         },
         "security": [
@@ -1312,7 +1318,10 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "A successful response"
+            "description": "A successful response",
+            "schema": {
+              "$ref": "#/definitions/MainSpeciesListResponse"
+            }
           }
         },
         "security": [
@@ -1328,7 +1337,10 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "A successful response"
+            "description": "A successful response",
+            "schema": {
+              "$ref": "#/definitions/MainSpeciesListResponse"
+            }
           }
         },
         "security": [

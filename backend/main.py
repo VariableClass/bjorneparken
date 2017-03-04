@@ -256,11 +256,13 @@ ADD_REMOVE_ANIMAL_REQUEST = endpoints.ResourceContainer(
     enclosure_id = messages.IntegerField(1, required=True))
 ADD_REMOVE_SPECIES_REQUEST = endpoints.ResourceContainer(
     visitor_id = messages.IntegerField(1, required=True),
-    species_id = messages.IntegerField(2, required=True))
+    species_id = messages.IntegerField(2, required=True),
+    language_code = messages.StringField(3, required=True))
 ADD_REMOVE_EVENT_REQUEST = endpoints.ResourceContainer(
     visitor_id = messages.IntegerField(1, required=True),
     event_id = messages.IntegerField(2, required=True),
-    location_id = messages.IntegerField(3, required=True))
+    location_id = messages.IntegerField(3, required=True),
+    language_code = messages.StringField(4, required=True))
 # [END update request resources]
 # [END request resources]
 
@@ -2087,7 +2089,7 @@ class VisitorsApi(remote.Service):
 
     @endpoints.method(
         ADD_REMOVE_EVENT_REQUEST,
-        message_types.VoidMessage,
+        EventListResponse,
         path='itinerary/add',
         http_method='POST',
         name='visitors.itinerary.add')
@@ -2113,6 +2115,8 @@ class VisitorsApi(remote.Service):
                                                 str(request.location_id) +
                                                 "'.")
 
+        response = EventListResponse()
+
         # Check event does not already exist in list
         for event_inst in visitor.itinerary:
             if event_inst == event:
@@ -2124,11 +2128,38 @@ class VisitorsApi(remote.Service):
         # Write changes
         visitor.put()
 
-        return message_types.VoidMessage()
+        # Build up response
+        for event_inst in visitor.itinerary:
+
+            # Attempt to retrieve the event
+            event = Event.get_by_id(event_inst.event_id, parent=ndb.Key(Area, event_inst.location_id))
+
+            # If event successfully retrieved
+            if event:
+
+                # If event is an Event
+                if type(event) is Event:
+
+                    # Retrieve an Event response
+                    event_response = ApiHelper.get_event_response(event, request.language_code)
+
+                    # Add event to return list
+                    response.events.append(event_response)
+
+                # Else if event is a Feeding
+                elif type(event) is Feeding:
+
+                    # Retrieve a Feeding response
+                    feeding_response = ApiHelper.get_feeding_response(event, request.language_code)
+
+                    # Add feeding to return list
+                    response.feedings.append(feeding_response)
+
+        return response
 
     @endpoints.method(
         ADD_REMOVE_EVENT_REQUEST,
-        message_types.VoidMessage,
+        EventListResponse,
         path='itinerary/remove',
         http_method='POST',
         name='visitors.itinerary.remove')
@@ -2144,10 +2175,37 @@ class VisitorsApi(remote.Service):
 
         event = None
 
+        response = EventListResponse()
+
         # Attempt to retrieve event
         for event_inst in visitor.itinerary:
             if event_inst.event_id == request.event_id and event_inst.location_id == request.location_id:
                 event = event_inst
+
+            else:
+                # Attempt to retrieve the event
+                event = Event.get_by_id(event_reference.event_id, parent=ndb.Key(Area, event_reference.location_id))
+
+                # If event successffully retrieved
+                if event:
+
+                    # If event is an Event
+                    if type(event) is Event:
+
+                        # Retrieve an Event response
+                        event_response = ApiHelper.get_event_response(event, request.language_code)
+
+                        # Add event to return list
+                        response.events.append(event_response)
+
+                    # Else if event is a Feeding
+                    elif type(event) is Feeding:
+
+                        # Retrieve a Feeding response
+                        feeding_response = ApiHelper.get_feeding_response(event, request.language_code)
+
+                        # Add feeding to return list
+                        response.feedings.append(feeding_response)
 
         if event is None:
             raise endpoints.BadRequestException("Event not found in itinerary.")
@@ -2158,7 +2216,7 @@ class VisitorsApi(remote.Service):
         # Write changes
         visitor.put()
 
-        return message_types.VoidMessage()
+        return response
 
     @endpoints.method(
         ID_LANGUAGE_REQUEST,
@@ -2208,7 +2266,7 @@ class VisitorsApi(remote.Service):
 
     @endpoints.method(
         ADD_REMOVE_SPECIES_REQUEST,
-        message_types.VoidMessage,
+        SpeciesListResponse,
         path='starred_species/add',
         http_method='POST',
         name='visitors.starred_species.add')
@@ -2230,6 +2288,8 @@ class VisitorsApi(remote.Service):
             raise endpoints.BadRequestException("No species found with ID '" +
                                                 str(request.species_id) + "'.")
 
+        response = SpeciesListResponse()
+
         # Check species does not already exist in list
         for species_inst in visitor.starred_species:
             if species_inst == request.species_id:
@@ -2241,11 +2301,34 @@ class VisitorsApi(remote.Service):
         # Write changes
         visitor.put()
 
-        return message_types.VoidMessage()
+        # Build up response
+        for species_inst in visitor.starred_species:
+            # Attempt to retrieve the species
+            species = Species.get_by_id(species_inst)
+
+            # If species successfully retrieved
+            if species:
+
+                # Translate translatable species resources
+                species_common_name_translation = InternationalText.get_translation(
+                        request.language_code,
+                        species.common_name)
+                species_description_translation = InternationalText.get_translation(
+                        request.language_code,
+                        species.description)
+
+                # Add species to return list
+                response.species.append(SpeciesResponse(
+                    id=species.key.id(),
+                    common_name=species_common_name_translation,
+                    latin=species.latin,
+                    description=species_description_translation))
+
+        return response
 
     @endpoints.method(
         ADD_REMOVE_SPECIES_REQUEST,
-        message_types.VoidMessage,
+        SpeciesListResponse,
         path='starred_species/remove',
         http_method='POST',
         name='visitors.starred_species.remove')
@@ -2261,10 +2344,34 @@ class VisitorsApi(remote.Service):
 
         species_to_remove = None
 
+        response = SpeciesListResponse()
+
         # Attempt to retrieve species
         for species_inst in visitor.starred_species:
             if species_inst == request.species_id:
                 species_to_remove = species_inst
+
+            else:
+                # Attempt to retrieve the species
+                species = Species.get_by_id(species_inst)
+
+                # If species successffully retrieved
+                if species:
+
+                    # Translate translatable species resources
+                    species_common_name_translation = InternationalText.get_translation(
+                            request.language_code,
+                            species.common_name)
+                    species_description_translation = InternationalText.get_translation(
+                            request.language_code,
+                            species.description)
+
+                    # Add species to return list
+                    response.species.append(SpeciesResponse(
+                        id=species.key.id(),
+                        common_name=species_common_name_translation,
+                        latin=species.latin,
+                        description=species_description_translation))
 
         if species_to_remove is None:
             raise endpoints.BadRequestException("Species not found in starred species list.")
@@ -2275,7 +2382,7 @@ class VisitorsApi(remote.Service):
         # Write changes
         visitor.put()
 
-        return message_types.VoidMessage()
+        return response
 
 # [END Visitors API]
 # [END bjorneparkappen_api]
