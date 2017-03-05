@@ -378,7 +378,7 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
         mFileWriter.writeItineraryToFile(itineraryResponse);
 
         // Create notification service
-        NotificationEventReceiver.setupAlarm(getApplicationContext(), mItinerary);
+        NotificationEventReceiver.setupAlarm(getApplicationContext(), mItinerary, mVisitStart, mVisitEnd);
     }
 
     public void saveStarredSpecies(MainSpeciesListResponse starredSpeciesResponse){
@@ -675,7 +675,7 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
         }
 
         // Update notification service
-        NotificationEventReceiver.setupAlarm(getApplicationContext(), mItinerary);
+        NotificationEventReceiver.setupAlarm(getApplicationContext(), mItinerary, mVisitStart, mVisitEnd);
     }
 
     //endregion Fragment Listener Methods

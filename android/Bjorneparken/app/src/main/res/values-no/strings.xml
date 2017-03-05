@@ -27,6 +27,10 @@
     <string name="select_feeding">Velg en fôring:</string>
     <string name="close_dialog">OK</string>
 
+    <!-- Notification -->
+    <string name="event_warning">Om %1$d minutter</string>
+    <string name="event_now">Nå</string>
+
     <!-- My Visit Fragment -->
     <string name="empty_itinerary">Du har ingen favoritter for øyeblikket. Gå til \'Dyr\'-fanen for å velge noen favorittfôringer!</string>
 

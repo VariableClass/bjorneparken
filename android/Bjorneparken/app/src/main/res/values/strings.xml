@@ -29,6 +29,7 @@
 
     <!-- Notification -->
     <string name="event_warning">In %1$d minutes</string>
+    <string name="event_now">Now</string>
 
     <!-- My Visit Fragment -->
     <string name="empty_itinerary">You don\'t currently have any favourites. Go to the \'Animals\' tab to favourite some feedings!</string>
