@@ -32,6 +32,7 @@ import com.callumveale.bjorneparken.models.Feeding;
 import com.callumveale.bjorneparken.models.NavigationDrawerItem;
 import com.callumveale.bjorneparken.models.Species;
 import com.callumveale.bjorneparken.R;
+import com.callumveale.bjorneparken.notifications.NotificationEventReceiver;
 import com.callumveale.bjorneparken.requests.RequestsModule;
 
 import com.google.api.client.util.DateTime;
@@ -375,6 +376,9 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
 
         // Write response to file
         mFileWriter.writeItineraryToFile(itineraryResponse);
+
+        // Create notification service
+        NotificationEventReceiver.setupAlarm(getApplicationContext(), mItinerary);
     }
 
     public void saveStarredSpecies(MainSpeciesListResponse starredSpeciesResponse){
@@ -669,6 +673,9 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
             // Add the species to the datastore itinerary
             mRequester.addToItinerary(mVisitorId, eventToStar);
         }
+
+        // Update notification service
+        NotificationEventReceiver.setupAlarm(getApplicationContext(), mItinerary);
     }
 
     //endregion Fragment Listener Methods

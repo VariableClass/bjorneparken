@@ -89,6 +89,7 @@ public class Feeding extends Event implements IModel, Parcelable{
         dest.writeStringArray(new String[]{this.getLabel(), this.getDescription(), this.getStartTime(), this.getEndTime()});
         dest.writeParcelable((Enclosure)this.getLocation(), 0);
         dest.writeBooleanArray(new boolean[]{this.isActive()});
+        dest.writeParcelable(this.keeper, 0);
     }
 
     //endregion Parcelable Overridden Methods

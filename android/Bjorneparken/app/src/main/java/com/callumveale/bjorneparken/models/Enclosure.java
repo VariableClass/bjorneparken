@@ -53,6 +53,7 @@ public class Enclosure extends Area implements IModel, Parcelable {
         in.readStringList(coordinates);
         setCoordinates(coordinates);
 
+        animals = new ArrayList<>();
         in.readTypedList(animals, Animal.CREATOR);
     }
 
