@@ -42,6 +42,13 @@ public class EventRecyclerViewAdapter extends RecyclerViewAdapter {
 
         final Event event = (Event) mItems.get(position);
 
+        // If the event is not active
+        if (!event.isActive()){
+
+            // Do nothing
+            return;
+        }
+
         // Set list view item
         holder.mItem = event;
 

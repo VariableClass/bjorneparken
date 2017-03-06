@@ -621,6 +621,15 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
             // Retrieve feedings for the species
             ArrayList<Feeding> feedings = getFeedingsForSpecies(speciesToStar);
 
+            // Remove any inactive feedings
+            for (Feeding feeding : feedings){
+
+                if (!feeding.isActive()){
+
+                    feedings.remove(feeding);
+                }
+            }
+
             // If there are feedings to show
             if (feedings.size() > 0) {
 
