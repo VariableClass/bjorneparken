@@ -815,9 +815,9 @@ class AnimalsApi(remote.Service):
         enclosure = Enclosure.get_for_animal(animal_id=request.animal_id, species_id=request.species_id)
 
         # Remove animal from enclosure
-        for animal_reference in enclosure:
+        for animal_reference in enclosure.animals:
             if animal_reference.animal_id == request.animal_id and animal_reference.species_id == request.species_id:
-                enclosure.remove(animal_reference)
+                enclosure.animals.remove(animal_reference)
                 enclosure.put()
 
         # Retrieve all feedings which include the enclosure
@@ -1563,27 +1563,30 @@ class EventsApi(remote.Service):
             # Update description values
             event.description=description
 
-        # If value for start_time provided
-        if request.start_time:
-            # Temporarily store the passed start time
-            temp_start_time = request.start_time
+        # If values for both start_time and end_time provided
+        if request.start_time and request.end_time:
+            # Validate times
+            if not Time.validate_times(request.start_time, request.end_time):
+                raise endpoints.BadRequestException("Time must be in the format 'HH.MM' and end time must not exceed start time.")
 
-        # If value for start_time provided
-        if request.end_time:
-            # Temporarily store the passed end time
-            temp_end_time = request.end_time
+            event.start_time = request.start_time
+            event.end_time = request.end_time
 
-        # Validate times
-        if not Time.validate_times(temp_start_time, temp_end_time):
-            raise endpoints.BadRequestException("Time must be in the format 'HH.MM' and end time must not exceed start time.")
+        # Else, if value for start_time only provided
+        elif request.start_time:
+            # Validate times
+            if not Time.validate_times(request.start_time, event.end_time):
+                raise endpoints.BadRequestException("Time must be in the format 'HH.MM' and end time must not exceed start time.")
 
-        # If value for start_time provided
-        if request.start_time:
             event.start_time = request.start_time
 
-        # If value for end_time provided
-        if request.end_time:
-            event.start_time = request.start_time
+        # Else, if value for end_time only provided
+        elif request.end_time:
+            # Validate times
+            if not Time.validate_times(event.start_time, request.end_time):
+                raise endpoints.BadRequestException("Time must be in the format 'HH.MM' and end time must not exceed start time.")
+
+            event.end_time = request.end_time
 
         # Check if value for is_active provided
         try:
@@ -1727,24 +1730,13 @@ class EventsApi(remote.Service):
         if not Time.validate_times(temp_start_time, temp_end_time):
             raise endpoints.BadRequestException("Time must be in the format 'HH.MM' and end time must not exceed start time.")
 
-        # Retrieve keeper
-        keeper = ndb.Key(Keeper, request.keeper_id).get()
-
-        # If keeper not found, raise BadRequestException
-        if not keeper:
-            raise endpoints.BadRequestException("No keeper by ID '" + str(request.keeper_id) + "' found.")
-
-        # If keeper busy, raise BadRequestException
-        if not keeper.is_available(request.start_time, request.end_time):
-            raise endpoints.BadRequestException("Keeper '" + str(request.keeper_id) + "' busy during requested times.")
-
         # If value for start_time provided
         if request.start_time:
             feeding.start_time = request.start_time
 
         # If value for end_time provided
         if request.end_time:
-            feeding.start_time = request.start_time
+            feeding.end_time = request.end_time
 
         # Check if value for is_active provided
         try:
@@ -1767,6 +1759,10 @@ class EventsApi(remote.Service):
             # If keeper not found, raise exception
             if not keeper:
                 raise endpoints.BadRequestException("Keeper of ID '" + str(request.keeper_id) + "' not found")
+
+            # If keeper busy, raise BadRequestException
+            if not keeper.is_available(feeding.start_time, feeding.end_time):
+                raise endpoints.BadRequestException("Keeper '" + str(request.keeper_id) + "' busy during requested times.")
 
             # Update keeper_id value
             feeding.keeper_id = keeper_id
@@ -2064,7 +2060,7 @@ class VisitorsApi(remote.Service):
             # Attempt to retrieve the event
             event = Event.get_by_id(event_reference.event_id, parent=ndb.Key(Area, event_reference.location_id))
 
-            # If event successffully retrieved
+            # If event successfully retrieved
             if event:
 
                 # If event is an Event
@@ -2119,7 +2115,7 @@ class VisitorsApi(remote.Service):
 
         # Check event does not already exist in list
         for event_inst in visitor.itinerary:
-            if event_inst == event:
+            if event_inst.event_id == event.key.id() and event_inst.location_id == event.key.parent().id():
                 raise endpoints.BadRequestException("Event already starred.")
 
         # Add event to visitor's itinerary
@@ -2184,9 +2180,9 @@ class VisitorsApi(remote.Service):
 
             else:
                 # Attempt to retrieve the event
-                event = Event.get_by_id(event_reference.event_id, parent=ndb.Key(Area, event_reference.location_id))
+                event = Event.get_by_id(event_inst.event_id, parent=ndb.Key(Area, event_inst.location_id))
 
-                # If event successffully retrieved
+                # If event successfully retrieved
                 if event:
 
                     # If event is an Event
@@ -2244,7 +2240,7 @@ class VisitorsApi(remote.Service):
             # Attempt to retrieve the species
             species = Species.get_by_id(species_id)
 
-            # If species successffully retrieved
+            # If species successfully retrieved
             if species:
 
                 # Translate translatable species resources
@@ -2355,7 +2351,7 @@ class VisitorsApi(remote.Service):
                 # Attempt to retrieve the species
                 species = Species.get_by_id(species_inst)
 
-                # If species successffully retrieved
+                # If species successfully retrieved
                 if species:
 
                     # Translate translatable species resources

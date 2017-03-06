@@ -31,5 +31,5 @@ class InternationalText(ndb.Model):
     SUPPORTED_LANGUAGES = ['en', 'no', 'nb', 'nn']
 
     # Properties
-    text = ndb.StringProperty()
+    text = ndb.StringProperty(indexed=False)
     language_code = ndb.StringProperty()
