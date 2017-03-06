@@ -686,12 +686,18 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
 
     //region Activity Overridden Methods
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
     /* Called whenever we call invalidateOptionsMenu() */
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         // If the nav drawer is open, hide action items related to the content view
         boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
-        //menu.findItem(R.id.action_bar_item).setVisible(!drawerOpen);
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -715,7 +721,11 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
         if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
-        // Handle your other action bar items...
+        if (item.getItemId() == R.id.action_my_visit) {
+            navigateToPosition(1);
+            return true;
+        }
+
 
         return super.onOptionsItemSelected(item);
     }
