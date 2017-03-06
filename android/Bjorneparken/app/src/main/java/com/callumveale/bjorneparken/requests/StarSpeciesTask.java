@@ -61,7 +61,7 @@ public class StarSpeciesTask extends AsyncTask<Void, Void, MainSpeciesListRespon
 
         try {
 
-            starredSpeciesResponse = mBuilder.build().visitors().starredSpecies().add(request).execute();
+            starredSpeciesResponse = mBuilder.build().visitors().starredSpecies().add(request).setKey(RequestsModule.API_KEY).execute();
 
         } catch (IOException e) {
 

@@ -62,7 +62,7 @@ public class RemoveFromItineraryTask extends AsyncTask<Void, Void, MainEventList
 
         try {
 
-            itineraryResponse = mBuilder.build().visitors().itinerary().remove(request).execute();
+            itineraryResponse = mBuilder.build().visitors().itinerary().remove(request).setKey(RequestsModule.API_KEY).execute();
 
         } catch (IOException e) {
 

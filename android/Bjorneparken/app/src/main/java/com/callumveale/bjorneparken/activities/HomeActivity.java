@@ -365,8 +365,6 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
 
         // Update starred species
         mRequester.getStarredSpecies(mVisitorId);
-
-        onVisitorInitialise();
     }
 
     public void saveItinerary(MainEventListResponse itineraryResponse){
