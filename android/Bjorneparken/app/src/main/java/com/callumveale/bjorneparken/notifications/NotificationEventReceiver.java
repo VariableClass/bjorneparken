@@ -46,48 +46,24 @@ public class NotificationEventReceiver extends WakefulBroadcastReceiver {
             // For each event
             for (Event event : events){
 
-                // Retrieve the event start time
-                int eventStartHour = Integer.parseInt(event.getStartTime().substring(0, 2));
-                int eventStartMinute = Integer.parseInt(event.getStartTime().substring(3, 5));
-
-                // Get exact start date
-                Calendar eventStartTime = getEventTime(visitStart, i, eventStartHour, eventStartMinute);
-
-                // Retrieve the event end time
-                int eventEndHour = Integer.parseInt(event.getEndTime().substring(0, 2));
-                int eventEndMinute = Integer.parseInt(event.getEndTime().substring(3, 5));
-
-                // Get exact end date
-                Calendar eventEndTime = getEventTime(visitStart, i, eventEndHour, eventEndMinute);
+                // Retrieve event end time
+                Calendar endTime = event.getEventEndCalendar(visitEnd, i);
 
                 // If the event is not over
-                if (eventEndTime.getTimeInMillis() > System.currentTimeMillis()) {
+                if (endTime.getTimeInMillis() > System.currentTimeMillis()) {
+
+                    // Retrieve exact start time
+                    Calendar startTime = event.getEventStartCalendar(visitStart, i);
 
                     // Retrieve an intent for the event at it's start time
-                    PendingIntent alarmIntent = getStartPendingIntent(context, event, eventStartTime);
+                    PendingIntent alarmIntent = getStartPendingIntent(context, event, startTime);
 
                     // Set an alarm for the specified number of minutes prior to the event
-                    eventStartTime.add(Calendar.MINUTE, -WARNING_TIME_MINUTES);
-                    alarmManager.set(AlarmManager.RTC_WAKEUP, eventStartTime.getTimeInMillis(), alarmIntent);
+                    startTime.add(Calendar.MINUTE, -WARNING_TIME_MINUTES);
+                    alarmManager.set(AlarmManager.RTC_WAKEUP, startTime.getTimeInMillis(), alarmIntent);
                 }
             }
         }
-    }
-
-    private static Calendar getEventTime(Calendar visitStart, int daysDelta, int hour, int minute){
-
-        // Create a new Calendar set to the visit start date
-        Calendar eventTime = Calendar.getInstance();
-        eventTime.setTime(visitStart.getTime());
-
-        // Add 1 day until we reach the currently processing date
-        eventTime.add(Calendar.HOUR, (24 * daysDelta));
-
-        // Set the hour and minute to the event time
-        eventTime.set(Calendar.HOUR_OF_DAY, hour);
-        eventTime.set(Calendar.MINUTE, minute);
-
-        return eventTime;
     }
 
     @Override

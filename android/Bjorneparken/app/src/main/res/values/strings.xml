@@ -33,6 +33,7 @@
 
     <!-- My Visit Fragment -->
     <string name="empty_itinerary">You don\'t currently have any favourites. Go to the \'Animals\' tab to favourite some feedings!</string>
+    <string name="no_more_events">That\'s it for today!</string>
 
     <!-- Animals Fragment -->
     <string name="no_species">No animals found.</string>

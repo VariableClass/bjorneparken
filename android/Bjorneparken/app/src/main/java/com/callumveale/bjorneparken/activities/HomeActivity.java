@@ -470,17 +470,12 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
 
         // Display home page by default
         String title = getString(R.string.app_name);
-        Fragment fragment = HomeFragment.newInstance(mItinerary);;
+        Fragment fragment = HomeFragment.newInstance(mItinerary, mVisitStart, mVisitEnd);
 
         // Open the appropriate page
         switch (position){
 
             case 0: // If selection is 'Home'
-                // Retrieve title for page
-                title = getString(R.string.app_name);
-
-                // Retrieve new home fragment, populating from visitor itinerary
-                fragment = HomeFragment.newInstance(mItinerary);
                 break;
 
             case 1: // If selection is 'My Visit'
@@ -557,7 +552,7 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
     private void onVisitorInitialise(){
 
         // Create new home fragment, populating from visitor itinerary
-        HomeFragment homeFragment = HomeFragment.newInstance(mItinerary);
+        HomeFragment homeFragment = HomeFragment.newInstance(mItinerary, mVisitStart, mVisitEnd);
 
         // Change to new fragment
         setFragment(homeFragment);

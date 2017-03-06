@@ -3,6 +3,8 @@ package com.callumveale.bjorneparken.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.Calendar;
+
 /**
  * Created by callum on 27/02/2017.
  */
@@ -72,6 +74,42 @@ public class Event implements IModel, Parcelable{
     //endregion Constructors
 
     //region Methods
+
+    private Calendar getEventTime(Calendar visitStart, int daysDelta, int hour, int minute){
+
+        // Create a new Calendar set to the visit start date
+        Calendar timeCalendar = Calendar.getInstance();
+        timeCalendar.setTime(visitStart.getTime());
+
+        // Add 1 day until we reach the currently processing date
+        timeCalendar.add(Calendar.HOUR, (24 * daysDelta));
+
+        // Set the hour and minute to the event time
+        timeCalendar.set(Calendar.HOUR_OF_DAY, hour);
+        timeCalendar.set(Calendar.MINUTE, minute);
+
+        return timeCalendar;
+    }
+
+    public Calendar getEventStartCalendar(Calendar visitStart, int daysDelta){
+
+        // Retrieve the event start time
+        int startHour = Integer.parseInt(startTime.substring(0, 2));
+        int startMinute = Integer.parseInt(startTime.substring(3, 5));
+
+        // Return calendar instance
+        return getEventTime(visitStart, daysDelta, startHour, startMinute);
+    }
+
+    public Calendar getEventEndCalendar(Calendar visitStart, int daysDelta){
+
+        // Retrieve the event end time
+        int endHour = Integer.parseInt(endTime.substring(0, 2));
+        int endMinute = Integer.parseInt(endTime.substring(3, 5));
+
+        // Return calendar instance
+        return getEventTime(visitStart, daysDelta, endHour, endMinute);
+    }
 
     public long getId() {
         return id;

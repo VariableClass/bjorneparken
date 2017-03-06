@@ -33,6 +33,7 @@
 
     <!-- My Visit Fragment -->
     <string name="empty_itinerary">Du har ingen favoritter for øyeblikket. Gå til \'Dyr\'-fanen for å velge noen favorittfôringer!</string>
+    <string name="no_more_events">Det var alt for i dag!</string>
 
     <!-- Animals Fragment -->
     <string name="no_species">Ingen dyr funnet.</string>
