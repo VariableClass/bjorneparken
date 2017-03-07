@@ -1,6 +1,8 @@
 package com.callumveale.bjorneparken.adapters;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.os.Parcelable;
 import android.support.v7.widget.RecyclerView;
@@ -47,6 +49,19 @@ public class SpeciesRecyclerViewAdapter extends RecyclerViewAdapter {
         // Set list view item
         holder.mItem = species;
 
+        int maxTextLength = 95;
+
+        // Set image
+        byte[] imageBytes = species.getImageBytes();
+        if (imageBytes != null){
+
+            Bitmap bitmap = BitmapFactory.decodeByteArray(species.getImageBytes(), 0, species.getImageBytes().length);
+
+            holder.mImageView.setImageBitmap(bitmap);
+            holder.mImageView.setVisibility(View.VISIBLE);
+            maxTextLength = 75;
+        }
+
         // Set header
         holder.mHeaderView.setText(species.getCommonName());
 
@@ -73,8 +88,8 @@ public class SpeciesRecyclerViewAdapter extends RecyclerViewAdapter {
 
         // Set body
         String description = species.getDescription();
-        if (description.length() > 100){
-            description = description.substring(0, 95) + "...";
+        if (description.length() > maxTextLength){
+            description = description.substring(0, maxTextLength) + "...";
         }
         holder.mBodyView.setText(description);
 

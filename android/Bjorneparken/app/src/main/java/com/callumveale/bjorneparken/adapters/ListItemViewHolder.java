@@ -22,6 +22,7 @@ class ListItemViewHolder extends RecyclerView.ViewHolder {
     final TextView mSubheadingView;
     final TextView mImportantSubheadingView;
     final TextView mBodyView;
+    final ImageView mImageView;
     final ImageView mStarView;
 
     Parcelable mItem;
@@ -37,6 +38,7 @@ class ListItemViewHolder extends RecyclerView.ViewHolder {
         mSubheadingView = (TextView) view.findViewById(R.id.header_subheading);
         mImportantSubheadingView = (TextView) view.findViewById(R.id.header_important_subheading);
         mBodyView = (TextView) view.findViewById(R.id.body);
+        mImageView = (ImageView) view.findViewById(R.id.list_image);
         mStarView = (ImageView) view.findViewById(R.id.list_star);
 
     }

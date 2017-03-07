@@ -1,11 +1,13 @@
 package com.callumveale.bjorneparken.file;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
+
 import com.callumveale.bjorneparken.models.*;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import none.bjorneparkappen_api.model.*;
@@ -28,8 +30,20 @@ public class ResponseConverter {
             return null;
         }
 
+        String base64mime = response.getImage();
+
+        byte[] imageBytes = null;
+
+        if (base64mime != null){
+
+            String base64 = base64mime.split(",")[1];
+
+            // Decode base64 image
+            imageBytes = Base64.decode(base64, Base64.DEFAULT);
+        }
+
         // Return a new species object created from the species response
-        return new Species(response.getId(), response.getCommonName(), response.getLatin(), response.getDescription());
+        return new Species(response.getId(), response.getCommonName(), response.getLatin(), response.getDescription(), imageBytes);
     }
 
     public static ArrayList<Species> convertSpeciesListResponse(MainSpeciesListResponse response){

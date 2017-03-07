@@ -107,6 +107,9 @@ public class Animal implements IModel, Parcelable{
         return null;
     }
 
+    @Override
+    public byte[] getImageBytes() { return null; }
+
     //endregion IModel Overridden Methods
 
     //region Parcelable Overridden Methods

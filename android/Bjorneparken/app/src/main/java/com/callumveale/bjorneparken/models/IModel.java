@@ -15,4 +15,6 @@ public interface IModel {
     String getCaption();
 
     String getSubcaption();
+
+    byte[] getImageBytes();
 }

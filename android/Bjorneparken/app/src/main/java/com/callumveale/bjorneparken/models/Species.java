@@ -1,5 +1,6 @@
 package com.callumveale.bjorneparken.models;
 
+import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -30,16 +31,18 @@ public class Species implements IModel, Parcelable{
     private String commonName;
     private String latin;
     private String description;
+    private byte[] imageBytes;
 
     //endregion Properties
 
     //region Constructors
 
-    public Species(long id, String commonName, String latin, String description){
+    public Species(long id, String commonName, String latin, String description, byte[] imageBytes){
         this.id = id;
         this.commonName = commonName;
         this.latin = latin;
         this.description = description;
+        this.imageBytes = imageBytes;
     }
 
     // Parcelling part
@@ -51,6 +54,8 @@ public class Species implements IModel, Parcelable{
         this.commonName = data[1];
         this.latin = data[2];
         this.description = data[3];
+
+        in.readByteArray(this.imageBytes);
     }
 
     //endregion Constructors
@@ -70,6 +75,8 @@ public class Species implements IModel, Parcelable{
     public String getDescription() {
         return description;
     }
+
+    public byte[] getImageBytes() { return imageBytes; }
 
     //region IModel Overridden Methods
 
@@ -109,6 +116,8 @@ public class Species implements IModel, Parcelable{
                 this.commonName,
                 this.latin,
                 this.description});
+
+        dest.writeByteArray(imageBytes);
     }
 
     //endregion Parcelable Overridden Methods
