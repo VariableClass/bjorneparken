@@ -2169,14 +2169,14 @@ class VisitorsApi(remote.Service):
             raise endpoints.BadRequestException("No visitor found with ID '" +
                                                 str(request.visitor_id) + "'.")
 
-        event = None
+        event_to_remove = None
 
         response = EventListResponse()
 
         # Attempt to retrieve event
         for event_inst in visitor.itinerary:
             if event_inst.event_id == request.event_id and event_inst.location_id == request.location_id:
-                event = event_inst
+                event_to_remove = event_inst
 
             else:
                 # Attempt to retrieve the event
@@ -2203,11 +2203,11 @@ class VisitorsApi(remote.Service):
                         # Add feeding to return list
                         response.feedings.append(feeding_response)
 
-        if event is None:
+        if event_to_remove is None:
             raise endpoints.BadRequestException("Event not found in itinerary.")
 
         # Remove event from visitor's itinerary
-        visitor.itinerary.remove(event)
+        visitor.itinerary.remove(event_to_remove)
 
         # Write changes
         visitor.put()
