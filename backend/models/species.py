@@ -1,5 +1,6 @@
 from animal import Animal
 from i18n import InternationalText
+from image import Image
 from google.appengine.ext import ndb
 
 class Species(ndb.Model):
@@ -8,6 +9,7 @@ class Species(ndb.Model):
     common_name = ndb.LocalStructuredProperty(InternationalText, repeated=True)
     latin = ndb.StringProperty()
     description = ndb.LocalStructuredProperty(InternationalText, repeated=True)
+    image = ndb.StructuredProperty(Image)
 
     # Methods
     def get_animals(self):

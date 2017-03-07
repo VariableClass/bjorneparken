@@ -1,5 +1,6 @@
 # coding=utf-8
 # [START imports]
+import crud
 import datetime
 import endpoints
 from google.appengine.ext import ndb
@@ -10,6 +11,7 @@ from models.enclosure import Enclosure
 from models.event import Event
 from models.feeding import Feeding
 from models.i18n import InternationalText
+from models.image import Image
 from models.keeper import Keeper
 from models.species import Species
 from models.time import Time
@@ -48,12 +50,14 @@ class SpeciesRequest(messages.Message):
     common_name = messages.MessageField(InternationalMessage, 1, repeated=True)
     latin = messages.StringField(2)
     description = messages.MessageField(InternationalMessage, 3, repeated=True)
+    image = messages.StringField(4)
 
 class SpeciesResponse(messages.Message):
     id = messages.IntegerField(1)
     common_name = messages.StringField(2)
     latin = messages.StringField(3)
     description = messages.StringField(4)
+    image = messages.StringField(5)
 
 class SpeciesListResponse(messages.Message):
     species = messages.MessageField(SpeciesResponse, 1, repeated=True)
@@ -507,12 +511,19 @@ class SpeciesApi(remote.Service):
                     request.language_code,
                     species.description)
 
+            image = None
+
+            # If species has an image
+            if not species.image is None:
+                image = species.image.get()
+
             # Add species to return list
             response.species.append(SpeciesResponse(
                 id=species.key.id(),
                 common_name=species_common_name_translation,
                 latin=species.latin,
-                description=species_description_translation))
+                description=species_description_translation,
+                image=image))
 
         return response
 
@@ -540,9 +551,17 @@ class SpeciesApi(remote.Service):
         description = ApiHelper.convert_i18n_messages_to_i18n_texts(international_messages=request.description)
 
         # Create new species
-        Species(common_name=common_name,
+        species = Species(common_name=common_name,
             latin=request.latin,
-            description=description).put()
+            description=description)
+
+        # Write to datastore
+        species_key = species.put()
+
+        # If image attached, create one
+        if request.image:
+            species.image = Image.upload(species_key.id(), request.image)
+            species.put()
 
         # Update version
         ApiHelper.update_version()
@@ -587,6 +606,10 @@ class SpeciesApi(remote.Service):
             # Update latin value
             species.latin=request.latin
 
+        # If value for image provided:
+        if request.image:
+            species.image = Image.upload(species.key.id(), request.image)
+
         # Write changes
         species.put()
 
@@ -624,6 +647,11 @@ class SpeciesApi(remote.Service):
         for visitor in visitors:
             visitor.starred_species.remove(request.id)
             visitor.put()
+
+        # If species has an image
+        if not species.image is None:
+            # Delete image
+            species.image.delete()
 
         # Delete species
         species.key.delete()
