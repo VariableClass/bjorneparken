@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.util.Calendar;
+import java.util.Comparator;
 
 /**
  * Created by callum on 27/02/2017.
@@ -218,4 +219,18 @@ public class Event implements IModel, Parcelable{
     //endregion Parcelable Overridden Methods
 
     //endregion Methods
+
+    //region Interfaces
+
+    public static class EventTimeComparator implements Comparator<Event> {
+        @Override
+        public int compare(Event event1, Event event2) {
+
+            Calendar now = Calendar.getInstance();
+
+            return event1.getEventStartCalendar(now, 0).compareTo(event2.getEventStartCalendar(now, 0));
+        }
+    }
+
+    //endregion Interfaces
 }

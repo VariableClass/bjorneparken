@@ -66,7 +66,7 @@ public class DialogListFragment extends DialogFragment {
 
             Feeding feeding = feedings.get(i);
 
-            stringArray[i] = feeding.getHeader() + ": " + feeding.getStartTime() + " - " + feeding.getEndTime();
+            stringArray[i] = feeding.getStartTime() + ": " + feeding.getHeader();
         }
 
         return stringArray;

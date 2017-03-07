@@ -38,6 +38,7 @@ import com.callumveale.bjorneparken.requests.RequestsModule;
 import com.google.api.client.util.DateTime;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 
 import none.bjorneparkappen_api.model.MainAreaListResponse;
@@ -268,6 +269,9 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
                 }
             }
         }
+
+        // Sort feedings by start time
+        Collections.sort(returnList, new Event.EventTimeComparator());
 
         return returnList;
     }

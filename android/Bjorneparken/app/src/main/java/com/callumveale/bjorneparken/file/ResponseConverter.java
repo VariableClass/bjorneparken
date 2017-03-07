@@ -3,6 +3,9 @@ package com.callumveale.bjorneparken.file;
 import com.callumveale.bjorneparken.models.*;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import none.bjorneparkappen_api.model.*;
@@ -380,6 +383,8 @@ public class ResponseConverter {
         returnList.addAll(events);
         returnList.addAll(feedings);
 
+        // Sort events by time
+        Collections.sort(returnList, new Event.EventTimeComparator());
         return returnList;
     }
 
