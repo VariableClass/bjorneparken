@@ -1,5 +1,5 @@
 import os
-import cloudstorage as gcs
+import lib.cloudstorage as gcs
 from google.appengine.api import app_identity
 
 

@@ -55,11 +55,16 @@ public class SpeciesRecyclerViewAdapter extends RecyclerViewAdapter {
         byte[] imageBytes = species.getImageBytes();
         if (imageBytes != null){
 
-            Bitmap bitmap = BitmapFactory.decodeByteArray(species.getImageBytes(), 0, species.getImageBytes().length);
+            Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
 
             holder.mImageView.setImageBitmap(bitmap);
             holder.mImageView.setVisibility(View.VISIBLE);
             maxTextLength = 75;
+
+        } else {
+
+            holder.mImageView.setImageBitmap(null);
+            holder.mImageView.setVisibility(View.GONE);
         }
 
         // Set header

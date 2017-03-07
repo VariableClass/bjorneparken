@@ -26,30 +26,29 @@ class Image(ndb.Model):
         crud.delete_file(self.name);
 
 
-    # Static Methods
-    @classmethod
-    def is_valid_mime_type(cls, mime_type):
-        return mime_type in cls.accepted_mime_types
+    # Class Methods
+    @staticmethod
+    def is_valid_mime_type(mime_type):
+        return mime_type in Image.accepted_mime_types
 
 
-    @classmethod
-    def upload(cls, image_id, image):
+    @staticmethod
+    def upload(image_id, image):
         # Knock mime type off start of image base64 and store it
         request_data = image.split(',')
         mime_type = re.split('[:;]+', request_data[0])[1]
 
         # Validate mime type
-        if cls.is_valid_mime_type(mime_type):
+        if Image.is_valid_mime_type(mime_type):
 
-            # Write image metadata to
+            # Create image metadata
             image = Image(name=image_id, mime_type=mime_type)
-            image.put()
 
             # Decode base64 image
             image_file = request_data[1].decode('base64')
 
             # Upload image to cloud storage
-            crud.upload_image_file(image_file, image_id, mime_type)
+            crud.upload_image_file(image_file, image.name, image.mime_type)
 
             return image
 

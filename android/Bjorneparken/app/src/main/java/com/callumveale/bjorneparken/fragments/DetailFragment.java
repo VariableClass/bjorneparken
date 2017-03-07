@@ -1,6 +1,8 @@
 package com.callumveale.bjorneparken.fragments;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
@@ -99,6 +101,22 @@ public class DetailFragment extends Fragment {
 
         // Retrieve item from which to populate the view
         IModel item = (IModel) mItem;
+
+        if (item.getImageBytes() != null){
+
+
+        }
+
+        // Set image
+        byte[] imageBytes = item.getImageBytes();
+        if (imageBytes != null){
+
+            Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+
+            ImageView imageView = (ImageView) view.findViewById(R.id.detail_image);
+            imageView.setImageBitmap(bitmap);
+            imageView.setVisibility(View.VISIBLE);
+        }
 
         final ImageView star = (ImageView) view.findViewById(R.id.detail_star);
 
