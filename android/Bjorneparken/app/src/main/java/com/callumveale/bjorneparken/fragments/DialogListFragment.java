@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 
 import com.callumveale.bjorneparken.R;
+import com.callumveale.bjorneparken.activities.HomeActivity;
 import com.callumveale.bjorneparken.models.Feeding;
 
 import java.util.ArrayList;
@@ -54,26 +55,45 @@ public class DialogListFragment extends DialogFragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mOptions = getArguments().getParcelableArrayList(ARG_OPTIONS);
-
         }
+    }
+
+    private String[] getStringArray(ArrayList<Feeding> feedings){
+
+        String[] stringArray = new String[feedings.size()];
+
+        for (int i = 0; i < feedings.size(); i++){
+
+            Feeding feeding = feedings.get(i);
+
+            stringArray[i] = feeding.getHeader() + ": " + feeding.getStartTime() + " - " + feeding.getEndTime();
+        }
+
+        return stringArray;
+    }
+
+    private boolean[] getSelectedItems(ArrayList<Feeding> feedings){
+
+        boolean[] selectedItems = new boolean[feedings.size()];
+
+        for (int i = 0; i < feedings.size(); i++){
+
+            selectedItems[i] = ((HomeActivity) getActivity()).isInItinerary(feedings.get(i));
+        }
+
+        return selectedItems;
     }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
-        String[] stringOptions = new String[mOptions.size()];
-
-        for (int i = 0; i < mOptions.size(); i++){
-
-            Feeding feeding = mOptions.get(i);
-
-            stringOptions[i] = feeding.getHeader() + ": " + feeding.getStartTime() + " - " + feeding.getEndTime();
-        }
+        String[] options = getStringArray(mOptions);
+        boolean[] selected = getSelectedItems(mOptions);
 
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(R.string.select_feeding)
-                .setMultiChoiceItems(stringOptions, null, new DialogInterface.OnMultiChoiceClickListener() {
+                .setMultiChoiceItems(options, selected, new DialogInterface.OnMultiChoiceClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i, boolean b) {
 
