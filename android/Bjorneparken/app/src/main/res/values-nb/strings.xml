@@ -36,12 +36,12 @@
     <string name="no_more_events">Det var alt for i dag!</string>
 
     <!-- Animals Fragment -->
-    <string name="no_species">Ingen dyr funnet.</string>
+    <string name="no_species">Koble deg på internett for å se hva vi har i parken vår.</string>
 
     <!-- Attractions Fragment -->
-    <string name="no_attractions">Ingen attraksjoner funnet.</string>
+    <string name="no_attractions">Koble deg på internett for å se hva vi har i parken vår.</string>
 
     <!-- Amenities Fragment -->
-    <string name="no_amenities">Ingen fasiliteter funnet.</string>
+    <string name="no_amenities">Koble deg på internett for å se hva vi har i parken vår.</string>
 
 </resources>
