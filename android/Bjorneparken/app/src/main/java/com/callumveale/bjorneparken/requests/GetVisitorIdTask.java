@@ -70,7 +70,10 @@ public class GetVisitorIdTask extends AsyncTask<Void, Void, MainVisitorResponse>
     @Override
     protected void onPostExecute(MainVisitorResponse response) {
 
-        mActivity.setId(response.getId());
+        if (response.getId() != null) {
+
+            mActivity.setId(response.getId());
+        }
         mActivity.updateProgress(true);
     }
 

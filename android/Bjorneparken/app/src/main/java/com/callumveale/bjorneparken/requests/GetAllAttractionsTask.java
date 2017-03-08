@@ -68,7 +68,10 @@ public class GetAllAttractionsTask extends AsyncTask<Void, Void, MainAreaListRes
     @Override
     protected void onPostExecute(MainAreaListResponse attractionsResponse) {
 
-        mActivity.saveAttractions(attractionsResponse);
+        if (attractionsResponse != null) {
+
+            mActivity.saveAttractions(attractionsResponse);
+        }
         mActivity.updateProgress(true);
     }
 

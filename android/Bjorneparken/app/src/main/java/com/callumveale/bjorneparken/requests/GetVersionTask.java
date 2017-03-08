@@ -61,7 +61,11 @@ public class GetVersionTask extends AsyncTask<Void, Void, MainVersionResponse> {
     @Override
     protected void onPostExecute(MainVersionResponse versionResponse) {
 
-        mActivity.compareVersions(versionResponse.getVersion());
+        if (versionResponse.getVersion() != null) {
+
+            mActivity.compareVersions(versionResponse.getVersion());
+        }
+
         mActivity.updateProgress(true);
     }
 

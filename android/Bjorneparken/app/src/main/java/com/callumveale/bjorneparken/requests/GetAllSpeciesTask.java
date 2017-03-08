@@ -62,7 +62,10 @@ public class GetAllSpeciesTask extends AsyncTask<Void, Void, MainSpeciesListResp
     @Override
     protected void onPostExecute(MainSpeciesListResponse speciesResponse) {
 
-        mActivity.saveSpecies(speciesResponse);
+        if (speciesResponse != null){
+
+            mActivity.saveSpecies(speciesResponse);
+        }
         mActivity.updateProgress(true);
     }
 

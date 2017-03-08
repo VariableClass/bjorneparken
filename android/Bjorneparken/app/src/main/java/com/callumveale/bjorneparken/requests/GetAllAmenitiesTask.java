@@ -62,7 +62,10 @@ public class GetAllAmenitiesTask extends AsyncTask<Void, Void, MainAreaListRespo
     @Override
     protected void onPostExecute(MainAreaListResponse amenitiesResponse) {
 
-        mActivity.saveAmenities(amenitiesResponse);
+        if (amenitiesResponse != null) {
+
+            mActivity.saveAmenities(amenitiesResponse);
+        }
         mActivity.updateProgress(true);
     }
 

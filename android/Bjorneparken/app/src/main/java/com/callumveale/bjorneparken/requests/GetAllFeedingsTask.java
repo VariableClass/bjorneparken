@@ -64,8 +64,10 @@ public class GetAllFeedingsTask extends AsyncTask<Void, Void, MainEventListRespo
     @Override
     protected void onPostExecute(MainEventListResponse feedingsResponse) {
 
-        mActivity.saveFeedings(feedingsResponse);
+        if (feedingsResponse != null) {
 
+            mActivity.saveFeedings(feedingsResponse);
+        }
         mActivity.updateProgress(true);
     }
 
