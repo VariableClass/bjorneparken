@@ -59,7 +59,7 @@ public class SpeciesRecyclerViewAdapter extends RecyclerViewAdapter {
 
             holder.mImageView.setImageBitmap(bitmap);
             holder.mImageView.setVisibility(View.VISIBLE);
-            maxTextLength = 75;
+            maxTextLength = 65;
 
         } else {
 
