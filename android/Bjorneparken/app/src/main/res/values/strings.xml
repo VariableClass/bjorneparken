@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">Bjørneparken</string>
+    <string name="facebook_app_id">611788629011007</string>
+    <string name="facebook_place_id">201367389875716</string>
+    <string name="hashtag">#bjørneparken</string>
 
     <!-- Navigation Drawer -->
     <string name="drawer_open">Navigation drawer open</string>
@@ -11,7 +14,7 @@
     <string name="amenities">Amenities</string>
     <string name="park_map">Map</string>
     <string name="restaurant_menu">Restaurant Menu</string>
-    <string name="share">Share</string>
+    <string name="social">Social</string>
     <string name="settings">Settings</string>
     <string name="help">Help</string>
 
@@ -43,5 +46,16 @@
 
     <!-- Amenities Fragment -->
     <string name="no_amenities">Connect to the internet to see what\'s available in our park.</string>
+
+    <!-- Share Fragment -->
+    <string name="social_share">Share:</string>
+    <string name="social_follow">Follow:</string>
+    <string name="social_rate">Rate:</string>
+    <string name="share_facebook">Share to Facebook</string>
+    <string name="share_twitter">Share to Twitter</string>
+    <string name="share_instagram">Share to Instagram</string>
+    <string name="share_other">Share to other</string>
+    <string name="share_photo">Share Photo</string>
+    <string name="trip_advisor_widget">&lt;div id=&quot;TA_cdswritereviewlg363&quot; class=&quot;TA_cdswritereviewlg&quot;&gt;&lt;ul id=&quot;GlKPiSM&quot; class=&quot;TA_links urWVTeEh&quot;&gt;&lt;li id=&quot;U5RGdYUUfw&quot; class=&quot;OLT1ZKw4h&quot;&gt;&lt;a target=&quot;_blank&quot; href=&quot;https://www.tripadvisor.co.uk/&quot;&gt;&lt;img src=&quot;https://www.tripadvisor.co.uk/img/cdsi/img2/branding/medium&#8211;logo&#8211;12097&#8211;2.png&quot; alt=&quot;TripAdvisor&quot;/&gt;&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;&lt;script src=&quot;https://www.jscache.com/wejs?wtype=cdswritereviewlg&amp;uniq=363&amp;locationId=6825946&amp;lang=en_UK&amp;lang=en_UK&amp;display_version=2&quot;&gt;&lt;/script&gt;</string>
 
 </resources>

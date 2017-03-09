@@ -6,8 +6,15 @@
     tools:context=".activities.HomeActivity">
 
     <item
-        android:id="@+id/action_my_visit"
+        android:id="@+id/action_share"
         android:orderInCategory="100"
+        android:title="@string/social"
+        android:icon="@drawable/action_share"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_my_visit"
+        android:orderInCategory="200"
         android:title="@string/my_visit"
         android:icon="@drawable/notification_icon"
         app:showAsAction="ifRoom" />

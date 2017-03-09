@@ -1,5 +1,6 @@
 package com.callumveale.bjorneparken.activities;
 
+import android.content.Intent;
 import android.content.res.Configuration;
 
 import android.os.Parcelable;
@@ -24,6 +25,7 @@ import com.callumveale.bjorneparken.fragments.DetailFragment;
 import com.callumveale.bjorneparken.fragments.DialogListFragment;
 import com.callumveale.bjorneparken.fragments.HomeFragment;
 import com.callumveale.bjorneparken.fragments.ListFragment;
+import com.callumveale.bjorneparken.fragments.SocialFragment;
 import com.callumveale.bjorneparken.models.Amenity;
 import com.callumveale.bjorneparken.models.Animal;
 import com.callumveale.bjorneparken.models.Enclosure;
@@ -134,7 +136,7 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
                 getString(R.string.amenities),
                 getString(R.string.park_map),
                 getString(R.string.restaurant_menu),
-                getString(R.string.share),
+                getString(R.string.social),
                 getString(R.string.settings),
                 getString(R.string.help)};
 
@@ -522,9 +524,12 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
                 title = mNavigationOptions[6].name;
                 break;
 
-            case 7: // If selection is 'Share'
+            case 7: // If selection is 'Social'
                 // Retrieve title for page
                 title = mNavigationOptions[7].name;
+
+                // Retrieve new social fragment
+                fragment = SocialFragment.newInstance();
                 break;
 
             case 8: // If selection is 'Settings'
@@ -725,11 +730,17 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
         if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
+
         if (item.getItemId() == R.id.action_my_visit) {
+
             navigateToPosition(1);
             return true;
-        }
 
+        } else if (item.getItemId() == R.id.action_share){
+
+            SocialFragment social = new SocialFragment();
+            social.takePhoto(SocialFragment.OTHER);
+        }
 
         return super.onOptionsItemSelected(item);
     }
