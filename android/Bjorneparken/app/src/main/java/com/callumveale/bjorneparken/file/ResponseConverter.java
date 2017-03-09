@@ -1,7 +1,5 @@
 package com.callumveale.bjorneparken.file;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.util.Base64;
 
 import com.callumveale.bjorneparken.models.*;
@@ -19,6 +17,275 @@ import none.bjorneparkappen_api.model.*;
 public class ResponseConverter {
 
     //region Methods
+
+    //region To JSON
+
+    //region Species
+
+    private static MainSpeciesResponse convertLocalSpecies(Species species){
+
+        // If species is null, return null
+        if (species == null){
+
+            return null;
+        }
+
+        MainSpeciesResponse response = new MainSpeciesResponse();
+        response.setId(species.getId());
+        response.setCommonName(species.getCommonName());
+        response.setLatin(species.getLatin());
+        response.setDescription(species.getDescription());
+
+        // If species has image
+        if (species.getImageBytes() != null) {
+
+            // Encode base64 image
+            byte[] base64 = Base64.encode(species.getImageBytes(), Base64.DEFAULT);
+
+            String base64mime = "data:image/jpeg;base64," + base64.toString();
+
+            response.setImage(base64mime);
+        }
+
+        // Return a new species response created from the species object
+        return response;
+    }
+
+    public static MainSpeciesListResponse convertLocalSpeciesList(ArrayList<Species> species){
+
+        // Create new response to return
+        MainSpeciesListResponse returnList = new MainSpeciesListResponse();
+
+        // If species list is null
+        if (species == null) {
+
+            // Return the empty list
+            return returnList;
+        }
+
+        ArrayList<MainSpeciesResponse> listOfSpecies = new ArrayList<>();
+
+        // Else, for each species within the list
+        for (Species speciesInst : species){
+
+            // Create a new species response
+            MainSpeciesResponse response = convertLocalSpecies(speciesInst);
+
+            // Add it to the return list
+            listOfSpecies.add(response);
+        }
+
+        returnList.setSpecies(listOfSpecies);
+
+        // Return populated list
+        return returnList;
+    }
+
+    //endregion Species
+
+    //region Animals
+
+    private static MainAnimalResponse convertLocalAnimal(Animal animal){
+
+        // If animal is null, return null
+        if (animal == null){
+
+            return null;
+        }
+
+        MainSpeciesResponse species = convertLocalSpecies(animal.getSpecies());
+
+        MainAnimalResponse response = new MainAnimalResponse();
+        response.setId(animal.getId());
+        response.setName(animal.getName());
+        response.setSpecies(species);
+        response.setDescription(animal.getDescription());
+        response.setIsAvailable(animal.isAvailable());
+
+        // Return a new animal response created from the animal object
+        return response;
+    }
+
+    //endregion Animals
+
+    //region Areas
+
+    //region Amenities
+
+    private static MainAmenityResponse convertLocalAmenity(Amenity amenity){
+
+        // If amenity is null, return null
+        if (amenity == null){
+
+            return null;
+        }
+
+        MainAmenityResponse response = new MainAmenityResponse();
+        response.setId(amenity.getId());
+        response.setLabel(amenity.getLabel());
+        response.setVisitorDestination(amenity.getVisitorDestination());
+        response.setCoordinates(amenity.getCoordinates());
+        response.setAmenityType(amenity.getAmenityType());
+
+        // Return a new amenity response created from the amenity object
+        return response;
+    }
+
+    //endregion Amenities
+
+    //region Enclosures
+
+    private static MainEnclosureResponse convertLocalEnclosure(Enclosure enclosure){
+
+        // If enclosure is null, return null
+        if (enclosure == null){
+
+            return null;
+        }
+
+        ArrayList<MainAnimalResponse> animals = new ArrayList<>();
+
+        for (Animal animal : enclosure.getAnimals()){
+
+            MainAnimalResponse response = convertLocalAnimal(animal);
+
+            animals.add(response);
+        }
+
+        MainEnclosureResponse response = new MainEnclosureResponse();
+        response.setId(enclosure.getId());
+        response.setLabel(enclosure.getLabel());
+        response.setVisitorDestination(enclosure.getVisitorDestination());
+        response.setCoordinates(enclosure.getCoordinates());
+        response.setAnimals(animals);
+
+        // Return a new amenity response created from the amenity object
+        return response;
+    }
+
+    //endregion Enclosures
+
+    //endregion Areas
+
+    //region Keepers
+
+    private static MainKeeperResponse convertLocalKeeper(Keeper keeper){
+
+        // If keeper is null, return null
+        if (keeper == null){
+
+            return null;
+        }
+
+        MainKeeperResponse response = new MainKeeperResponse();
+        response.setId(keeper.getId());
+        response.setName(keeper.getName());
+        response.setBio(keeper.getBio());
+
+        // Return a new keeper response created from the keeper object
+        return response;
+    }
+
+    //endregion Keepers
+
+    //region Events
+
+    private static MainEventResponse convertLocalEvent(Event event){
+
+        // If event is null, return null
+        if (event == null){
+
+            return null;
+        }
+
+        MainAmenityResponse amenity = convertLocalAmenity((Amenity) event.getLocation());
+
+        MainEventResponse response = new MainEventResponse();
+        response.setId(event.getId());
+        response.setLabel(event.getLabel());
+        response.setDescription(event.getDescription());
+        response.setLocation(amenity);
+        response.setStartTime(event.getStartTime());
+        response.setEndTime(event.getEndTime());
+        response.setIsActive(event.isActive());
+
+        // Return a new event response created from the event object
+        return response;
+    }
+
+    private static MainFeedingResponse convertLocalFeeding(Feeding feeding){
+
+        // If feeding is null, return null
+        if (feeding == null){
+
+            return null;
+        }
+
+        MainEnclosureResponse enclosure = convertLocalEnclosure((Enclosure) feeding.getLocation());
+        MainKeeperResponse keeper = convertLocalKeeper(feeding.getKeeper());
+
+        MainFeedingResponse response = new MainFeedingResponse();
+        response.setId(feeding.getId());
+        response.setLabel(feeding.getLabel());
+        response.setDescription(feeding.getDescription());
+        response.setLocation(enclosure);
+        response.setStartTime(feeding.getStartTime());
+        response.setEndTime(feeding.getEndTime());
+        response.setIsActive(feeding.isActive());
+        response.setKeeper(keeper);
+
+        // Return a new feeding response created from the feeding object
+        return response;
+    }
+
+    public static MainEventListResponse convertLocalEventList(ArrayList<Event> events){
+
+        // Create new response to return
+        MainEventListResponse returnList = new MainEventListResponse();
+
+        // If event list is null
+        if (events == null) {
+
+            // Return the empty list
+            return returnList;
+        }
+
+        ArrayList<MainEventResponse> listOfEvents = new ArrayList<>();
+        ArrayList<MainFeedingResponse> listOfFeedings = new ArrayList<>();
+
+        // Else, for each event within the list
+        for (Event event : events){
+
+            if (event instanceof Feeding){
+
+                // Create a new feeding response
+                MainFeedingResponse response = convertLocalFeeding((Feeding) event);
+
+                // Add it to the return list
+                listOfFeedings.add(response);
+
+            } else {
+
+                // Create a new event response
+                MainEventResponse response = convertLocalEvent(event);
+
+                // Add it to the return list
+                listOfEvents.add(response);
+            }
+        }
+
+        returnList.setEvents(listOfEvents);
+        returnList.setFeedings(listOfFeedings);
+
+        // Return populated list
+        return returnList;
+    }
+
+    //endregion Events
+
+    //endregion To JSON
+
+    //region From JSON
 
     //region Species
 
@@ -403,6 +670,8 @@ public class ResponseConverter {
     }
 
     //endregion Events
+
+    //endregion From JSON
 
     //endregion Methods
 }

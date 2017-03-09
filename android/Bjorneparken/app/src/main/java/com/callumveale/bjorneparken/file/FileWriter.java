@@ -110,6 +110,14 @@ public class FileWriter {
         writeJsonToFile(itineraryJson, ITINERARY_FILE);
     }
 
+    public void writeItineraryToFile(ArrayList<Event> itinerary){
+
+        MainEventListResponse itineraryJson = ResponseConverter.convertLocalEventList(itinerary);
+        itineraryJson.setFactory(new JacksonFactory());
+
+        writeItineraryToFile(itineraryJson);
+    }
+
     public ArrayList<Event> getItineraryFromFile(){
 
         MainEventListResponse itinerary = new MainEventListResponse();
@@ -139,6 +147,14 @@ public class FileWriter {
     public void writeStarredSpeciesToFile(MainSpeciesListResponse starredSpeciesJson){
 
         writeJsonToFile(starredSpeciesJson, STARRED_SPECIES_FILE);
+    }
+
+    public void writeStarredSpeciesToFile(ArrayList<Species> species){
+
+        MainSpeciesListResponse starredSpeciesJson = ResponseConverter.convertLocalSpeciesList(species);
+        starredSpeciesJson.setFactory(new JacksonFactory());
+
+        writeStarredSpeciesToFile(starredSpeciesJson);
     }
 
     public ArrayList<Species> getStarredSpeciesFromFile(){

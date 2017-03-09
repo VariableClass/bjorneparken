@@ -7,6 +7,8 @@ import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.DateTime;
 
+import java.io.IOException;
+import java.net.InetAddress;
 import java.util.Locale;
 
 import none.bjorneparkappen_api.BjorneparkappenApi;
@@ -18,7 +20,8 @@ public class RequestsModule {
 
     //region Constants
 
-    private static final String ROOT_URL = "https://api-dot-bjorneparkappen.appspot.com/_ah/api/";
+    private static final String HOST = "api-dot-bjorneparkappen.appspot.com";
+    private static final String ROOT_URL = "https://" + HOST + "/_ah/api/";
 
     //region Request Constants
 
@@ -58,6 +61,12 @@ public class RequestsModule {
     //endregion Constructors
 
     //region Methods
+
+    public void checkServerAvailability(){
+
+        CheckConnectionTask checkConnection = new CheckConnectionTask(HOST, mActivity);
+        checkConnection.execute();
+    }
 
     //region GET Requests
 

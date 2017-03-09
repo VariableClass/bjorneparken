@@ -1,8 +1,9 @@
 package com.callumveale.bjorneparken.activities;
 
-import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
 
+import android.net.ConnectivityManager;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
@@ -35,6 +36,7 @@ import com.callumveale.bjorneparken.models.NavigationDrawerItem;
 import com.callumveale.bjorneparken.models.Species;
 import com.callumveale.bjorneparken.R;
 import com.callumveale.bjorneparken.notifications.NotificationEventReceiver;
+import com.callumveale.bjorneparken.requests.NetworkChangeReceiver;
 import com.callumveale.bjorneparken.requests.RequestsModule;
 
 import com.google.api.client.util.DateTime;
@@ -72,6 +74,13 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
 
     //region Data Retrieval
 
+    // Application initialising indicator
+    private boolean mInitialised;
+
+    // Network Change Listener
+    private NetworkChangeReceiver mNetworkChangeReceiver;
+    private boolean mServerAvailable;
+
     // Request Maker
     private RequestsModule mRequester;
 
@@ -86,7 +95,9 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
     private DateTime mVisitStart;
     private DateTime mVisitEnd;
     private ArrayList<Event> mItinerary;
+    private boolean mItineraryUpdated;
     private ArrayList<Species> mStarredSpecies;
+    private boolean mStarredSpeciesUpdated;
 
     // Park Data
     private ArrayList<Amenity> mAmenities;
@@ -105,6 +116,9 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+        // Set initialised to false
+        mInitialised = false;
+
         // Change theme from splash screen to application theme
         setTheme(R.style.Bjorneparken);
 
@@ -113,8 +127,14 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
         // Build and display UI components
         buildUIComponents();
 
-        // Retrieve data with which to populate the application
-        getApplicationData();
+        // Initialise requester to perform calls to the server
+        mRequester = new RequestsModule(getString(R.string.app_name), this);
+
+        // Initialise and register a new receiver to notify the main thread of network changes
+        setupNetworkChangeListener();
+
+        // Check whether the server can be reached
+        checkServerAvailability();
     }
 
     private void buildUIComponents(){
@@ -172,87 +192,116 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
         mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
     }
 
-    private void getApplicationData(){
+    private void setupNetworkChangeListener(){
+
+        // Initialise new network change receiver to flag network changes
+        mNetworkChangeReceiver = new NetworkChangeReceiver(mRequester);
+
+        // Create intent filter and add CONNECTIVITY_ACTION to limit alerts to network connection changes
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+
+        // Register receiver with filter as broadcast receiever
+        registerReceiver(mNetworkChangeReceiver, filter);
+    }
+
+    private void getData(){
 
         // Create new FileWriter to interact with local data
         mFileWriter = new FileWriter(getApplicationContext());
 
-        // Retrieve version and visitor ID
-        getBaseDataFromFile();
-
-        // Initialise requester to perform calls to the server
-        mRequester = new RequestsModule(getString(R.string.app_name), this);
-
-        // Get version from server
-        checkVersion();
-
-        // Decide whether to retrieve new ID or populate from local data
-        checkUserId();
-    }
-
-    private void getBaseDataFromFile(){
-
-        // Attempt to retrieve data version from file
-        mVersion = mFileWriter.getVersionFromFile();
-
         // Attempt to retrieve visitor ID from file
         mVisitorId = mFileWriter.getIdFromFile();
 
+        // Attempt to retrieve park data from file
         getParkDataFromFile();
+
+        // Attempt to retrieve visitor data from file
+        getVisitorDataFromFile();
+
+        // If user exists
+        if (mVisitorId != 0){
+
+            // If server is available
+            if (mServerAvailable) {
+
+                // Attempt to retrieve version from file
+                mVersion = mFileWriter.getVersionFromFile();
+
+                // Check version
+                checkVersion();
+
+            } else {
+
+                // Initialise view with locally available data
+                onAllDataInitialised();
+            }
+
+        } else {
+
+            // TODO Retrieve visit of dates from user
+            mVisitStart = new DateTime(new Date());
+            mVisitEnd = new DateTime(new Date());
+
+            // Initialise version file
+            mVersion = new DateTime(new Date(0));
+            mFileWriter.writeVersionToFile(mVersion);
+
+            // If server is available
+            if (mServerAvailable) {
+
+                // Obtain new ID
+                getNewId();
+
+            } else {
+
+                // TODO Show connect to internet message
+            }
+        }
+    }
+
+    private void onAllDataInitialised(){
+
+        // Update initialised flag
+        mInitialised = true;
+
+        // Create new home fragment, populating from visitor itinerary
+        HomeFragment homeFragment = HomeFragment.newInstance(mItinerary, mVisitStart, mVisitEnd);
+
+        // Change to new fragment
+        setFragment(homeFragment);
     }
 
     //endregion Initialisation
 
-    //region Park Data
-
-    private void checkVersion(){
-
-        // Obtain version from server to compare with local version
-        mRequester.getVersion();
-    }
-
-    public void compareVersions(DateTime serverVersion){
-
-        // If no version stored or version has changed
-        if ((mVersion == null) || (mVersion.getValue() != serverVersion.getValue())) {
-
-            // Perform update
-            updateParkData();
-
-            // If a visitor exists
-            if (mVisitorId != 0) {
-
-                // Fetch user's data again, as some starred items may not currently be available
-                getVisitorDataFromServer();
-            }
-
-            // Update stored version number
-            mVersion = serverVersion;
-            mFileWriter.writeVersionToFile(mVersion);
-        }
-    }
-
-    public void updateParkData(){
-
-        // Fetch amenities
-        mRequester.getAllAmenities();
-
-        // Fetch attractions
-        mRequester.getAllAttractions();
-
-        // Fetch feedings
-        mRequester.getAllFeedings();
-
-        // Fetch species
-        mRequester.getAllSpecies();
-    }
+    //region Data From File
 
     public void getParkDataFromFile(){
 
+        // Attempt to retrieve amenities from file
         mAmenities = mFileWriter.getAmenitiesFromFile();
+
+        // Attempt to retrieve attractions from file
         mAttractions = mFileWriter.getAttractionsFromFile();
+
+        // Attempt to retrieve feedings from file
         mFeedings = mFileWriter.getFeedingsFromFile();
+
+        // Attempt to retrieve species from file
         mSpecies = mFileWriter.getSpeciesFromFile();
+    }
+
+    private void getVisitorDataFromFile(){
+
+        // TODO Retrieve visit of dates from user
+        mVisitStart = new DateTime(new Date());
+        mVisitEnd = new DateTime(new Date());
+
+        // Attempt to retrieve visitor itinerary from file
+        mItinerary = mFileWriter.getItineraryFromFile();
+
+        // Attempt to retrieve visitor starred species from file
+        mStarredSpecies = mFileWriter.getStarredSpeciesFromFile();
     }
 
     private ArrayList<Feeding> getFeedingsForSpecies(Species species){
@@ -276,122 +325,6 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
         Collections.sort(returnList, new Event.EventTimeComparator());
 
         return returnList;
-    }
-
-    public void saveAmenities(MainAreaListResponse amenities){
-
-        // Cache response
-        mAmenities = ResponseConverter.convertAmenityListResponse(amenities);
-
-        // Write response to file
-        mFileWriter.writeAmenitiesToFile(amenities);
-    }
-
-    public void saveAttractions(MainAreaListResponse attractions){
-
-        // Cache response
-        mAttractions = ResponseConverter.convertAmenityListResponse(attractions);
-
-        // Write response to file
-        mFileWriter.writeAttractionsToFile(attractions);
-    }
-
-    public void saveFeedings(MainEventListResponse feedings){
-
-        // Cache response
-        mFeedings = ResponseConverter.convertFeedingListResponse(feedings);
-
-        // Write response to file
-        mFileWriter.writeFeedingsToFile(feedings);
-    }
-
-    public void saveSpecies(MainSpeciesListResponse species){
-
-        // Cache response
-        mSpecies = ResponseConverter.convertSpeciesListResponse(species);
-
-        // Write response to file
-        mFileWriter.writeSpeciesToFile(species);
-    }
-
-    //endregion Park Data
-
-    //region User Data
-
-    public void checkUserId(){
-
-        // TODO Retrieve visit of dates from user
-        mVisitStart = new DateTime(new Date());
-        mVisitEnd = new DateTime(new Date());
-
-        // If not found
-        if (mVisitorId == 0){
-
-            // Obtain a visitor ID from server
-            getNewId();
-
-        } else {
-
-            // Retrieve visitor data file
-            getVisitorDataFromFile();
-
-            // Perform visitor initialise action
-            onVisitorInitialise();
-        }
-    }
-
-    public void getNewId(){
-
-        // Obtain new user ID from server
-        mRequester.getVisitorId(mVisitStart, mVisitEnd);
-    }
-
-    public void setId(long visitorId){
-
-        // Store ID
-        mVisitorId = visitorId;
-        mFileWriter.writeIdToFile(mVisitorId);
-
-        // Fetch user data for new ID
-        getVisitorDataFromServer();
-    }
-
-    private void getVisitorDataFromFile(){
-
-        mItinerary = mFileWriter.getItineraryFromFile();
-        mStarredSpecies = mFileWriter.getStarredSpeciesFromFile();
-
-        onVisitorInitialise();
-    }
-
-    private void getVisitorDataFromServer(){
-
-        // Update itinerary
-        mRequester.getItinerary(mVisitorId);
-
-        // Update starred species
-        mRequester.getStarredSpecies(mVisitorId);
-    }
-
-    public void saveItinerary(MainEventListResponse itineraryResponse){
-
-        // Cache response
-        mItinerary = ResponseConverter.convertEventListResponse(itineraryResponse);
-
-        // Write response to file
-        mFileWriter.writeItineraryToFile(itineraryResponse);
-
-        // Create notification service
-        NotificationEventReceiver.setupAlarm(getApplicationContext(), mItinerary, mVisitStart, mVisitEnd);
-    }
-
-    public void saveStarredSpecies(MainSpeciesListResponse starredSpeciesResponse){
-
-        // Cache response
-        mStarredSpecies = ResponseConverter.convertSpeciesListResponse(starredSpeciesResponse);
-
-        // Write response to file
-        mFileWriter.writeStarredSpeciesToFile(starredSpeciesResponse);
     }
 
     public boolean isInItinerary(Event event){
@@ -429,12 +362,192 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
         return isStarred;
     }
 
-    public ArrayList<Species> getStarredSpecies(){
+    //endregion Data From File
 
-        return mStarredSpecies;
+    //region Data From Server
+
+    private void checkServerAvailability(){
+
+        // Check whether the server can be reached
+        mRequester.checkServerAvailability();
     }
 
-    //endregion User Data
+    public void setServerAvailability(boolean available) {
+
+        mServerAvailable = available;
+
+        // If application is still initialising
+        if (!mInitialised) {
+
+            // Populate app with data
+            getData();
+
+        } else {
+
+            // If server is not available, return
+            if (!available) {
+
+                return;
+            }
+
+            // Else, synchronise user's itinerary and starred species
+            // TODO Implement methods to synchronise itinerary and starred species lists with server
+
+            // Check version has not changed since last connection
+            checkVersion();
+        }
+    }
+
+    private void checkVersion(){
+
+        // Obtain version from server to compare with local version
+        mRequester.getVersion();
+    }
+
+    public void compareVersions(DateTime serverVersion){
+
+        // If no version stored or version has changed
+        if ((mVersion == null) || (mVersion.getValue() != serverVersion.getValue())) {
+
+            // Retrieve park data from server
+            getParkDataFromServer();
+
+            // If initialising
+            if (!mInitialised) {
+
+                // Fetch user's data, as some previously starred items may not currently be available
+                getVisitorDataFromServer();
+            }
+
+            // Update stored version number
+            mVersion = serverVersion;
+            mFileWriter.writeVersionToFile(mVersion);
+        }
+
+        // If initialising
+        if (!mInitialised) {
+
+            // Initialise view with most up to date data
+            onAllDataInitialised();
+        }
+    }
+
+    public void getNewId(){
+
+        // Obtain new user ID from server
+        mRequester.getVisitorId(mVisitStart, mVisitEnd);
+    }
+
+    public void setId(long visitorId){
+
+        // Store ID
+        mVisitorId = visitorId;
+        mFileWriter.writeIdToFile(mVisitorId);
+
+        // Fetch latest park data
+        getParkDataFromServer();
+
+        // Fetch user data for ID
+        getVisitorDataFromServer();
+
+        // Initialise view with locally available data
+        onAllDataInitialised();
+    }
+
+    private void getVisitorDataFromServer(){
+
+        // Update itinerary
+        mRequester.getItinerary(mVisitorId);
+
+        // Update starred species
+        mRequester.getStarredSpecies(mVisitorId);
+    }
+
+    public void getParkDataFromServer(){
+
+        // Fetch amenities
+        mRequester.getAllAmenities();
+
+        // Fetch attractions
+        mRequester.getAllAttractions();
+
+        // Fetch feedings
+        mRequester.getAllFeedings();
+
+        // Fetch species
+        mRequester.getAllSpecies();
+    }
+
+    //region Callbacks
+
+    //region Park Data Callbacks
+
+    public void saveAmenities(MainAreaListResponse amenities){
+
+        // Cache response
+        mAmenities = ResponseConverter.convertAmenityListResponse(amenities);
+
+        // Write response to file
+        mFileWriter.writeAmenitiesToFile(amenities);
+    }
+
+    public void saveAttractions(MainAreaListResponse attractions){
+
+        // Cache response
+        mAttractions = ResponseConverter.convertAmenityListResponse(attractions);
+
+        // Write response to file
+        mFileWriter.writeAttractionsToFile(attractions);
+    }
+
+    public void saveFeedings(MainEventListResponse feedings){
+
+        // Cache response
+        mFeedings = ResponseConverter.convertFeedingListResponse(feedings);
+
+        // Write response to file
+        mFileWriter.writeFeedingsToFile(feedings);
+    }
+
+    public void saveSpecies(MainSpeciesListResponse species){
+
+        // Cache response
+        mSpecies = ResponseConverter.convertSpeciesListResponse(species);
+
+        // Write response to file
+        mFileWriter.writeSpeciesToFile(species);
+    }
+
+    //endregion Park Data Callbacks
+
+    //region User Data Callbacks
+
+    public void saveItinerary(MainEventListResponse itineraryResponse){
+
+        // Cache response
+        mItinerary = ResponseConverter.convertEventListResponse(itineraryResponse);
+
+        // Write response to file
+        mFileWriter.writeItineraryToFile(itineraryResponse);
+
+        // Create notification service
+        NotificationEventReceiver.setupAlarm(getApplicationContext(), mItinerary, mVisitStart, mVisitEnd);
+    }
+
+    public void saveStarredSpecies(MainSpeciesListResponse starredSpeciesResponse){
+
+        // Cache response
+        mStarredSpecies = ResponseConverter.convertSpeciesListResponse(starredSpeciesResponse);
+
+        // Write response to file
+        mFileWriter.writeStarredSpeciesToFile(starredSpeciesResponse);
+    }
+
+    //endregion User Data Callbacks
+
+    //endregion Callbacks
+
+    //endregion Data From Server
 
     //region UI
 
@@ -556,15 +669,6 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
         mDrawerLayout.closeDrawer(mDrawerList);
     }
 
-    private void onVisitorInitialise(){
-
-        // Create new home fragment, populating from visitor itinerary
-        HomeFragment homeFragment = HomeFragment.newInstance(mItinerary, mVisitStart, mVisitEnd);
-
-        // Change to new fragment
-        setFragment(homeFragment);
-    }
-
     //region Fragment Listener Methods
 
     @Override
@@ -617,8 +721,20 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
             // Remove the species from the local starred species list
             mStarredSpecies.remove(speciesIndex);
 
-            // Remove the species from the datastore starred species list
-            mRequester.unstarSpecies(mVisitorId, speciesToStar);
+            // If the server is available
+            if (mServerAvailable) {
+
+                // Remove the species from the datastore starred species list
+                mRequester.unstarSpecies(mVisitorId, speciesToStar);
+
+            } else {
+
+                // Else, flag the starred species list as updated to be synchronised when the server next becomes available
+                mStarredSpeciesUpdated = true;
+
+                // Write to file
+                mFileWriter.writeStarredSpeciesToFile(mStarredSpecies);
+            }
 
         } else {
 
@@ -645,8 +761,20 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
                 options.show(getSupportFragmentManager(), "DialogListFragment");
             }
 
-            // Add the species to the datastore starred species list
-            mRequester.starSpecies(mVisitorId, speciesToStar);
+            // If the server is available
+            if (mServerAvailable) {
+
+                // Add the species to the datastore starred species list
+                mRequester.starSpecies(mVisitorId, speciesToStar);
+
+            } else {
+
+                // Else, flag the starred species list as updated to be synchronised when the server next becomes available
+                mStarredSpeciesUpdated = true;
+
+                // Write to file
+                mFileWriter.writeStarredSpeciesToFile(mStarredSpecies);
+            }
         }
     }
 
@@ -673,16 +801,40 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
             // Remove the event from the local itinerary
             mItinerary.remove(eventIndex);
 
-            // Remove the event from the datastore itinerary
-            mRequester.removeFromItinerary(mVisitorId, eventToStar);
+            // If server is available
+            if (mServerAvailable) {
+
+                // Remove the event from the datastore itinerary
+                mRequester.removeFromItinerary(mVisitorId, eventToStar);
+
+            } else {
+
+                // Else, flag the itinerary as updated to be synchronised when the server next becomes available
+                mItineraryUpdated = true;
+
+                // Write to file
+                mFileWriter.writeItineraryToFile(mItinerary);
+            }
 
         } else {
 
             // Add the event to the local itinerary
             mItinerary.add(eventToStar);
 
-            // Add the species to the datastore itinerary
-            mRequester.addToItinerary(mVisitorId, eventToStar);
+            // If server is available
+            if (mServerAvailable) {
+
+                // Add the species to the datastore itinerary
+                mRequester.addToItinerary(mVisitorId, eventToStar);
+
+            } else {
+
+                // Else, flag the itinerary as updated to be synchronised when the server next becomes available
+                mItineraryUpdated = true;
+
+                // Write to file
+                mFileWriter.writeItineraryToFile(mItinerary);
+            }
         }
 
         // Update notification service
