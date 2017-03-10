@@ -83,6 +83,7 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
 
     // Request Maker
     private RequestsModule mRequester;
+    private int mRequestsActive;
 
     // File Writer
     private FileWriter mFileWriter;
@@ -129,6 +130,7 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
 
         // Initialise requester to perform calls to the server
         mRequester = new RequestsModule(getString(R.string.app_name), this);
+        mRequestsActive = 0;
 
         // Initialise and register a new receiver to notify the main thread of network changes
         setupNetworkChangeListener();
@@ -577,10 +579,20 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
         // If task has completed
         if (complete) {
 
-            // Hide progress wheel
-            mProgressBar.setVisibility(View.GONE);
+            // Decrease number of active requests
+            mRequestsActive -= 1;
+
+            // If no requests active
+            if (mRequestsActive == 0) {
+
+                // Hide progress wheel
+                mProgressBar.setVisibility(View.GONE);
+            }
 
         } else {
+
+            // Increase number of active requests
+            mRequestsActive += 1;
 
             // Show progress bar
             mProgressBar.setVisibility(View.VISIBLE);
