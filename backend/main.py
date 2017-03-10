@@ -267,6 +267,14 @@ ADD_REMOVE_EVENT_REQUEST = endpoints.ResourceContainer(
     event_id = messages.IntegerField(2, required=True),
     location_id = messages.IntegerField(3, required=True),
     language_code = messages.StringField(4, required=True))
+SYNC_ITINERARY_REQUEST = endpoints.ResourceContainer(
+    itinerary = messages.MessageField(EventListResponse, 1, required=True),
+    visitor_id = messages.IntegerField(2, required=True),
+    language_code = messages.StringField(3, required=True))
+SYNC_STARRED_SPECIES_REQUEST = endpoints.ResourceContainer(
+    starred_species = messages.MessageField(SpeciesListResponse, 1, required=True),
+    visitor_id = messages.IntegerField(2, required=True),
+    language_code = messages.StringField(3, required=True))
 # [END update request resources]
 # [END request resources]
 
@@ -2243,6 +2251,66 @@ class VisitorsApi(remote.Service):
         return response
 
     @endpoints.method(
+        SYNC_ITINERARY_REQUEST,
+        EventListResponse,
+        path='itinerary/sync',
+        http_method='POST',
+        name='visitors.itinerary.sync')
+    def sync_itinerary(self, request):
+
+        # Validate language code
+        ApiHelper.check_language(language_code=request.language_code)
+
+        # Attempt to retrieve visitor
+        visitor = Visitor.get_by_id(request.visitor_id)
+
+        # If visitor does not exist, raise BadRequestException
+        if not visitor:
+            raise endpoints.BadRequestException("No visitor found with ID '" +
+                                                str(request.id) + "'.")
+
+        response = EventListResponse()
+
+        # Create a new itinerary to write against the user
+        itinerary_to_write = []
+
+        # Validate received itinerary events
+        for received_event in request.itinerary.events:
+            # Attempt to retrieve the event
+            event = Event.get_by_id(received_event.id, parent=ndb.Key(Area, received_event.location.id))
+
+            # If event is found, add to new itinerary and response
+            if event:
+                itinerary_to_write.append(Event.EventLookup(event_id=event.key.id(), location_id=event.key.parent().id()))
+
+                # Retrieve an Event response
+                event_response = ApiHelper.get_event_response(event, request.language_code)
+
+                # Add event to response
+                response.events.append(event_response)
+
+        # Validate received itinerary feedings
+        for received_feeding in request.itinerary.feedings:
+            # Attempt to retrieve feeding
+            feeding = Feeding.get_by_id(received_feeding.id, parent=ndb.Key(Area, received_feeding.location.id))
+
+            # If feeding is found, add to new itinerary and response
+            if feeding:
+                itinerary_to_write.append(Event.EventLookup(event_id=feeding.key.id(), location_id=feeding.key.parent().id()))
+
+                # Retrieve a Feeding response
+                feeding_response = ApiHelper.get_feeding_response(feeding, request.language_code)
+
+                # Add feeding to response
+                response.feedings.append(feeding_response)
+
+        # Overwrite the visitor's itinerary with the newly created itinerary
+        visitor.itinerary = itinerary_to_write
+        visitor.put()
+
+        return response
+
+    @endpoints.method(
         ID_LANGUAGE_REQUEST,
         SpeciesListResponse,
         path='starred_species',
@@ -2404,6 +2472,67 @@ class VisitorsApi(remote.Service):
         visitor.starred_species.remove(species_to_remove)
 
         # Write changes
+        visitor.put()
+
+        return response
+
+    @endpoints.method(
+        SYNC_STARRED_SPECIES_REQUEST,
+        SpeciesListResponse,
+        path='starred_species/sync',
+        http_method='POST',
+        name='visitors.starred_species.sync')
+    def sync_starred_species(self, request):
+
+        # Validate language code
+        ApiHelper.check_language(language_code=request.language_code)
+
+        # Attempt to retrieve visitor
+        visitor = Visitor.get_by_id(request.visitor_id)
+
+        # If visitor does not exist, raise BadRequestException
+        if not visitor:
+            raise endpoints.BadRequestException("No visitor found with ID '" +
+                                                str(request.id) + "'.")
+
+        response = SpeciesListResponse()
+
+        # Create a new starred species list to write against the user
+        starred_species_to_write = []
+
+        # Validate received species
+        for received_species in request.starred_species.species:
+            # Attempt to retrieve the species
+            species = Species.get_by_id(received_species.id)
+
+            # If species is found, add to new starred species list and response
+            if species is not None:
+                starred_species_to_write.append(species.key.id())
+
+                # Translate translatable species resources
+                species_common_name_translation = InternationalText.get_translation(
+                        request.language_code,
+                        species.common_name)
+                species_description_translation = InternationalText.get_translation(
+                        request.language_code,
+                        species.description)
+
+                image = None
+
+                # If species has an image
+                if not species.image is None:
+                    image = species.image.get()
+
+                # Add species to return list
+                response.species.append(SpeciesResponse(
+                    id=species.key.id(),
+                    common_name=species_common_name_translation,
+                    latin=species.latin,
+                    description=species_description_translation,
+                    image=image))
+
+        # Overwrite the visitor's starred species list with the newly created list
+        visitor.starred_species = starred_species_to_write
         visitor.put()
 
         return response
