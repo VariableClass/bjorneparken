@@ -41,6 +41,8 @@ public class SocialFragment extends Fragment {
 
     //region Constants
 
+    private static final String ARG_INTERNET = "internet-available";
+
     public static final int FACEBOOK = 1;
     public static final int TWITTER = 2;
     public static final int INSTAGRAM = 3;
@@ -53,6 +55,7 @@ public class SocialFragment extends Fragment {
     private CallbackManager callbackManager;
     private ShareDialog shareDialog;
     private String mCurrentPhotoPath;
+    private boolean mInternetAvailable;
 
     //endregion Properties
 
@@ -72,9 +75,10 @@ public class SocialFragment extends Fragment {
      *
      * @return A new instance of fragment SocialFragment.
      */
-    public static SocialFragment newInstance() {
+    public static SocialFragment newInstance(boolean internetAvailable) {
         SocialFragment fragment = new SocialFragment();
         Bundle args = new Bundle();
+        args.putBoolean(ARG_INTERNET, internetAvailable);
         fragment.setArguments(args);
         return fragment;
     }
@@ -84,6 +88,9 @@ public class SocialFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (savedInstanceState != null){
+            mInternetAvailable = getArguments().getBoolean(ARG_INTERNET);
+        }
 
         callbackManager = CallbackManager.Factory.create();
         shareDialog = new ShareDialog(this);
@@ -133,9 +140,15 @@ public class SocialFragment extends Fragment {
                 "https://www.facebook.com/bjorneparken",
                 LikeView.ObjectType.PAGE);
 
-        WebView tripadvisor = (WebView) view.findViewById(R.id.trip_advisor);
-        tripadvisor.getSettings().setJavaScriptEnabled(true);
-        tripadvisor.loadData(getString(R.string.trip_advisor_widget), "text/html", null);
+        // If internet is available
+        if (mInternetAvailable) {
+
+            // Show the TripAdvisor webview
+            WebView tripadvisor = (WebView) view.findViewById(R.id.trip_advisor);
+            tripadvisor.getSettings().setJavaScriptEnabled(true);
+            tripadvisor.loadData(getString(R.string.trip_advisor_widget), "text/html", null);
+            tripadvisor.setVisibility(View.VISIBLE);
+        }
 
         return view;
     }

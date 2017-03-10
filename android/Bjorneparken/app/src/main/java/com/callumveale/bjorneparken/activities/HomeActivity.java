@@ -685,7 +685,7 @@ public class HomeActivity
                 title = mNavigationOptions[7].name;
 
                 // Retrieve new social fragment
-                fragment = SocialFragment.newInstance();
+                fragment = SocialFragment.newInstance(mServerAvailable);
                 break;
 
             case 8: // If selection is 'Settings'
