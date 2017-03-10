@@ -45,9 +45,6 @@
     <string name="no_amenities">Koble deg på internett for å se hva vi har i parken vår.</string>
 
     <!-- Share Fragment -->
-    <string name="social_share">Del:</string>
-    <string name="social_follow">Følg:</string>
-    <string name="social_rate">Vurdere:</string>
     <string name="share_facebook">Del på Facebook</string>
     <string name="share_twitter">Del på Twitter</string>
     <string name="share_instagram">Del på Instagram</string>
@@ -55,4 +52,6 @@
     <string name="share_photo">Del photo</string>
     <string name="trip_advisor_widget">&lt;div id=&quot;TA_cdswritereviewlg664&quot; class=&quot;TA_cdswritereviewlg&quot;&gt;     &lt;ul id=&quot;tISjeW8TxJT&quot; class=&quot;TA_links K2ZzYC6q6EP&quot;&gt;         &lt;li id=&quot;hLN186X&quot; class=&quot;Adhl1CRT7d&quot;&gt;             &lt;a target=&quot;_blank&quot; href=&quot;https://no.tripadvisor.com/&quot;&gt;&lt;img src=&quot;https://no.tripadvisor.com/img/cdsi/img2/branding/medium&#8211;logo&#8211;12097&#8211;2.png&quot; alt=&quot;TripAdvisor&quot;/&gt;&lt;/a&gt;         &lt;/li&gt;     &lt;/ul&gt; &lt;/div&gt; &lt;script src=&quot;https://www.jscache.com/wejs?wtype=cdswritereviewlg&amp;uniq=664&amp;locationId=6825946&amp;lang=no&amp;lang=no&amp;display_version=2&quot;&gt;&lt;/script&gt;</string>
 
+    <!-- Settings Fragment -->
+    <string name="notifications">Notifikasjoner</string>
 </resources>
