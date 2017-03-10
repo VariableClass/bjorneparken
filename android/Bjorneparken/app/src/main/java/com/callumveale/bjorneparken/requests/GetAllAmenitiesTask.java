@@ -5,8 +5,10 @@ import android.os.AsyncTask;
 import com.callumveale.bjorneparken.activities.HomeActivity;
 
 import java.io.IOException;
+import java.util.List;
 
 import none.bjorneparkappen_api.BjorneparkappenApi;
+import none.bjorneparkappen_api.model.MainAmenityResponse;
 import none.bjorneparkappen_api.model.MainAreaListResponse;
 
 /**
@@ -63,6 +65,22 @@ public class GetAllAmenitiesTask extends AsyncTask<Void, Void, MainAreaListRespo
     protected void onPostExecute(MainAreaListResponse amenitiesResponse) {
 
         if (amenitiesResponse != null) {
+
+            // Remove any attractions from the list
+            List<MainAmenityResponse> amenities = amenitiesResponse.getAmenities();
+
+            for (int i = amenities.size() - 1; i >= 0; i--){
+
+                MainAmenityResponse amenity = amenities.get(i);
+
+                if (amenity.getAmenityType().equals("ATTRACTION")){
+
+                    amenities.remove(amenity);
+                }
+            }
+
+            // Update the amenities list in the response
+            amenitiesResponse.setAmenities(amenities);
 
             mActivity.saveAmenities(amenitiesResponse);
         }
