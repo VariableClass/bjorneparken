@@ -390,11 +390,20 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
                 return;
             }
 
-            // Else, synchronise user's itinerary and starred species
-            // TODO Implement methods to synchronise itinerary and starred species lists with server
-
             // Check version has not changed since last connection
             checkVersion();
+
+            // If itinerary has been updated whilst offline, synchronise it
+            if (mItineraryUpdated) {
+
+                mRequester.syncItinerary(mVisitorId, mItinerary);
+            }
+
+            // If starred species list has been updated whilst offline, synchronise it
+            if (mStarredSpeciesUpdated) {
+
+                mRequester.syncStarredSpecies(mVisitorId, mStarredSpecies);
+            }
         }
     }
 
@@ -527,6 +536,9 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
         // Cache response
         mItinerary = ResponseConverter.convertEventListResponse(itineraryResponse);
 
+        // Clear synchronisation flag
+        mItineraryUpdated = false;
+
         // Write response to file
         mFileWriter.writeItineraryToFile(itineraryResponse);
 
@@ -538,6 +550,9 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
 
         // Cache response
         mStarredSpecies = ResponseConverter.convertSpeciesListResponse(starredSpeciesResponse);
+
+        // Clear synchronisation flag
+        mStarredSpeciesUpdated = false;
 
         // Write response to file
         mFileWriter.writeStarredSpeciesToFile(starredSpeciesResponse);

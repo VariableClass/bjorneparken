@@ -9,6 +9,7 @@ import com.google.api.client.util.DateTime;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.Locale;
 
 import none.bjorneparkappen_api.BjorneparkappenApi;
@@ -32,6 +33,8 @@ public class RequestsModule {
     static final String LOCATION_ID = "location_id";
     static final String SPECIES_ID = "species_id";
     static final String VISITOR_ID = "visitor_id";
+    static final String ITINERARY = "itinerary";
+    static final String STARRED_SPECIES = "starred_species";
 
     //endregion Request Constants
 
@@ -134,6 +137,12 @@ public class RequestsModule {
         removeFromItinerary.execute();
     }
 
+    public void syncItinerary(long visitorId, ArrayList<Event> itinerary){
+
+        SyncItineraryTask syncItinerary = new SyncItineraryTask(mBuilder, mActivity, mLanguage, visitorId, itinerary);
+        syncItinerary.execute();
+    }
+
     public void starSpecies(long visitorId, Species species){
 
         StarSpeciesTask starSpecies = new StarSpeciesTask(mBuilder, mActivity, mLanguage, visitorId, species);
@@ -144,6 +153,12 @@ public class RequestsModule {
 
         UnstarSpeciesTask unstarSpecies = new UnstarSpeciesTask(mBuilder, mActivity, mLanguage, visitorId, species);
         unstarSpecies.execute();
+    }
+
+    public void syncStarredSpecies(long visitorId, ArrayList<Species> starredSpecies){
+
+        SyncStarredSpeciesTask syncStarredSpecies = new SyncStarredSpeciesTask(mBuilder, mActivity, mLanguage, visitorId, starredSpecies);
+        syncStarredSpecies.execute();
     }
 
     //endregion POST Requests
