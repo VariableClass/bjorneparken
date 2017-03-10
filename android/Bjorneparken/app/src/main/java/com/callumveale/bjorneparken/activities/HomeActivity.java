@@ -1,7 +1,6 @@
 package com.callumveale.bjorneparken.activities;
 
 import android.content.IntentFilter;
-import android.content.res.Configuration;
 
 import android.net.ConnectivityManager;
 import android.os.Parcelable;
@@ -20,12 +19,14 @@ import android.view.View;
 import android.widget.ProgressBar;
 
 import com.callumveale.bjorneparken.adapters.NavigationDrawerAdapter;
+import com.callumveale.bjorneparken.config.Configuration;
 import com.callumveale.bjorneparken.file.FileWriter;
 import com.callumveale.bjorneparken.file.ResponseConverter;
 import com.callumveale.bjorneparken.fragments.DetailFragment;
 import com.callumveale.bjorneparken.fragments.DialogListFragment;
 import com.callumveale.bjorneparken.fragments.HomeFragment;
 import com.callumveale.bjorneparken.fragments.ListFragment;
+import com.callumveale.bjorneparken.fragments.SettingsFragment;
 import com.callumveale.bjorneparken.fragments.SocialFragment;
 import com.callumveale.bjorneparken.models.Amenity;
 import com.callumveale.bjorneparken.models.Animal;
@@ -49,7 +50,12 @@ import none.bjorneparkappen_api.model.MainAreaListResponse;
 import none.bjorneparkappen_api.model.MainEventListResponse;
 import none.bjorneparkappen_api.model.MainSpeciesListResponse;
 
-public class HomeActivity extends AppCompatActivity implements ListFragment.OnListItemSelectionListener, DetailFragment.OnItemStarredListener, NavigationDrawerAdapter.INavigationDrawerListener {
+public class HomeActivity
+        extends AppCompatActivity
+        implements ListFragment.OnListItemSelectionListener,
+            DetailFragment.OnItemStarredListener,
+            NavigationDrawerAdapter.INavigationDrawerListener,
+            SettingsFragment.OnNotificationsChangedListener {
 
     //region Properties
 
@@ -84,6 +90,9 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
     // Request Maker
     private RequestsModule mRequester;
     private int mRequestsActive;
+
+    // Configuration File
+    private Configuration mConfig;
 
     // File Writer
     private FileWriter mFileWriter;
@@ -211,6 +220,9 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
 
         // Create new FileWriter to interact with local data
         mFileWriter = new FileWriter(getApplicationContext());
+
+        // Get config from file
+        mConfig = mFileWriter.getConfigFromFile();
 
         // Attempt to retrieve visitor ID from file
         mVisitorId = mFileWriter.getIdFromFile();
@@ -544,8 +556,12 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
         // Write response to file
         mFileWriter.writeItineraryToFile(itineraryResponse);
 
-        // Create notification service
-        NotificationEventReceiver.setupAlarm(getApplicationContext(), mItinerary, mVisitStart, mVisitEnd);
+        // If notifications enabled
+        if (Boolean.valueOf(mConfig.getProperty(Configuration.NOTIFICATIONS_ENABLED))) {
+
+            // Create notification service
+            NotificationEventReceiver.setupAlarm(getApplicationContext(), mItinerary, mVisitStart, mVisitEnd);
+        }
     }
 
     public void saveStarredSpecies(MainSpeciesListResponse starredSpeciesResponse){
@@ -654,7 +670,7 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
                 fragment = ListFragment.newInstance(mAmenities, 1, Amenity.class.getSimpleName());
                 break;
 
-            case 5: // If selection is 'Park Map'
+            case 5: // If selection is 'Map'
                 // Retrieve title for page
                 title = mNavigationOptions[5].name;
                 break;
@@ -675,6 +691,9 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
             case 8: // If selection is 'Settings'
                 // Retrieve title for page
                 title = mNavigationOptions[8].name;
+
+                // Retrieve new settings fragment
+                fragment = SettingsFragment.newInstance(mConfig);
                 break;
 
             case 9: // If selection is 'Help'
@@ -864,8 +883,20 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
             }
         }
 
-        // Update notification service
-        NotificationEventReceiver.setupAlarm(getApplicationContext(), mItinerary, mVisitStart, mVisitEnd);
+        // If notifications enabled
+        if (Boolean.valueOf(mConfig.getProperty(Configuration.NOTIFICATIONS_ENABLED))) {
+
+            // Create notification service
+            NotificationEventReceiver.setupAlarm(getApplicationContext(), mItinerary, mVisitStart, mVisitEnd);
+        }
+    }
+
+    @Override
+    public void onNotificationsEnabledChanged(boolean enabled){
+
+        // Update config and write to file
+        mConfig.setNotificationsEnabled(enabled);
+        mFileWriter.writeConfigToFile(mConfig);
     }
 
     //endregion Fragment Listener Methods
@@ -897,7 +928,7 @@ public class HomeActivity extends AppCompatActivity implements ListFragment.OnLi
     }
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
+    public void onConfigurationChanged(android.content.res.Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         mDrawerToggle.onConfigurationChanged(newConfig);
     }

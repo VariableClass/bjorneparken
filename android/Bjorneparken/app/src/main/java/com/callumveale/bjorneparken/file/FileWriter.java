@@ -2,6 +2,7 @@ package com.callumveale.bjorneparken.file;
 
 import android.content.Context;
 
+import com.callumveale.bjorneparken.config.Configuration;
 import com.callumveale.bjorneparken.models.Amenity;
 import com.callumveale.bjorneparken.models.Event;
 import com.callumveale.bjorneparken.models.Feeding;
@@ -32,6 +33,7 @@ public class FileWriter {
 
     private static final String AMENITIES_FILE = "amenities";
     private static final String ATTRACTIONS_FILE = "attractions";
+    private static final String CONFIG_FILE = "config";
     private static final String FEEDINGS_FILE = "feedings";
     private static final String ITINERARY_FILE = "itinerary";
     private static final String SPECIES_FILE = "species";
@@ -57,6 +59,50 @@ public class FileWriter {
     //endregion Constructors
 
     //region Methods
+
+    //region Config
+
+    public void writeConfigToFile(Configuration config){
+
+        FileOutputStream outputStream;
+
+        try {
+            outputStream = mContext.openFileOutput(CONFIG_FILE, Context.MODE_PRIVATE);
+
+            config.store(outputStream, CONFIG_FILE);
+
+            outputStream.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Configuration getConfigFromFile(){
+
+        Configuration config = new Configuration();
+
+        try {
+            InputStream inputStream = mContext.openFileInput(VISITOR_ID_FILE);
+
+            if (inputStream != null) {
+
+                config.load(inputStream);
+
+                inputStream.close();
+
+            }
+        }
+        catch (FileNotFoundException fileNotFoundException) {
+            fileNotFoundException.printStackTrace();
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
+
+        return config;
+    }
+
+    //endregion Config
 
     //region Visitor
 

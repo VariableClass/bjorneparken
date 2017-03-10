@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import com.callumveale.bjorneparken.config.Configuration;
 import com.callumveale.bjorneparken.file.FileWriter;
 import com.callumveale.bjorneparken.models.Event;
 import com.google.api.client.util.DateTime;
@@ -22,12 +23,17 @@ public final class NotificationServiceStarterReceiver extends BroadcastReceiver 
         // Retrieve itinerary from file
         FileWriter fileWriter = new FileWriter(context);
         ArrayList<Event> itinerary = fileWriter.getItineraryFromFile();
+        Configuration config = fileWriter.getConfigFromFile();
 
         // TODO Retrieve visitor start and end date from file
         DateTime visitStart = new DateTime(new Date()); //fileWriter.getVisitStartFromFile();
         DateTime visitEnd = new DateTime(new Date()); //fileWriter.getVisitEndFromFile();
 
-        // Update times
-        NotificationEventReceiver.setupAlarm(context, itinerary, visitStart, visitEnd);
+        // If notifications enabled
+        if (Boolean.valueOf(config.getProperty(Configuration.NOTIFICATIONS_ENABLED))) {
+
+            // Update times
+            NotificationEventReceiver.setupAlarm(context, itinerary, visitStart, visitEnd);
+        }
     }
 }
