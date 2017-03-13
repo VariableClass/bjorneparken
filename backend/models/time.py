@@ -19,7 +19,7 @@ class Time():
         end_time = Time.get_compare_formatted(end_time)
 
         # Check end_time after start_time
-        if start_time > end_time:
+        if start_time >= end_time:
             return False
 
         return True

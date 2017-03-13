@@ -2151,8 +2151,25 @@ class VisitorsApi(remote.Service):
 
         # Check event does not already exist in list
         for event_inst in visitor.itinerary:
+
+            # Check event is not already starred
             if event_inst.event_id == event.key.id() and event_inst.location_id == event.key.parent().id():
                 raise endpoints.BadRequestException("Event already starred.")
+
+            # If not, retrieve the event from the itinerary to compare with the newly starred event
+            compare_event = Event.get_by_id(event_inst.event_id, parent=ndb.Key(Area, event_inst.location_id))
+
+            # If newly starred event end time after start_time
+            if Time.validate_times(compare_event.start_time, event.end_time):
+                # Check newly starred event start time not before end time
+                if Time.validate_times(event.start_time, compare_event.end_time):
+                    raise endpoints.BadRequestException("Event conflicts with another at the same time.")
+
+            # If newly starred event start time before end_time
+            if Time.validate_times(event.start_time, compare_event.end_time):
+                # Check end time not after newly starred event end time
+                if Time.validate_times(compare_event.start_time, event.end_time):
+                    raise endpoints.BadRequestException("Event conflicts with another at the same time.")
 
         # Add event to visitor's itinerary
         visitor.itinerary.append(Event.EventLookup(event_id=request.event_id, location_id=request.location_id))
