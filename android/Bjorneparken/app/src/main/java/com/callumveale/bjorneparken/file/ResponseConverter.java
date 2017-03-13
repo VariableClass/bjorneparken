@@ -299,18 +299,19 @@ public class ResponseConverter {
 
         String base64mime = response.getImage();
 
-        byte[] imageBytes = null;
-
         if (base64mime != null){
 
             String base64 = base64mime.split(",")[1];
 
             // Decode base64 image
-            imageBytes = Base64.decode(base64, Base64.DEFAULT);
+            byte[] imageBytes = Base64.decode(base64, Base64.DEFAULT);
+
+            // Return a new species object created from the species response
+            return new Species(response.getId(), response.getCommonName(), response.getLatin(), response.getDescription(), imageBytes);
         }
 
         // Return a new species object created from the species response
-        return new Species(response.getId(), response.getCommonName(), response.getLatin(), response.getDescription(), imageBytes);
+        return new Species(response.getId(), response.getCommonName(), response.getLatin(), response.getDescription());
     }
 
     public static ArrayList<Species> convertSpeciesListResponse(MainSpeciesListResponse response){

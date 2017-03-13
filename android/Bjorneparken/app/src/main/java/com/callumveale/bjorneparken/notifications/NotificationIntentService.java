@@ -90,7 +90,7 @@ public class NotificationIntentService extends IntentService {
                 .setVibrate(new long[] { 0, 100, 30, 100, 200, 500 })
                 .setContentText(String.format(getString(R.string.event_warning), difference));
 
-        PendingIntent pendingIntent = PendingIntent.getActivity(this,
+        final PendingIntent pendingIntent = PendingIntent.getActivity(this,
                 NOTIFICATION_ID,
                 new Intent(this, HomeActivity.class),
                 PendingIntent.FLAG_UPDATE_CURRENT);
@@ -127,7 +127,9 @@ public class NotificationIntentService extends IntentService {
                                         .setColor(getApplication().getResources().getColor(R.color.primary))
                                         .setSmallIcon(R.drawable.notification_icon)
                                         .setLargeIcon(icon)
-                                        .setContentText(String.format(getString(R.string.event_warning), difference));
+                                        .setContentText(String.format(getString(R.string.event_warning), difference))
+                                        .setContentIntent(pendingIntent)
+                                        .setDeleteIntent(NotificationEventReceiver.getDeleteIntent(getApplicationContext()));
                                 manager.notify(NOTIFICATION_ID, repeatBuilder.build());
 
                                 try {

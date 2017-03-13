@@ -45,6 +45,14 @@ public class Species implements IModel, Parcelable{
         this.imageBytes = imageBytes;
     }
 
+    public Species(long id, String commonName, String latin, String description){
+        this.id = id;
+        this.commonName = commonName;
+        this.latin = latin;
+        this.description = description;
+        this.imageBytes = new byte[]{};
+    }
+
     // Parcelling part
     public Species(Parcel in){
         String[] data = new String[4];
@@ -55,6 +63,9 @@ public class Species implements IModel, Parcelable{
         this.latin = data[2];
         this.description = data[3];
 
+        int arrayLength = in.readInt();
+
+        this.imageBytes = new byte[arrayLength];
         in.readByteArray(this.imageBytes);
     }
 
@@ -117,6 +128,7 @@ public class Species implements IModel, Parcelable{
                 this.latin,
                 this.description});
 
+        dest.writeInt(imageBytes.length);
         dest.writeByteArray(imageBytes);
     }
 

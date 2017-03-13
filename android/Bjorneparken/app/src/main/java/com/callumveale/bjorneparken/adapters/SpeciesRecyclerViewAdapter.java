@@ -53,7 +53,7 @@ public class SpeciesRecyclerViewAdapter extends RecyclerViewAdapter {
 
         // Set image
         byte[] imageBytes = species.getImageBytes();
-        if (imageBytes != null){
+        if (imageBytes.length > 0){
 
             Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
 
