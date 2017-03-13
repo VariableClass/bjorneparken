@@ -57,6 +57,12 @@ public class HomeActivity
             NavigationDrawerAdapter.INavigationDrawerListener,
             SettingsFragment.OnNotificationsChangedListener {
 
+    //region Constants
+
+    private static final String ARG_SERVER_AVAILABLE = "server-available";
+
+    //endregion Constants
+
     //region Properties
 
     //region UI Components
@@ -130,6 +136,13 @@ public class HomeActivity
         // Set initialised to false
         mInitialised = false;
 
+        // If creating from a bundle
+        if (savedInstanceState != null) {
+
+            // Set server available from savedInstanceState
+            mServerAvailable = savedInstanceState.getBoolean(ARG_SERVER_AVAILABLE);
+        }
+
         // Change theme from splash screen to application theme
         setTheme(R.style.Bjorneparken);
 
@@ -145,8 +158,12 @@ public class HomeActivity
         // Initialise and register a new receiver to notify the main thread of network changes
         setupNetworkChangeListener();
 
-        // Check whether the server can be reached
-        checkServerAvailability();
+        // If server was not previously available
+        if (!mServerAvailable) {
+
+            // Check whether the server can be reached
+            checkServerAvailability();
+        }
     }
 
     private void buildUIComponents(){
@@ -1010,6 +1027,12 @@ public class HomeActivity
         }
 
         super.onStop();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putBoolean(ARG_SERVER_AVAILABLE, mServerAvailable);
     }
 
     @Override
