@@ -13,9 +13,14 @@
 
             <!-- The main content view -->
             <FrameLayout
-                android:id="@+id/content_frame"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
+                android:layout_height="match_parent" >
+
+               <FrameLayout
+                   android:id="@+id/content_frame"
+                   android:layout_width="match_parent"
+                   android:layout_height="match_parent" >
+                </FrameLayout>
 
                 <ProgressBar
                     style="@android:style/Widget.DeviceDefault.ProgressBar"
@@ -24,7 +29,8 @@
                     android:layout_gravity = "center_vertical|center_horizontal"
                     android:id="@+id/progress_bar"
                     android:visibility="gone" />
-            </FrameLayout>
+
+           </FrameLayout>
 
             <!-- The navigation drawer -->
             <android.support.v7.widget.RecyclerView android:id="@+id/left_drawer"
