@@ -24,7 +24,7 @@ import com.callumveale.bjorneparken.models.IModel;
  * Use the {@link DetailFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class DetailFragment extends Fragment {
+public class DetailFragment extends Fragment implements DialogConfirmFragment.OnUnstarDetailListener {
 
     //region Constants
 
@@ -102,14 +102,9 @@ public class DetailFragment extends Fragment {
         // Retrieve item from which to populate the view
         IModel item = (IModel) mItem;
 
-        if (item.getImageBytes() != null){
-
-
-        }
-
         // Set image
         byte[] imageBytes = item.getImageBytes();
-        if (imageBytes != null){
+        if (imageBytes.length <= 0){
 
             Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
 
@@ -178,6 +173,8 @@ public class DetailFragment extends Fragment {
             mSubcaptionView.setVisibility(View.VISIBLE);
         }
 
+        final DetailFragment fragment = this;
+
         // Add starred listener
         star.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -187,24 +184,40 @@ public class DetailFragment extends Fragment {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
                     isStarred = !isStarred;
+
                     if (isStarred) {
 
                         // Set image to starred
                         star.setImageResource(R.drawable.star_selected);
                         star.setContentDescription(getString(R.string.starred));
 
+                        // Perform star action
+                        mListener.onItemStarred(mItem);
+
                     } else {
 
-                        // Set image to unstarred
-                        star.setImageResource(R.drawable.star_unselected);
-                        star.setContentDescription(getString(R.string.unstarred));
+                        DialogConfirmFragment confirmDialog = DialogConfirmFragment.newInstance();
+                        confirmDialog.setUnstarDetailListener(fragment);
+                        confirmDialog.show(getActivity().getSupportFragmentManager(), "DialogConfirmFragment");
                     }
-                    mListener.onItemStarred(mItem);
                 }
             }
         });
 
         return view;
+    }
+
+    @Override
+    public void unstar(){
+
+        ImageView star = (ImageView) getView().findViewById(R.id.detail_star);
+
+        // Set image to unstarred
+        star.setImageResource(R.drawable.star_unselected);
+        star.setContentDescription(getString(R.string.unstarred));
+
+        // Perform unstar action
+        mListener.onItemStarred(mItem);
     }
 
     @Override

@@ -30,6 +30,12 @@
     <string name="select_feeding">Select a feeding:</string>
     <string name="close_dialog">OK</string>
 
+    <!-- Confirm Unstar Species Dialog -->
+    <string name="confirm_unstar_species_title">Are you sure?</string>
+    <string name="confirm_unstar_species_message">Unstarring an animal will remove all feedings for animals of this type from your itinerary.</string>
+    <string name="confirm">OK</string>
+    <string name="cancel">Cancel</string>
+
     <!-- Notification -->
     <string name="event_warning">In %1$d minutes</string>
     <string name="event_now">Now</string>

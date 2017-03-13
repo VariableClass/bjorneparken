@@ -1,5 +1,7 @@
 package com.callumveale.bjorneparken.activities;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.IntentFilter;
 
 import android.net.ConnectivityManager;
@@ -23,6 +25,7 @@ import com.callumveale.bjorneparken.config.Configuration;
 import com.callumveale.bjorneparken.file.FileWriter;
 import com.callumveale.bjorneparken.file.ResponseConverter;
 import com.callumveale.bjorneparken.fragments.DetailFragment;
+import com.callumveale.bjorneparken.fragments.DialogConfirmFragment;
 import com.callumveale.bjorneparken.fragments.DialogListFragment;
 import com.callumveale.bjorneparken.fragments.HomeFragment;
 import com.callumveale.bjorneparken.fragments.ListFragment;

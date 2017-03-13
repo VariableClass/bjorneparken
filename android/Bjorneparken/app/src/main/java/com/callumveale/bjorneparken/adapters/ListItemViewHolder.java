@@ -13,7 +13,7 @@ import com.callumveale.bjorneparken.R;
  * Created by callum on 03/03/2017.
  */
 
-class ListItemViewHolder extends RecyclerView.ViewHolder {
+public class ListItemViewHolder extends RecyclerView.ViewHolder {
 
     //region Properties
 

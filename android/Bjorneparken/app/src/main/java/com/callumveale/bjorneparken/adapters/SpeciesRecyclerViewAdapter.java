@@ -1,6 +1,9 @@
 package com.callumveale.bjorneparken.adapters;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.DialogFragment;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
@@ -11,6 +14,7 @@ import android.view.View;
 import com.callumveale.bjorneparken.R;
 import com.callumveale.bjorneparken.activities.HomeActivity;
 import com.callumveale.bjorneparken.fragments.DetailFragment;
+import com.callumveale.bjorneparken.fragments.DialogConfirmFragment;
 import com.callumveale.bjorneparken.fragments.ListFragment.OnListItemSelectionListener;
 import com.callumveale.bjorneparken.models.Species;
 
@@ -20,7 +24,7 @@ import java.util.ArrayList;
  * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
  * specified {@link OnListFragmentInteractionListener}.
  */
-public class SpeciesRecyclerViewAdapter extends RecyclerViewAdapter {
+public class SpeciesRecyclerViewAdapter extends RecyclerViewAdapter implements DialogConfirmFragment.OnUnstarListItemListener {
 
     //region Constants
 
@@ -111,6 +115,8 @@ public class SpeciesRecyclerViewAdapter extends RecyclerViewAdapter {
             }
         });
 
+        final SpeciesRecyclerViewAdapter adapter = this;
+
         // Add starred listener
         holder.mStarView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -118,19 +124,22 @@ public class SpeciesRecyclerViewAdapter extends RecyclerViewAdapter {
                 if (null != mItemSelectedListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    if (mActivity.isStarred(species)){
+                    if (mActivity.isStarred(species)) {
 
-                        // Set image to unstarred
-                        holder.mStarView.setImageResource(R.drawable.star_unselected);
-                        holder.mStarView.setContentDescription(mActivity.getString(R.string.unstarred));
+                        // Show confirmation dialog
+                        DialogConfirmFragment confirmDialog = DialogConfirmFragment.newInstance(position);
+                        confirmDialog.setUnstarListItemListener(adapter);
+                        confirmDialog.show(mActivity.getSupportFragmentManager(), "DialogConfirmFragment");
 
                     } else {
 
                         // Set image to starred
                         holder.mStarView.setImageResource(R.drawable.star_selected);
                         holder.mStarView.setContentDescription(mActivity.getString(R.string.starred));
+
+                        // Perform star action
+                        mItemStarredListener.onItemStarred(holder.mItem);
                     }
-                    mItemStarredListener.onItemStarred(holder.mItem);
                 }
             }
         });
@@ -140,6 +149,21 @@ public class SpeciesRecyclerViewAdapter extends RecyclerViewAdapter {
     public String getEmptyText(Activity activity){
 
         return activity.getString(EMPTY_TEXT_RESOURCE);
+    }
+
+    @Override
+    public void unstarItem(int position) {
+
+
+        // Retrieve view holder
+        ListItemViewHolder holder = (ListItemViewHolder) mRecyclerView.findViewHolderForAdapterPosition(position);
+
+        // Set image to unstarred
+        holder.mStarView.setImageResource(R.drawable.star_unselected);
+        holder.mStarView.setContentDescription(mActivity.getString(R.string.unstarred));
+
+        // Perform unstar action
+        mItemStarredListener.onItemStarred(holder.mItem);
     }
 
     //endregion RecyclerViewAdapter Overridden Methods

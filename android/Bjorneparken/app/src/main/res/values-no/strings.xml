@@ -27,6 +27,12 @@
     <string name="select_feeding">Velg en fôring:</string>
     <string name="close_dialog">OK</string>
 
+    <!-- Confirm Unstar Species Dialog -->
+    <string name="confirm_unstar_species_title">Er du sikker?</string>
+    <string name="confirm_unstar_species_message">Avstjerne et dyr vil fjerne alle fôringene for dette dyret i dagsplanen din.</string>
+    <string name="confirm">OK</string>
+    <string name="cancel">Avbryt</string>
+
     <!-- Notification -->
     <string name="event_warning">Om %1$d minutter</string>
     <string name="event_now">Nå</string>

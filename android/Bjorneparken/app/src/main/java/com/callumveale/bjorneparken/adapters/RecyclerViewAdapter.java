@@ -32,6 +32,8 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<ListItemViewHolder> imple
     final ListFragment.OnListItemSelectionListener mItemSelectedListener;
     final DetailFragment.OnItemStarredListener mItemStarredListener;
 
+    RecyclerView mRecyclerView;
+
     //endregion Properties
 
     //region Constructors
@@ -60,6 +62,8 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<ListItemViewHolder> imple
     public ListItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.fragment_list_item, parent, false);
+
+        mRecyclerView = (RecyclerView) parent;
 
         return new ListItemViewHolder(view);
     }
