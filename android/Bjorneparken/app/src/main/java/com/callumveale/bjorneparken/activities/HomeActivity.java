@@ -85,6 +85,7 @@ public class HomeActivity
 
     // Network Change Listener
     private NetworkChangeReceiver mNetworkChangeReceiver;
+    private boolean mReceiverRegistered;
     private boolean mServerAvailable;
 
     // Request Maker
@@ -205,6 +206,13 @@ public class HomeActivity
 
     private void setupNetworkChangeListener(){
 
+        // Unregister receiver
+        if (mReceiverRegistered) {
+
+            unregisterReceiver(mNetworkChangeReceiver);
+            mReceiverRegistered = false;
+        }
+
         // Initialise new network change receiver to flag network changes
         mNetworkChangeReceiver = new NetworkChangeReceiver(mRequester);
 
@@ -212,8 +220,11 @@ public class HomeActivity
         IntentFilter filter = new IntentFilter();
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
 
-        // Register receiver with filter as broadcast receiever
+        // Register receiver with filter as broadcast receiver
         registerReceiver(mNetworkChangeReceiver, filter);
+
+        // Update registered state
+        mReceiverRegistered = true;
     }
 
     private void getData(){
@@ -586,8 +597,25 @@ public class HomeActivity
 
     private void setFragment(Fragment fragment){
 
-        // Replace existing fragment with newly passed fragment
-        getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).addToBackStack(null).commit();
+        // Do not perform any fragment transactions if the activity is finishing or destroyed
+        if (isFinishing() || getSupportFragmentManager().isDestroyed()){
+
+            return;
+        }
+
+        // Get currently displayed fragment
+        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.content_frame);
+
+        if (currentFragment != null) {
+
+            // Replace existing fragment with newly passed fragment
+            getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).addToBackStack(null).commitAllowingStateLoss();
+
+        } else {
+
+            // Create fragment
+            getSupportFragmentManager().beginTransaction().add(R.id.content_frame, fragment).addToBackStack(null).commitAllowingStateLoss();
+        }
     }
 
     public void updateProgress(boolean complete) {
@@ -827,6 +855,7 @@ public class HomeActivity
     private void onEventStarred(Event eventToStar){
 
         int eventIndex = -1;
+        boolean conflict = false;
 
         // Attempt to retrieve the index of the passed event
         for (Event event : mItinerary) {
@@ -837,6 +866,13 @@ public class HomeActivity
 
                     eventIndex = mItinerary.indexOf(event);
                     break;
+
+                } else {
+
+                    if (event.conflictsWith(eventToStar)){
+
+                        conflict = true;
+                    }
                 }
             }
         }
@@ -864,23 +900,31 @@ public class HomeActivity
 
         } else {
 
-            // Add the event to the local itinerary
-            mItinerary.add(eventToStar);
+            if (!conflict) {
 
-            // If server is available
-            if (mServerAvailable) {
+                // Add the event to the local itinerary
+                mItinerary.add(eventToStar);
 
-                // Add the species to the datastore itinerary
-                mRequester.addToItinerary(mVisitorId, eventToStar);
+                // If server is available
+                if (mServerAvailable) {
+
+                    // Add the species to the datastore itinerary
+                    mRequester.addToItinerary(mVisitorId, eventToStar);
+
+                } else {
+
+                    // Else, flag the itinerary as updated to be synchronised when the server next becomes available
+                    mItineraryUpdated = true;
+
+                    // Write to file
+                    mFileWriter.writeItineraryToFile(mItinerary);
+                }
 
             } else {
 
-                // Else, flag the itinerary as updated to be synchronised when the server next becomes available
-                mItineraryUpdated = true;
-
-                // Write to file
-                mFileWriter.writeItineraryToFile(mItinerary);
+                // TODO Perform event conflict action
             }
+
         }
 
         // If notifications enabled
@@ -953,6 +997,39 @@ public class HomeActivity
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onStop(){
+
+        // Unregister receiver
+        if (mReceiverRegistered) {
+
+            unregisterReceiver(mNetworkChangeReceiver);
+            mReceiverRegistered = false;
+        }
+
+        super.onStop();
+    }
+
+    @Override
+    public void onPause(){
+
+        // Unregister receiver
+        if (mReceiverRegistered){
+
+            unregisterReceiver(mNetworkChangeReceiver);
+            mReceiverRegistered = false;
+        }
+
+        super.onPause();
+    }
+
+    @Override
+    public void onResume(){
+
+        setupNetworkChangeListener();
+        super.onResume();
     }
 
     @Override

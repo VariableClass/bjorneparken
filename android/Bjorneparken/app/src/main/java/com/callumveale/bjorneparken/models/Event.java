@@ -76,6 +76,39 @@ public class Event implements IModel, Parcelable{
 
     //region Methods
 
+    public boolean conflictsWith(Event compareEvent){
+
+        Calendar now = Calendar.getInstance();
+
+        Calendar thisStart = getEventStartCalendar(now, 0);
+        Calendar thisEnd = getEventEndCalendar(now, 0);
+
+        Calendar compareStart = compareEvent.getEventStartCalendar(now, 0);
+        Calendar compareEnd = compareEvent.getEventEndCalendar(now, 0);
+
+        // If this event's end time after the passed event's start time
+        if (thisEnd.compareTo(compareStart) > 0){
+
+            // If this event's start time before the passed event's end time
+            if (thisStart.compareTo(compareEnd) < 0){
+
+                return true;
+            }
+        }
+
+        // If this event's start time before the passed event's end time
+        if (thisStart.compareTo(compareEnd) < 0){
+
+            // If this event's end time after the passed event's start time
+            if (thisEnd.compareTo(compareStart) > 0) {
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private Calendar getEventTime(Calendar visitStart, int daysDelta, int hour, int minute){
 
         // Create a new Calendar set to the visit start date
