@@ -380,9 +380,54 @@ var cancelKeeperButton = document.getElementById('keeper-create-cancel');
 // Cancel Species onclick event
 cancelSpeciesButton.onclick = function(){
 
-    // Display Cancel Species page
+    // Display List Species page
     bjørneparkappen.adminconsole.navigation.displayPage(listSpeciesPage);
 }
+
+// Cancel Area onclick event
+cancelAreaButton.onclick = function(){
+
+    // Display List Areas page
+    bjørneparkappen.adminconsole.navigation.displayPage(listAreasPage);
+}
+
+// Cancel Animal onclick event
+cancelAnimalButton.onclick = function(){
+
+     // Display List Animals page
+     bjørneparkappen.adminconsole.navigation.displayPage(listAnimalsPage);
+}
+
+// Cancel Event onclick event
+cancelEventButton.onclick = function(){
+    // Display List Events page
+    bjørneparkappen.adminconsole.navigation.displayPage(listEventsPage);
+}
+
+// Cancel Keeper onclick event
+cancelKeeperButton.onclick = function(){
+
+    // Display List Keepers page
+    bjørneparkappen.adminconsole.navigation.displayPage(listKeepersPage);
+}
+
+// Selectors
+var areaTypeSelector = document.getElementById('area_type_selector');
+
+areaTypeSelector.onchange = function(){
+
+    var amenity_fields = document.getElementById('amenity_fields');
+
+    if (areaTypeSelector.value == "enclosure"){
+
+        amenity_fields.style.display = HIDDEN;
+
+    } else {
+
+        amenity_fields.style.display = DISPLAYED;
+    }
+}
+
 
 // API
 bjørneparkappen.adminconsole.api.listSpecies = function(){};

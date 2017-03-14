@@ -25,26 +25,26 @@
     <div class="content">
         <section id="create-species-page" class="page">
             <h2>Create Species</h2>
-                <form id="create-species-form" class="section-content" action="javascript:void(0)" enctype="multipart/form-data">
-                    <p>
-                        <label for="species_name">Name:</label>
-                        <input name="species_name" id="species_name" type="text" size="20" required/>
-                    </p>
-                    <p>
-                        <label for="species_latin">Latin:</label>
-                        <input name="species_latin" id="species_latin" type="text" size="20" required/>
-                    </p>
-                    <p>
-                        <label for="species_description">Description:</label>
-                        <input name="species_description" id="species_description" type="text" size="20" required/>
-                    </p>
-                    <p>
-                        <label for="image_file">Image:</label>
-                        <input name="image_file" id="image_file" type="file" accept="image/*" size="4" required/>
-                    </p>
-                    <input id="species-create-cancel" type="button" class="button cancel" value="Cancel" />
-                    <input id="species-create-confirm" type="button" class="button submit" value="Create" />
-                </form>
+            <form id="create-species-form" class="section-content" action="javascript:void(0)" enctype="multipart/form-data">
+                <p>
+                    <label for="species_name">Name:</label>
+                    <input name="species_name" id="species_name" type="text" size="20" required autofocus/>
+                </p>
+                <p>
+                    <label for="species_latin">Latin:</label>
+                    <input name="species_latin" id="species_latin" type="text" size="20" required/>
+                </p>
+                <p>
+                    <label for="species_description">Description:</label>
+                    <input name="species_description" id="species_description" type="text" size="20" required/>
+                </p>
+                <p>
+                    <label for="image_file">Image:</label>
+                    <input name="image_file" id="image_file" type="file" accept="image/*" size="4" required/>
+                </p>
+                <input id="species-create-cancel" type="button" class="button cancel" value="Cancel" />
+                <input id="species-create-confirm" type="button" class="button submit" value="Create" />
+            </form>
         </section>
         <section id="update-species-page" class="page">
         </section>
@@ -80,14 +80,44 @@
             <h2>Create Area</h2>
             <form id="create-area-form" class="section-content" action="javascript:void(0)" enctype="multipart/form-data">
                 <p>
-                    <label for="area_label">Label:</label>
-                    <input name="area_label" id="area_label" type="text" size="20" required/>
+                    <label for="area_type_selector">Create an </label>
+                    <select id="area_type_selector" style="align" required/>
+                        <option value="amenity">Amenity</option>
+                        <option value="enclosure">Enclosure</option>
+                    </select>
                 </p>
+                <p>
+                    <label for="area_label">Label:</label>
+                    <input name="area_label" id="area_label" type="text" size="20" required autofocus/>
+                </p>
+                <p>
+                    <label for="area_visitor_destination">Visitor Destination:</label>
+                    <input name="area_visitor_destination" id="area_visitor_destination" type="text" size="20" required/>
+                </p>
+                <div id="amenity_fields">
+                    <p>
+                        <label for="amenity_type">Amenity Type:</label>
+                        <select name="amenity_type" id="amenity_type" form="create-area-form">
+                            <option value="ATTRACTION">Attraction</option>
+                            <option value="BBQ">BBQ</option>
+                            <option value="PLAY_AREA">Play Area</option>
+                            <option value="RECEPTION">Reception</option>
+                            <option value="RESTAURANT">Restaurant</option>
+                            <option value="SNACKS">Snacks</option>
+                            <option value="WC">Toilets</option>
+                        </select>
+                    </p>
+                    <p>
+                        <label for="amenity_description">Description:</label>
+                        <input name="amenity_description" id="amenity_description" type="text" size="20" />
+                    </p>
+                </div>
                 <p>
                     <label for="image_file">Image:</label>
                     <input name="image_file" id="image_file" type="file" accept="image/*" size="4" required/>
                 </p>
-                <input type="submit" value="Create"/>
+                <input id="area-create-cancel" type="button" class="button cancel" value="Cancel" />
+                <input id="area-create-confirm" type="button" class="button submit" value="Create" />
             </form>
         </section>
         <section id="update-area-page" class="page">
@@ -121,6 +151,30 @@
         </section>
 
         <section id="create-animal-page" class="page">
+            <h2>Create Animal</h2>
+            <form id="create-animal-form" class="section-content" action="javascript:void(0)" enctype="multipart/form-data">
+                <p>
+                    <label for="animal_name">Name:</label>
+                    <input name="animal_name" id="animal_name" type="text" size="20" required autofocus/>
+                </p>
+                <p>
+                    <label for="animal_description">Description:</label>
+                    <input name="animal_description" id="animal_description" type="text" size="20" required/>
+                </p>
+                <p>
+                    <label for="animal_species">Species:</label>
+                    <select name="animal_species" id="animal_species" form="create-animal-form" required >
+                        <option value="0119484879548958">Bear</option>
+                        <option value="0309405934059039">Moose</option>
+                    </select>
+                </p>
+                <p>
+                    <label for="animal_available">Available:</label>
+                    <input name="animal_available" id="animal_available" type="checkbox" checked="true" required />
+                </p>
+                <input id="animal-create-cancel" type="button" class="button cancel" value="Cancel" />
+                <input id="animal-create-confirm" type="button" class="button submit" value="Create" />
+            </form>
         </section>
         <section id="update-animal-page" class="page">
         </section>
@@ -141,14 +195,14 @@
                         <td>Rugg</td>
                         <td>Ursus Arctos Arctos</td>
                         <td>Rugg is the oldest bear in the park.</td>
-                        <td><input type='checkbox'></td>
+                        <td><input type='checkbox' checked="true"></td>
                         <td><a href='#'>Delete</a></td>
                     </tr>
                     <tr>
                         <td>Nora</td>
                         <td>Ursus Arctos Arctos</td>
                         <td>Nora is the mother of Brutus</td>
-                        <td><input type='checkbox'></td>
+                        <td><input type='checkbox' checked="true"></td>
                         <td><a href='#'>Delete</a></td>
                     </tr>
                 </table>
@@ -156,6 +210,45 @@
         </section>
 
         <section id="create-event-page" class="page">
+            <h2>Create Event</h2>
+            <form id="create-event-form" class="section-content" action="javascript:void(0)" enctype="multipart/form-data">
+                <p>
+                    <label for="event_label">Label:</label>
+                    <input name="event_label" id="event_label" type="text" size="20" required autofocus/>
+                </p>
+                <p>
+                    <label for="event_start_time">Start Time:</label>
+                    <input name="event_start_time" id="event_start_time" type="time" step="60" required/>
+                </p>
+                <p>
+                    <label for="event_end_time">End Time:</label>
+                    <input name="event_end_time" id="event_end_time" type="time" step="60" required/>
+                </p>
+                <p>
+                    <label for="event_location">Area:</label>
+                    <select name="event_location" id="event_location" form="create-event-form" required >
+                        <option value="0119484879548958">Main Bear Enclosure</option>
+                        <option value="0309405934059039">Reception</option>
+                    </select>
+                </p>
+                <p>
+                    <label for="event_description">Description:</label>
+                    <input name="event_description" id="event_description" type="text" size="20" required/>
+                </p>
+                <p>
+                    <label for="event_keeper">Keeper:</label>
+                    <select name="event_keeper" id="event_keeper" form="create-event-form" >
+                        <option value="0119484879548958">Magnhild</option>
+                        <option value="0309405934059039">Callum</option>
+                    </select>
+                </p>
+                <p>
+                    <label for="event_active">Active:</label>
+                    <input name="event_active" id="event_active" type="checkbox" checked="true" required />
+                </p>
+                <input id="event-create-cancel" type="button" class="button cancel" value="Cancel" />
+                <input id="event-create-confirm" type="button" class="button submit" value="Create" />
+            </form>
         </section>
         <section id="update-event-page" class="page">
         </section>
@@ -180,7 +273,7 @@
                         <td>17.30</td>
                         <td>Rugg gets his daily feast.</td>
                         <td>Magnhild</td>
-                        <td><input type='checkbox'></td>
+                        <td><input type='checkbox' checked="true"></td>
                         <td><a href='#'>Delete</a></td>
                     </tr>
                     <tr>
@@ -189,7 +282,7 @@
                         <td>15.00</td>
                         <td>Come and try your bravery!</td>
                         <td>-</td>
-                        <td><input type='checkbox'></td>
+                        <td><input type='checkbox' checked="true"></td>
                         <td><a href='#'>Delete</a></td>
                     </tr>
                 </table>
@@ -197,6 +290,19 @@
         </section>
 
         <section id="create-keeper-page" class="page">
+            <h2>Create Keeper</h2>
+            <form id="create-keeper-form" class="section-content" action="javascript:void(0)" enctype="multipart/form-data">
+                <p>
+                    <label for="keeper_name">Name:</label>
+                    <input name="keeper_name" id="keeper_name" type="text" size="20" required autofocus/>
+                </p>
+                <p>
+                    <label for="keeper_bio">Bio:</label>
+                    <input name="keeper_bio" id="keeper_bio" type="text" size="20" required/>
+                </p>
+                <input id="keeper-create-cancel" type="button" class="button cancel" value="Cancel" />
+                <input id="keeper-create-confirm" type="button" class="button submit" value="Create" />
+            </form>
         </section>
         <section id="update-keeper-page" class="page">
         </section>

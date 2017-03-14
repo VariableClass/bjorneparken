@@ -87,9 +87,8 @@ div.content .page {
 }
 
 form {
-    top:50%;
-    margin: auto;
-    width: 400px;
+    margin: 0 auto;
+    width:400px;
 }
 
 .button.create {
