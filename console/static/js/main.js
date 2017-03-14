@@ -33,13 +33,10 @@ const DISPLAYED = "block";
 const HIDDEN = "none";
 
 // Element to display whenever a operation requires the user to wait
-var loadingScreen = document.getElementById('loading-screen');
 var loadingText = document.getElementById('loading-text');
 
 // Puts the application UI into a wait state
 bjørneparkappen.adminconsole.startWait = function(){
-
-    bjørneparkappen.adminconsole.navigation.hideAllPages();
 
     loadingText.style.display = DISPLAYED;
 };
@@ -213,19 +210,84 @@ var updateKeeperPage = document.getElementById('update-keeper-page');
 var listKeepersPage = document.getElementById('list-keepers-page');
 
 // Clears the Species page
-bjørneparkappen.adminconsole.species.clearPageData = function(){};
+bjørneparkappen.adminconsole.species.clearPageData = function(){
+
+    // Clear search bar
+    document.getElementById('species-search').value = "";
+
+    // Retrieve table to empty
+    var table = document.getElementById('species-table');
+
+    // Empty table
+    while(table.rows.length > 1) {
+
+        table.deleteRow(1);
+    }
+};
 
 // Clears the Areas page
-bjørneparkappen.adminconsole.areas.clearPageData = function(){};
+bjørneparkappen.adminconsole.areas.clearPageData = function(){
+
+    // Clear search bar
+    document.getElementById('area-search').value = "";
+
+    // Retrieve table to empty
+    var table = document.getElementById('areas-table');
+
+    // Empty table
+    while(table.rows.length > 1) {
+
+        table.deleteRow(1);
+    }
+};
 
 // Clears the Animals page
-bjørneparkappen.adminconsole.animals.clearPageData = function(){};
+bjørneparkappen.adminconsole.animals.clearPageData = function(){
+
+    // Clear search bar
+    document.getElementById('animal-search').value = "";
+
+    // Retrieve table to empty
+    var table = document.getElementById('animals-table');
+
+    // Empty table
+    while(table.rows.length > 1) {
+
+        table.deleteRow(1);
+    }
+};
 
 // Clears the Events page
-bjørneparkappen.adminconsole.events.clearPageData = function(){};
+bjørneparkappen.adminconsole.events.clearPageData = function(){
+
+    // Clear search bar
+    document.getElementById('event-search').value = "";
+
+    // Retrieve table to empty
+    var table = document.getElementById('events-table');
+
+    // Empty table
+    while(table.rows.length > 1) {
+
+        table.deleteRow(1);
+    }
+};
 
 // Clears the Keepers page
-bjørneparkappen.adminconsole.keepers.clearPageData = function(){};
+bjørneparkappen.adminconsole.keepers.clearPageData = function(){
+
+    // Clear search bar
+    document.getElementById('keeper-search').value = "";
+
+    // Retrieve table to empty
+    var table = document.getElementById('keepers-table');
+
+    // Empty table
+    while(table.rows.length > 1) {
+
+        table.deleteRow(1);
+    }
+};
 
 // Loads the Species page
 bjørneparkappen.adminconsole.species.loadPage = function(){
@@ -243,7 +305,7 @@ bjørneparkappen.adminconsole.species.addToTable = function(id, commonName, lati
     var row = table.insertRow();
 
     // Create cells to insert into the table
-    var idCell = row.insertCell(-1);
+    var idCell = row.insertCell(0);
     var commonNameCell = row.insertCell(1);
     var latinCell = row.insertCell(2);
     var descriptionCell = row.insertCell(3);
@@ -256,6 +318,122 @@ bjørneparkappen.adminconsole.species.addToTable = function(id, commonName, lati
     latinCell.innerHTML = latin;
     descriptionCell.innerHTML = description;
     descriptionCell.style.display = HIDDEN;
+    deleteCell.innerHTML = "<a href='#'>Delete</a>"
+};
+
+// Adds a row to the Areas table
+bjørneparkappen.adminconsole.areas.addToTable = function(id, label, type){
+
+    var table = document.getElementById("areas-table");
+
+    // Create new table row
+    var row = table.insertRow();
+
+    // Create cells to insert into the table
+    var idCell = row.insertCell(0);
+    var labelCell = row.insertCell(1);
+    var typeCell = row.insertCell(2);
+    var deleteCell = row.insertCell(3);
+
+    // Provide values to the new row
+    idCell.innerHTML = id;
+    idCell.style.display = HIDDEN;
+    labelCell.innerHTML = label;
+    typeCell.innerHTML = type;
+    deleteCell.innerHTML = "<a href='#'>Delete</a>"
+};
+
+// Adds a row to the Animals table
+bjørneparkappen.adminconsole.animals.addToTable = function(id, name, species, description, available){
+
+    var table = document.getElementById("animals-table");
+
+    // Create new table row
+    var row = table.insertRow();
+
+    // Create cells to insert into the table
+    var idCell = row.insertCell(0);
+    var nameCell = row.insertCell(1);
+    var speciesCell = row.insertCell(2);
+    var descriptionCell = row.insertCell(3);
+    var availableCell = row.insertCell(4);
+    var deleteCell = row.insertCell(5);
+
+    // Provide values to the new row
+    idCell.innerHTML = id;
+    idCell.style.display = HIDDEN;
+    nameCell.innerHTML = name;
+    speciesCell.innerHTML = species.common_name;
+    descriptionCell.innerHTML = description;
+    descriptionCell.style.display = HIDDEN;
+
+    var checkbox = document.createElement('input');
+    checkbox.type = "checkbox";
+    checkbox.checked = available;
+    availableCell.appendChild(checkbox);
+    deleteCell.innerHTML = "<a href='#'>Delete</a>"
+};
+
+// Adds a row to the Events table
+bjørneparkappen.adminconsole.events.addToTable = function(id, label, startTime, endTime, description, keeper, active){
+
+    var table = document.getElementById("events-table");
+
+    // Create new table row
+    var row = table.insertRow();
+
+    // Create cells to insert into the table
+    var idCell = row.insertCell(0);
+    var labelCell = row.insertCell(1);
+    var startTimeCell = row.insertCell(2);
+    var endTimeCell = row.insertCell(3);
+    var descriptionCell = row.insertCell(4);
+    var keeperCell = row.insertCell(5);
+    var activeCell = row.insertCell(6);
+    var deleteCell = row.insertCell(7);
+
+    // Provide values to the new row
+    idCell.innerHTML = id;
+    idCell.style.display = HIDDEN;
+    labelCell.innerHTML = label;
+    startTimeCell.innerHTML = startTime;
+    endTimeCell.innerHTML = endTime;
+    descriptionCell.innerHTML = description;
+    descriptionCell.style.display = HIDDEN;
+    if (keeper != null){
+
+        keeperCell.innerHTML = keeper.name;
+
+    } else {
+
+        keeperCell.innerHTML = "-";
+    }
+    var checkbox = document.createElement('input');
+    checkbox.type = "checkbox";
+    checkbox.checked = active;
+    activeCell.appendChild(checkbox);
+    deleteCell.innerHTML = "<a href='#'>Delete</a>"
+};
+
+// Adds a row to the Keepers table
+bjørneparkappen.adminconsole.keepers.addToTable = function(id, name, bio){
+
+    var table = document.getElementById("keepers-table");
+
+    // Create new table row
+    var row = table.insertRow();
+
+    // Create cells to insert into the table
+    var idCell = row.insertCell(0);
+    var nameCell = row.insertCell(1);
+    var bioCell = row.insertCell(2);
+    var deleteCell = row.insertCell(3);
+
+    // Provide values to the new row
+    idCell.innerHTML = id;
+    idCell.style.display = HIDDEN;
+    nameCell.innerHTML = name;
+    bioCell.innerHTML = bio;
     deleteCell.innerHTML = "<a href='#'>Delete</a>"
 };
 
@@ -517,8 +695,237 @@ bjørneparkappen.adminconsole.api.listSpecies = function(){
     // Send request
     xhr.send();
 };
+bjørneparkappen.adminconsole.api.listAreas = function(){
+    // Put UI into wait state
+    bjørneparkappen.adminconsole.startWait();
 
-bjørneparkappen.adminconsole.api.listAreas = function(){};
-bjørneparkappen.adminconsole.api.listAnimals = function(){};
-bjørneparkappen.adminconsole.api.listEvents = function(){};
-bjørneparkappen.adminconsole.api.listKeepers = function(){};
+    // Create new request
+    var xhr = new XMLHttpRequest();
+
+    // Open new GET request
+    xhr.open('GET', BASE_URL + "areas/all?language_code=" + LANGUAGE_CODE + "&key=" + API_KEY);
+
+    // GET request state change callback event
+    xhr.onreadystatechange = function() {
+
+        // If request has completed
+        if (xhr.readyState == XMLHttpRequest.DONE){
+
+            // If request status is 200
+            if (xhr.status == 200){
+
+                // Parse response JSON
+                resp = JSON.parse(xhr.responseText);
+                resp.amenities = resp.amenities || [];
+                resp.enclosures = resp.enclosures || [];
+
+                // If amenities returned
+                if (resp.amenities.length > 0) {
+
+                    // Iterate through each one and display it
+                    for (var i = 0; i < resp.amenities.length; i++) {
+
+                        var id = resp.amenities[i].id;
+                        var label = resp.amenities[i].label;
+                        var type = resp.amenities[i].amenity_type;
+
+                        // Add event to table
+                        bjørneparkappen.adminconsole.areas.addToTable(id, label, type);
+                    }
+                }
+
+                // If enclosures returned
+                if (resp.enclosures.length > 0) {
+
+                    // Iterate through each one and display it
+                    for (var i = 0; i < resp.enclosures.length; i++) {
+
+                        var id = resp.enclosures[i].id;
+                        var label = resp.enclosures[i].label;
+                        var type = "ENCLOSURE";
+
+                        // Add event to table
+                        bjørneparkappen.adminconsole.areas.addToTable(id, label, type);
+                    }
+
+                }
+            }
+
+            // Terminate UI wait state
+            bjørneparkappen.adminconsole.endWait();
+        }
+    };
+
+    // Send request
+    xhr.send();
+};
+bjørneparkappen.adminconsole.api.listEvents = function(){
+    // Put UI into wait state
+    bjørneparkappen.adminconsole.startWait();
+
+    // Create new request
+    var xhr = new XMLHttpRequest();
+
+    // Open new GET request
+    xhr.open('GET', BASE_URL + "events/all?language_code=" + LANGUAGE_CODE + "&key=" + API_KEY);
+
+    // GET request state change callback event
+    xhr.onreadystatechange = function() {
+
+        // If request has completed
+        if (xhr.readyState == XMLHttpRequest.DONE){
+
+            // If request status is 200
+            if (xhr.status == 200){
+
+                // Parse response JSON
+                resp = JSON.parse(xhr.responseText);
+                resp.events = resp.events || [];
+                resp.feedings = resp.feedings || [];
+
+                // If events returned
+                if (resp.events.length > 0) {
+
+                    // Iterate through each one and display it
+                    for (var i = 0; i < resp.events.length; i++) {
+
+                        var id = resp.events[i].id;
+                        var label = resp.events[i].label;
+                        var startTime = resp.events[i].start_time;
+                        var endTime = resp.events[i].end_time;
+                        var description = resp.events[i].description;
+                        var available = resp.events[i].is_available;
+
+                        // Add event to table
+                        bjørneparkappen.adminconsole.events.addToTable(id, label, startTime, endTime, description, null, available);
+                    }
+                }
+
+                // If feedings returned
+                if (resp.feedings.length > 0) {
+
+                    // Iterate through each one and display it
+                    for (var i = 0; i < resp.feedings.length; i++) {
+
+                        var id = resp.feedings[i].id;
+                        var label = resp.feedings[i].label;
+                        var startTime = resp.feedings[i].start_time;
+                        var endTime = resp.feedings[i].end_time;
+                        var description = resp.feedings[i].description;
+                        var keeper = resp.feedings[i].keeper;
+                        var available = resp.feedings[i].is_available;
+
+                        // Add event to table
+                        bjørneparkappen.adminconsole.events.addToTable(id, label, startTime, endTime, description, keeper, available);
+                    }
+
+                }
+            }
+
+            // Terminate UI wait state
+            bjørneparkappen.adminconsole.endWait();
+        }
+    };
+
+    // Send request
+    xhr.send();
+};
+bjørneparkappen.adminconsole.api.listAnimals = function(){
+
+    // Put UI into wait state
+    bjørneparkappen.adminconsole.startWait();
+
+    // Create new request
+    var xhr = new XMLHttpRequest();
+
+    // Open new GET request
+    xhr.open('GET', BASE_URL + "animals/all?language_code=" + LANGUAGE_CODE + "&key=" + API_KEY);
+
+    // GET request state change callback event
+    xhr.onreadystatechange = function() {
+
+        // If request has completed
+        if (xhr.readyState == XMLHttpRequest.DONE){
+
+            // If request status is 200
+            if (xhr.status == 200){
+
+                // Parse response JSON
+                resp = JSON.parse(xhr.responseText);
+                resp.animals = resp.animals || [];
+
+                // If animals returned
+                if (resp.animals.length > 0) {
+
+                    // Iterate through each one and display it
+                    for (var i = 0; i < resp.animals.length; i++) {
+
+                        var id = resp.animals[i].id;
+                        var name = resp.animals[i].name;
+                        var species = resp.animals[i].species;
+                        var description = resp.animals[i].description;
+                        var available = resp.animals[i].is_available;
+
+                        // Add animal to table
+                        bjørneparkappen.adminconsole.animals.addToTable(id, name, species, description, available);
+                    }
+
+                }
+            }
+
+            // Terminate UI wait state
+            bjørneparkappen.adminconsole.endWait();
+        }
+    };
+
+    // Send request
+    xhr.send();
+};
+bjørneparkappen.adminconsole.api.listKeepers = function(){
+
+    // Put UI into wait state
+    bjørneparkappen.adminconsole.startWait();
+
+    // Create new request
+    var xhr = new XMLHttpRequest();
+
+    // Open new GET request
+    xhr.open('GET', BASE_URL + "keepers/all?language_code=" + LANGUAGE_CODE + "&key=" + API_KEY);
+
+    // GET request state change callback event
+    xhr.onreadystatechange = function() {
+
+        // If request has completed
+        if (xhr.readyState == XMLHttpRequest.DONE){
+
+            // If request status is 200
+            if (xhr.status == 200){
+
+                // Parse response JSON
+                resp = JSON.parse(xhr.responseText);
+                resp.keepers = resp.keepers || [];
+
+                // If keepers returned
+                if (resp.keepers.length > 0) {
+
+                    // Iterate through each one and display it
+                    for (var i = 0; i < resp.keepers.length; i++) {
+
+                        var id = resp.keepers[i].id;
+                        var name = resp.keepers[i].name;
+                        var bio = resp.keepers[i].bio;
+
+                        // Add species to table
+                        bjørneparkappen.adminconsole.keepers.addToTable(id, name, bio);
+                    }
+                }
+            }
+
+            // Terminate UI wait state
+            bjørneparkappen.adminconsole.endWait();
+        }
+    };
+
+    // Send request
+    xhr.send();
+};
