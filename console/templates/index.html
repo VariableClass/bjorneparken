@@ -23,6 +23,9 @@
         <li><a id="sign-out" href='javascript:void(0)'>Sign Out</a></li>
     </ul>
     <div class="content">
+        
+        <p id="loading-text">Loading...</p>
+
         <section id="create-species-page" class="page">
             <h2>Create Species</h2>
             <form id="create-species-form" class="section-content" action="javascript:void(0)" enctype="multipart/form-data">
@@ -57,20 +60,7 @@
                     <tr>
                         <th>Common Name</th>
                         <th>Latin</th>
-                        <th>Description</th>
                         <th>Delete</th>
-                    </tr>
-                    <tr>
-                        <td>Bear</td>
-                        <td>Ursus Arctos Arctos</td>
-                        <td>Big brown bear</td>
-                        <td><a href='#'>Delete</a></td>
-                    </tr>
-                    <tr>
-                        <td>Moose</td>
-                        <td>Alces Alces</td>
-                        <td>Big brown moose</td>
-                        <td><a href='#'>Delete</a></td>
                     </tr>
                 </table>
             </div>
@@ -80,7 +70,7 @@
             <h2>Create Area</h2>
             <form id="create-area-form" class="section-content" action="javascript:void(0)" enctype="multipart/form-data">
                 <p>
-                    <label for="area_type_selector">Create an </label>
+                    <label for="area_type_selector"><i>Create an </i></label>
                     <select id="area_type_selector" style="align" required/>
                         <option value="amenity">Amenity</option>
                         <option value="enclosure">Enclosure</option>

@@ -8,6 +8,12 @@
 // Base REST API request URL
 const BASE_URL = "https://api-dot-bjorneparkappen.appspot.com/_ah/api/bjorneparkappen_api/v1.0/";
 
+// API key
+const API_KEY = "AIzaSyCuD2dk_XFcn512V5JxAZbFlAK9dgNlQ9c";
+
+// Language Code
+const LANGUAGE_CODE = "en";
+
 // Namespaces for Bjørneparken and the Administrative Console
 var bjørneparkappen = bjørneparkappen || {};
 bjørneparkappen.adminconsole = bjørneparkappen.adminconsole || {};
@@ -35,14 +41,12 @@ bjørneparkappen.adminconsole.startWait = function(){
 
     bjørneparkappen.adminconsole.navigation.hideAllPages();
 
-    loadingScreen.style.display = DISPLAYED;
     loadingText.style.display = DISPLAYED;
 };
 
 // Terminates the application UI wait state
 bjørneparkappen.adminconsole.endWait = function(){
 
-    loadingScreen.style.display = HIDDEN;
     loadingText.style.display = HIDDEN;
 };
 
@@ -222,6 +226,38 @@ bjørneparkappen.adminconsole.events.clearPageData = function(){};
 
 // Clears the Keepers page
 bjørneparkappen.adminconsole.keepers.clearPageData = function(){};
+
+// Loads the Species page
+bjørneparkappen.adminconsole.species.loadPage = function(){
+
+    // Retrieve the list of species
+    bjørneparkappen.adminconsole.api.listSpecies();
+};
+
+// Adds a row to the Species table
+bjørneparkappen.adminconsole.species.addToTable = function(id, commonName, latin, description, image){
+
+    var table = document.getElementById("species-table");
+
+    // Create new table row
+    var row = table.insertRow();
+
+    // Create cells to insert into the table
+    var idCell = row.insertCell(-1);
+    var commonNameCell = row.insertCell(1);
+    var latinCell = row.insertCell(2);
+    var descriptionCell = row.insertCell(3);
+    var deleteCell = row.insertCell(4);
+
+    // Provide values to the new row
+    idCell.innerHTML = id;
+    idCell.style.display = HIDDEN;
+    commonNameCell.innerHTML = commonName;
+    latinCell.innerHTML = latin;
+    descriptionCell.innerHTML = description;
+    descriptionCell.style.display = HIDDEN;
+    deleteCell.innerHTML = "<a href='#'>Delete</a>"
+};
 
 // Table search filter function
 bjørneparkappen.adminconsole.lookup = function(search, table){
@@ -430,7 +466,58 @@ areaTypeSelector.onchange = function(){
 
 
 // API
-bjørneparkappen.adminconsole.api.listSpecies = function(){};
+bjørneparkappen.adminconsole.api.listSpecies = function(){
+
+    // Put UI into wait state
+    bjørneparkappen.adminconsole.startWait();
+
+    // Create new request
+    var xhr = new XMLHttpRequest();
+
+    // Open new GET request
+    xhr.open('GET', BASE_URL + "species/all?language_code=" + LANGUAGE_CODE + "&key=" + API_KEY);
+
+    // GET request state change callback event
+    xhr.onreadystatechange = function() {
+
+        // If request has completed
+        if (xhr.readyState == XMLHttpRequest.DONE){
+
+            // If request status is 200
+            if (xhr.status == 200){
+
+                // Parse response JSON
+                resp = JSON.parse(xhr.responseText);
+                resp.species = resp.species || [];
+
+                // If species returned
+                if (resp.species.length > 0) {
+
+                    // Iterate through each one and display it
+                    for (var i = 0; i < resp.species.length; i++) {
+
+                        var id = resp.species[i].id;
+                        var commonName = resp.species[i].common_name;
+                        var latin = resp.species[i].latin;
+                        var description = resp.species[i].description;
+                        var image = resp.species[i].image;
+
+                        // Add species to table
+                        bjørneparkappen.adminconsole.species.addToTable(id, commonName, latin, description, image);
+                    }
+
+                }
+            }
+
+            // Terminate UI wait state
+            bjørneparkappen.adminconsole.endWait();
+        }
+    };
+
+    // Send request
+    xhr.send();
+};
+
 bjørneparkappen.adminconsole.api.listAreas = function(){};
 bjørneparkappen.adminconsole.api.listAnimals = function(){};
 bjørneparkappen.adminconsole.api.listEvents = function(){};

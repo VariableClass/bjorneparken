@@ -58,6 +58,16 @@ div.content {
     padding: 1px 16px;
 }
 
+#loading-text {
+    display: none;
+    color: #d4135a;
+    text-align: justify;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
 h2 {
     color: #d4135a;
 }
