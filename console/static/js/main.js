@@ -268,11 +268,47 @@ bjørneparkappen.adminconsole.lookup = function(search, table){
     }
 }
 
-// Filter species table
+// Filter Species table
 bjørneparkappen.adminconsole.species.search = function(){
 
     var search = document.getElementById("species-search");
     var table = document.getElementById("species-table");
+
+    bjørneparkappen.adminconsole.lookup(search, table);
+}
+
+// Filter Areas table
+bjørneparkappen.adminconsole.areas.search = function(){
+
+    var search = document.getElementById("area-search");
+    var table = document.getElementById("areas-table");
+
+    bjørneparkappen.adminconsole.lookup(search, table);
+}
+
+// Filter Animals table
+bjørneparkappen.adminconsole.animals.search = function(){
+
+    var search = document.getElementById("animal-search");
+    var table = document.getElementById("animals-table");
+
+    bjørneparkappen.adminconsole.lookup(search, table);
+}
+
+// Filter Events table
+bjørneparkappen.adminconsole.events.search = function(){
+
+    var search = document.getElementById("event-search");
+    var table = document.getElementById("events-table");
+
+    bjørneparkappen.adminconsole.lookup(search, table);
+}
+
+// Filter Keepers table
+bjørneparkappen.adminconsole.keepers.search = function(){
+
+    var search = document.getElementById("keeper-search");
+    var table = document.getElementById("keepers-table");
 
     bjørneparkappen.adminconsole.lookup(search, table);
 }

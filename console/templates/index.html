@@ -51,28 +51,25 @@
             <h2>Species</h2>
             <button type="button" class="button create" id="species-create">Create New</button>
             <div class="table">
-                <input type="text" id='species-search' class="search" onkeyup="bjørneparkappen.adminconsole.species.search()" placeholder="Search for species..">
+                <input type="text" id='species-search' class="search" onkeyup="bjørneparkappen.adminconsole.species.search()" placeholder="Search for species...">
                 <table id="species-table">
                     <tr>
                         <th>Common Name</th>
                         <th>Latin</th>
                         <th>Description</th>
-                        <th>Available</th>
                         <th>Delete</th>
                     </tr>
                     <tr>
                         <td>Bear</td>
                         <td>Ursus Arctos Arctos</td>
                         <td>Big brown bear</td>
-                        <td><input type="checkbox"></td>
-                        <td><a href='#'>Delete</td>
+                        <td><a href='#'>Delete</a></td>
                     </tr>
                     <tr>
                         <td>Moose</td>
                         <td>Alces Alces</td>
                         <td>Big brown moose</td>
-                        <td><input type="checkbox"></td>
-                        <td><a href='#'>Delete</td>
+                        <td><a href='#'>Delete</a></td>
                     </tr>
                 </table>
             </div>
@@ -98,33 +95,29 @@
             <h2>Areas</h2>
             <button type="button" class="button create" id="area-create">Create New</button>
             <div class="table">
-                <input type="text" id='area-search' class="search" onkeyup="bjørneparkappen.adminconsole.areas.search()" placeholder="Search for areas..">
+                <input type="text" id='area-search' class="search" onkeyup="bjørneparkappen.adminconsole.areas.search()" placeholder="Search for areas...">
                 <table id="areas-table">
                     <tr>
-                        <th>Common Name</th>
-                        <th>Latin</th>
-                        <th>Description</th>
-                        <th>Available</th>
+                        <th>Label</th>
+                        <th>Type</th>
+                        <th>Visitor Destination</th>
                         <th>Delete</th>
                     </tr>
                     <tr>
-                        <td>Bear</td>
-                        <td>Ursus Arctos Arctos</td>
-                        <td>Big brown bear</td>
-                        <td><input type="checkbox"></td>
-                        <td><a href='#'>Delete</td>
+                        <td>Main Bear Enclosure</td>
+                        <td>Enclosure</td>
+                        <td>-40.2435, 60.6765</td>
+                        <td><a href='#'>Delete</a></td>
                     </tr>
                     <tr>
-                        <td>Moose</td>
-                        <td>Alces Alces</td>
-                        <td>Big brown moose</td>
-                        <td><input type="checkbox"></td>
-                        <td><a href='#'>Delete</td>
+                        <td>Reception Building</td>
+                        <td>Amenity</td>
+                        <td>-40.2435, 60.6765</td>
+                        <td><a href='#'>Delete</a></td>
                     </tr>
                 </table>
             </div>
         </section>
-
 
         <section id="create-animal-page" class="page">
         </section>
@@ -132,6 +125,33 @@
         </section>
         <section id="list-animals-page" class="page">
             <h2>Animals</h2>
+            <button type="button" class="button create" id="animal-create">Create New</button>
+            <div class="table">
+                <input type="text" id='animal-search' class="search" onkeyup="bjørneparkappen.adminconsole.animals.search()" placeholder="Search for animals...">
+                <table id="animals-table">
+                    <tr>
+                        <th>Name</th>
+                        <th>Species</th>
+                        <th>Description</th>
+                        <th>Available</th>
+                        <th>Delete</th>
+                    </tr>
+                    <tr>
+                        <td>Rugg</td>
+                        <td>Ursus Arctos Arctos</td>
+                        <td>Rugg is the oldest bear in the park.</td>
+                        <td><input type='checkbox'></td>
+                        <td><a href='#'>Delete</a></td>
+                    </tr>
+                    <tr>
+                        <td>Nora</td>
+                        <td>Ursus Arctos Arctos</td>
+                        <td>Nora is the mother of Brutus</td>
+                        <td><input type='checkbox'></td>
+                        <td><a href='#'>Delete</a></td>
+                    </tr>
+                </table>
+            </div>
         </section>
 
         <section id="create-event-page" class="page">
@@ -140,6 +160,39 @@
         </section>
         <section id="list-events-page" class="page">
             <h2>Events</h2>
+            <button type="button" class="button create" id="event-create">Create New</button>
+            <div class="table">
+                <table id="events-table">
+                    <input type="text" id='event-search' class="search" onkeyup="bjørneparkappen.adminconsole.events.search()" placeholder="Search for events...">
+                    <tr>
+                        <th>Label</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>Description</th>
+                        <th>Keeper</th>
+                        <th>Active</th>
+                        <th>Delete</th>
+                    </tr>
+                    <tr>
+                        <td>Dinner for Rugg</td>
+                        <td>17.00</td>
+                        <td>17.30</td>
+                        <td>Rugg gets his daily feast.</td>
+                        <td>Magnhild</td>
+                        <td><input type='checkbox'></td>
+                        <td><a href='#'>Delete</a></td>
+                    </tr>
+                    <tr>
+                        <td>Dare you hold a snake?</td>
+                        <td>14.30</td>
+                        <td>15.00</td>
+                        <td>Come and try your bravery!</td>
+                        <td>-</td>
+                        <td><input type='checkbox'></td>
+                        <td><a href='#'>Delete</a></td>
+                    </tr>
+                </table>
+            </div>
         </section>
 
         <section id="create-keeper-page" class="page">
@@ -148,6 +201,27 @@
         </section>
         <section id="list-keepers-page" class="page">
             <h2>Keepers</h2>
+            <button type="button" class="button create" id="keeper-create">Create New</button>
+            <div class="table">
+                <table id="keepers-table">
+                    <input type="text" id='keeper-search' class="search" onkeyup="bjørneparkappen.adminconsole.keepers.search()" placeholder="Search for keepers...">
+                    <tr>
+                        <th>Name</th>
+                        <th>Bio</th>
+                        <th>Delete</th>
+                    </tr>
+                    <tr>
+                        <td>Callum</td>
+                        <td>Callum made our app.</td>
+                        <td><a href='#'>Delete</a></td>
+                    </tr>
+                    <tr>
+                        <td>Magnhild</td>
+                        <td>Magnhild has been with us for 5 years.</td>
+                        <td><a href='#'>Delete</a></td>
+                    </tr>
+                </table>
+            </div>
         </section>
     </div>
 </body>
