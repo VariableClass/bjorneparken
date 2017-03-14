@@ -25,25 +25,26 @@
     <div class="content">
         <section id="create-species-page" class="page">
             <h2>Create Species</h2>
-            <form id="create-species-form" class="section-content" action="javascript:void(0)" enctype="multipart/form-data">
-                <p>
-                    <label for="species_name">Name:</label>
-                    <input name="species_name" id="species_name" type="text" size="20" required/>
-                </p>
-                <p>
-                    <label for="species_latin">Latin:</label>
-                    <input name="species_latin" id="species_latin" type="text" size="20" required/>
-                </p>
-                <p>
-                    <label for="species_description">Description:</label>
-                    <input name="species_description" id="species_description" type="text" size="20" required/>
-                </p>
-                <p>
-                    <label for="image_file">Image:</label>
-                    <input name="image_file" id="image_file" type="file" accept="image/*" size="4" required/>
-                </p>
-                <input type="submit" value="Create"/>
-            </form>
+                <form id="create-species-form" class="section-content" action="javascript:void(0)" enctype="multipart/form-data">
+                    <p>
+                        <label for="species_name">Name:</label>
+                        <input name="species_name" id="species_name" type="text" size="20" required/>
+                    </p>
+                    <p>
+                        <label for="species_latin">Latin:</label>
+                        <input name="species_latin" id="species_latin" type="text" size="20" required/>
+                    </p>
+                    <p>
+                        <label for="species_description">Description:</label>
+                        <input name="species_description" id="species_description" type="text" size="20" required/>
+                    </p>
+                    <p>
+                        <label for="image_file">Image:</label>
+                        <input name="image_file" id="image_file" type="file" accept="image/*" size="4" required/>
+                    </p>
+                    <input id="species-create-cancel" type="button" class="button cancel" value="Cancel" />
+                    <input id="species-create-confirm" type="button" class="button submit" value="Create" />
+                </form>
         </section>
         <section id="update-species-page" class="page">
         </section>

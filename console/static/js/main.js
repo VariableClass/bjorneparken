@@ -313,6 +313,77 @@ bjørneparkappen.adminconsole.keepers.search = function(){
     bjørneparkappen.adminconsole.lookup(search, table);
 }
 
+// Create buttons
+var createSpeciesButton = document.getElementById('species-create');
+var createAreaButton = document.getElementById('area-create');
+var createAnimalButton = document.getElementById('animal-create');
+var createEventButton = document.getElementById('event-create');
+var createKeeperButton = document.getElementById('keeper-create');
+
+// Create Species onclick event
+createSpeciesButton.onclick = function(){
+
+    // Clear page data
+    bjørneparkappen.adminconsole.species.clearPageData();
+
+    // Display Create Species page
+    bjørneparkappen.adminconsole.navigation.displayPage(createSpeciesPage);
+}
+
+// Create Area onclick event
+createAreaButton.onclick = function(){
+
+    // Clear page data
+    bjørneparkappen.adminconsole.areas.clearPageData();
+
+    // Display Create Area page
+    bjørneparkappen.adminconsole.navigation.displayPage(createAreaPage);
+}
+
+// Create Animal onclick event
+createAnimalButton.onclick = function(){
+
+    // Clear page data
+    bjørneparkappen.adminconsole.animals.clearPageData();
+
+    // Display Create Animal page
+    bjørneparkappen.adminconsole.navigation.displayPage(createAnimalPage);
+}
+
+// Create Event onclick event
+createEventButton.onclick = function(){
+
+    // Clear page data
+    bjørneparkappen.adminconsole.events.clearPageData();
+
+    // Display Create Event page
+    bjørneparkappen.adminconsole.navigation.displayPage(createEventPage);
+}
+
+// Create Keeper onclick event
+createKeeperButton.onclick = function(){
+
+    // Clear page data
+    bjørneparkappen.adminconsole.keepers.clearPageData();
+
+    // Display Create Keeper page
+    bjørneparkappen.adminconsole.navigation.displayPage(createKeeperPage);
+}
+
+// Cancel buttons
+var cancelSpeciesButton = document.getElementById('species-create-cancel');
+var cancelAreaButton = document.getElementById('area-create-cancel');
+var cancelAnimalButton = document.getElementById('animal-create-cancel');
+var cancelEventButton = document.getElementById('event-create-cancel');
+var cancelKeeperButton = document.getElementById('keeper-create-cancel');
+
+// Cancel Species onclick event
+cancelSpeciesButton.onclick = function(){
+
+    // Display Cancel Species page
+    bjørneparkappen.adminconsole.navigation.displayPage(listSpeciesPage);
+}
+
 // API
 bjørneparkappen.adminconsole.api.listSpecies = function(){};
 bjørneparkappen.adminconsole.api.listAreas = function(){};

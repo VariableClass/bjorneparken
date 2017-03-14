@@ -58,6 +58,10 @@ div.content {
     padding: 1px 16px;
 }
 
+h2 {
+    color: #d4135a;
+}
+
 div.content .page {
     display: none;
     position: relative;
@@ -70,11 +74,10 @@ div.content .page {
     border: none;
     padding: 10px 20px;
     text-align: center;
-    display: inline-block;
     font-size: 16px;
     font-weight: bold;
     -webkit-transition-duration: 0.3s; /* Safari */
-    transition-duration: 0.3s;
+    transition-duration: 0.3;
     cursor: pointer;
 }
 
@@ -83,10 +86,36 @@ div.content .page {
     color: #d4135a;
 }
 
+form {
+    top:50%;
+    margin: auto;
+    width: 400px;
+}
+
 .button.create {
     position: absolute;
     top: 0px;
     right: 0px;
+}
+
+.button.submit {
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+}
+
+.button.cancel {
+    border-radius: 4px;
+    background-color: white;
+    color: gray;
+    border: none;
+    position: absolute;
+    bottom: 0px;
+    right: 100px;
+}
+
+.button:hover{
+    color: #d4135a;
 }
 
 .table {
@@ -101,7 +130,7 @@ div.content .page {
     margin-bottom: 20px;
 }
 
-.search:focus {
+:focus {
     outline: none !important;
     border:1px solid #d4135a;
     box-shadow: 0 0 10px #d4135a;
@@ -132,6 +161,11 @@ tr:not(:first-child):hover {
     background-color: #d4135a;
 }
 
+label {
+  display: inline-block;
+  width: 140px;
+  text-align: right;
+}​
 
 @media screen and (max-width: 1050px){
     ul.sidenav {
