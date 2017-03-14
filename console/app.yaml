@@ -1,0 +1,14 @@
+runtime: python27
+api_version: 1
+threadsafe: true
+service: default
+
+handlers:
+- url: /css
+  static_dir: static/css
+- url: /js
+  static_dir: static/js
+- url: /
+  static_files: templates/index.html
+  upload: templates/index\.html
+  secure: always
