@@ -20,10 +20,25 @@ bjørneparkappen.adminconsole = bjørneparkappen.adminconsole || {};
 bjørneparkappen.adminconsole.api = bjørneparkappen.adminconsole.api || {};
 bjørneparkappen.adminconsole.navigation = bjørneparkappen.adminconsole.navigation || {};
 bjørneparkappen.adminconsole.species = bjørneparkappen.adminconsole.species || {};
+bjørneparkappen.adminconsole.species.list = bjørneparkappen.adminconsole.species.list || {};
+bjørneparkappen.adminconsole.species.create = bjørneparkappen.adminconsole.species.create || {};
+bjørneparkappen.adminconsole.species.update = bjørneparkappen.adminconsole.species.update || {};
 bjørneparkappen.adminconsole.areas = bjørneparkappen.adminconsole.areas || {};
+bjørneparkappen.adminconsole.areas.list = bjørneparkappen.adminconsole.areas.list || {};
+bjørneparkappen.adminconsole.areas.create = bjørneparkappen.adminconsole.areas.create || {};
+bjørneparkappen.adminconsole.areas.update = bjørneparkappen.adminconsole.areas.update || {};
 bjørneparkappen.adminconsole.animals = bjørneparkappen.adminconsole.animals || {};
+bjørneparkappen.adminconsole.animals.list = bjørneparkappen.adminconsole.animals.list || {};
+bjørneparkappen.adminconsole.animals.create = bjørneparkappen.adminconsole.animals.create || {};
+bjørneparkappen.adminconsole.animals.update = bjørneparkappen.adminconsole.animals.update || {};
 bjørneparkappen.adminconsole.events = bjørneparkappen.adminconsole.events || {};
+bjørneparkappen.adminconsole.events.list = bjørneparkappen.adminconsole.events.list || {};
+bjørneparkappen.adminconsole.events.create = bjørneparkappen.adminconsole.events.create || {};
+bjørneparkappen.adminconsole.events.update = bjørneparkappen.adminconsole.events.update || {};
 bjørneparkappen.adminconsole.keepers = bjørneparkappen.adminconsole.keepers || {};
+bjørneparkappen.adminconsole.keepers.list = bjørneparkappen.adminconsole.keepers.list || {};
+bjørneparkappen.adminconsole.keepers.create = bjørneparkappen.adminconsole.keepers.create || {};
+bjørneparkappen.adminconsole.keepers.update = bjørneparkappen.adminconsole.keepers.update || {};
 
 // To be used in setting the currently selected nav item
 const ACTIVE = "active";
@@ -51,7 +66,7 @@ bjørneparkappen.adminconsole.endWait = function(){
 bjørneparkappen.adminconsole.init = function() {
 
     // Load Species page if so
-    bjørneparkappen.adminconsole.species.loadPage();
+    bjørneparkappen.adminconsole.species.list.loadPage();
 };
 
 
@@ -78,20 +93,15 @@ bjørneparkappen.adminconsole.navigation.selectNavItem = function(navItem){
 // Hides all pages
 bjørneparkappen.adminconsole.navigation.hideAllPages = function(){
 
-    createSpeciesPage.style.display = HIDDEN;
-    updateSpeciesPage.style.display = HIDDEN;
+    speciesDetailPage.style.display = HIDDEN;
     listSpeciesPage.style.display = HIDDEN;
-    createAreaPage.style.display = HIDDEN;
-    updateAreaPage.style.display = HIDDEN;
+    areaDetailPage.style.display = HIDDEN;
     listAreasPage.style.display = HIDDEN;
-    createAnimalPage.style.display = HIDDEN;
-    updateAnimalPage.style.display = HIDDEN;
+    animalDetailPage.style.display = HIDDEN;
     listAnimalsPage.style.display = HIDDEN;
-    createEventPage.style.display = HIDDEN;
-    updateEventPage.style.display = HIDDEN;
+    eventDetailPage.style.display = HIDDEN;
     listEventsPage.style.display = HIDDEN;
-    createKeeperPage.style.display = HIDDEN;
-    updateKeeperPage.style.display = HIDDEN;
+    keeperDetailPage.style.display = HIDDEN;
     listKeepersPage.style.display = HIDDEN;
 };
 
@@ -105,338 +115,7 @@ bjørneparkappen.adminconsole.navigation.displayPage = function(page){
     page.style.display = DISPLAYED;
 };
 
-// Nav items
-var speciesNav = document.getElementById('species');
-var areasNav = document.getElementById('areas');
-var animalsNav = document.getElementById('animals');
-var eventsNav = document.getElementById('events');
-var keepersNav = document.getElementById('keepers');
-
-// Species Menu nav item onclick event
-speciesNav.onclick = function(){
-
-    // Clear page data
-    bjørneparkappen.adminconsole.species.clearPageData();
-
-    // List all species once page has loaded
-    bjørneparkappen.adminconsole.api.listSpecies();
-
-    // Select Species nav item
-    bjørneparkappen.adminconsole.navigation.selectNavItem(speciesNav);
-
-    // Display List Species page
-    bjørneparkappen.adminconsole.navigation.displayPage(listSpeciesPage);
-}
-
-// Areas nav item onclick event
-areasNav.onclick = function(){
-
-    // Clear page data
-    bjørneparkappen.adminconsole.areas.clearPageData();
-
-    // List all species once page has loaded
-    bjørneparkappen.adminconsole.api.listAreas();
-
-    // Select Areas nav item
-    bjørneparkappen.adminconsole.navigation.selectNavItem(areasNav);
-
-    // Display List Areas page
-    bjørneparkappen.adminconsole.navigation.displayPage(listAreasPage);
-};
-
-// Animals nav item onclick event
-animalsNav.onclick = function(){
-
-    // Clear page data
-    bjørneparkappen.adminconsole.animals.clearPageData();
-
-    // List all animals once page has loaded
-    bjørneparkappen.adminconsole.api.listAnimals();
-
-    // Select Animals nav item
-    bjørneparkappen.adminconsole.navigation.selectNavItem(animalsNav);
-
-    // Display List Animals page
-    bjørneparkappen.adminconsole.navigation.displayPage(listAnimalsPage);
-};
-
-// Events nav item onclick event
-eventsNav.onclick = function(){
-
-    // Clear page data
-    bjørneparkappen.adminconsole.events.clearPageData();
-
-    // List all events once page has loaded
-    bjørneparkappen.adminconsole.api.listEvents();
-
-    // Select Events nav item
-    bjørneparkappen.adminconsole.navigation.selectNavItem(eventsNav);
-
-    // Display List Events page
-    bjørneparkappen.adminconsole.navigation.displayPage(listEventsPage);
-};
-
-// Keepers nav item onclick event
-keepersNav.onclick = function(){
-
-    // Clear page data
-    bjørneparkappen.adminconsole.keepers.clearPageData();
-
-    // List all keepers once page has loaded
-    bjørneparkappen.adminconsole.api.listKeepers();
-
-    // Select Keepers nav item
-    bjørneparkappen.adminconsole.navigation.selectNavItem(keepersNav);
-
-    // Display List Keepers page
-    bjørneparkappen.adminconsole.navigation.displayPage(listKeepersPage);
-};
-
-// Pages
-var createSpeciesPage = document.getElementById('create-species-page');
-var updateSpeciesPage = document.getElementById('update-species-page');
-var listSpeciesPage = document.getElementById('list-species-page');
-var createAreaPage = document.getElementById('create-area-page');
-var updateAreaPage = document.getElementById('update-area-page');
-var listAreasPage = document.getElementById('list-areas-page');
-var createAnimalPage = document.getElementById('create-animal-page');
-var updateAnimalPage = document.getElementById('update-animal-page');
-var listAnimalsPage = document.getElementById('list-animals-page');
-var createEventPage = document.getElementById('create-event-page');
-var updateEventPage = document.getElementById('update-event-page');
-var listEventsPage = document.getElementById('list-events-page');
-var createKeeperPage = document.getElementById('create-keeper-page');
-var updateKeeperPage = document.getElementById('update-keeper-page');
-var listKeepersPage = document.getElementById('list-keepers-page');
-
-// Clears the Species page
-bjørneparkappen.adminconsole.species.clearPageData = function(){
-
-    // Clear search bar
-    document.getElementById('species-search').value = "";
-
-    // Retrieve table to empty
-    var table = document.getElementById('species-table');
-
-    // Empty table
-    while(table.rows.length > 1) {
-
-        table.deleteRow(1);
-    }
-};
-
-// Clears the Areas page
-bjørneparkappen.adminconsole.areas.clearPageData = function(){
-
-    // Clear search bar
-    document.getElementById('area-search').value = "";
-
-    // Retrieve table to empty
-    var table = document.getElementById('areas-table');
-
-    // Empty table
-    while(table.rows.length > 1) {
-
-        table.deleteRow(1);
-    }
-};
-
-// Clears the Animals page
-bjørneparkappen.adminconsole.animals.clearPageData = function(){
-
-    // Clear search bar
-    document.getElementById('animal-search').value = "";
-
-    // Retrieve table to empty
-    var table = document.getElementById('animals-table');
-
-    // Empty table
-    while(table.rows.length > 1) {
-
-        table.deleteRow(1);
-    }
-};
-
-// Clears the Events page
-bjørneparkappen.adminconsole.events.clearPageData = function(){
-
-    // Clear search bar
-    document.getElementById('event-search').value = "";
-
-    // Retrieve table to empty
-    var table = document.getElementById('events-table');
-
-    // Empty table
-    while(table.rows.length > 1) {
-
-        table.deleteRow(1);
-    }
-};
-
-// Clears the Keepers page
-bjørneparkappen.adminconsole.keepers.clearPageData = function(){
-
-    // Clear search bar
-    document.getElementById('keeper-search').value = "";
-
-    // Retrieve table to empty
-    var table = document.getElementById('keepers-table');
-
-    // Empty table
-    while(table.rows.length > 1) {
-
-        table.deleteRow(1);
-    }
-};
-
-// Loads the Species page
-bjørneparkappen.adminconsole.species.loadPage = function(){
-
-    // Retrieve the list of species
-    bjørneparkappen.adminconsole.api.listSpecies();
-};
-
-// Adds a row to the Species table
-bjørneparkappen.adminconsole.species.addToTable = function(id, commonName, latin, description, image){
-
-    var table = document.getElementById("species-table");
-
-    // Create new table row
-    var row = table.insertRow();
-
-    // Create cells to insert into the table
-    var idCell = row.insertCell(0);
-    var commonNameCell = row.insertCell(1);
-    var latinCell = row.insertCell(2);
-    var descriptionCell = row.insertCell(3);
-    var deleteCell = row.insertCell(4);
-
-    // Provide values to the new row
-    idCell.innerHTML = id;
-    idCell.style.display = HIDDEN;
-    commonNameCell.innerHTML = commonName;
-    latinCell.innerHTML = latin;
-    descriptionCell.innerHTML = description;
-    descriptionCell.style.display = HIDDEN;
-    deleteCell.innerHTML = "<a href='#'>Delete</a>"
-};
-
-// Adds a row to the Areas table
-bjørneparkappen.adminconsole.areas.addToTable = function(id, label, type){
-
-    var table = document.getElementById("areas-table");
-
-    // Create new table row
-    var row = table.insertRow();
-
-    // Create cells to insert into the table
-    var idCell = row.insertCell(0);
-    var labelCell = row.insertCell(1);
-    var typeCell = row.insertCell(2);
-    var deleteCell = row.insertCell(3);
-
-    // Provide values to the new row
-    idCell.innerHTML = id;
-    idCell.style.display = HIDDEN;
-    labelCell.innerHTML = label;
-    typeCell.innerHTML = type;
-    deleteCell.innerHTML = "<a href='#'>Delete</a>"
-};
-
-// Adds a row to the Animals table
-bjørneparkappen.adminconsole.animals.addToTable = function(id, name, species, description, available){
-
-    var table = document.getElementById("animals-table");
-
-    // Create new table row
-    var row = table.insertRow();
-
-    // Create cells to insert into the table
-    var idCell = row.insertCell(0);
-    var nameCell = row.insertCell(1);
-    var speciesCell = row.insertCell(2);
-    var descriptionCell = row.insertCell(3);
-    var availableCell = row.insertCell(4);
-    var deleteCell = row.insertCell(5);
-
-    // Provide values to the new row
-    idCell.innerHTML = id;
-    idCell.style.display = HIDDEN;
-    nameCell.innerHTML = name;
-    speciesCell.innerHTML = species.common_name;
-    descriptionCell.innerHTML = description;
-    descriptionCell.style.display = HIDDEN;
-
-    var checkbox = document.createElement('input');
-    checkbox.type = "checkbox";
-    checkbox.checked = available;
-    availableCell.appendChild(checkbox);
-    deleteCell.innerHTML = "<a href='#'>Delete</a>"
-};
-
-// Adds a row to the Events table
-bjørneparkappen.adminconsole.events.addToTable = function(id, label, startTime, endTime, description, keeper, active){
-
-    var table = document.getElementById("events-table");
-
-    // Create new table row
-    var row = table.insertRow();
-
-    // Create cells to insert into the table
-    var idCell = row.insertCell(0);
-    var labelCell = row.insertCell(1);
-    var startTimeCell = row.insertCell(2);
-    var endTimeCell = row.insertCell(3);
-    var descriptionCell = row.insertCell(4);
-    var keeperCell = row.insertCell(5);
-    var activeCell = row.insertCell(6);
-    var deleteCell = row.insertCell(7);
-
-    // Provide values to the new row
-    idCell.innerHTML = id;
-    idCell.style.display = HIDDEN;
-    labelCell.innerHTML = label;
-    startTimeCell.innerHTML = startTime;
-    endTimeCell.innerHTML = endTime;
-    descriptionCell.innerHTML = description;
-    descriptionCell.style.display = HIDDEN;
-    if (keeper != null){
-
-        keeperCell.innerHTML = keeper.name;
-
-    } else {
-
-        keeperCell.innerHTML = "-";
-    }
-    var checkbox = document.createElement('input');
-    checkbox.type = "checkbox";
-    checkbox.checked = active;
-    activeCell.appendChild(checkbox);
-    deleteCell.innerHTML = "<a href='#'>Delete</a>"
-};
-
-// Adds a row to the Keepers table
-bjørneparkappen.adminconsole.keepers.addToTable = function(id, name, bio){
-
-    var table = document.getElementById("keepers-table");
-
-    // Create new table row
-    var row = table.insertRow();
-
-    // Create cells to insert into the table
-    var idCell = row.insertCell(0);
-    var nameCell = row.insertCell(1);
-    var bioCell = row.insertCell(2);
-    var deleteCell = row.insertCell(3);
-
-    // Provide values to the new row
-    idCell.innerHTML = id;
-    idCell.style.display = HIDDEN;
-    nameCell.innerHTML = name;
-    bioCell.innerHTML = bio;
-    deleteCell.innerHTML = "<a href='#'>Delete</a>"
-};
-
+/** Common Functions */
 // Table search filter function
 bjørneparkappen.adminconsole.lookup = function(search, table){
 
@@ -482,152 +161,237 @@ bjørneparkappen.adminconsole.lookup = function(search, table){
     }
 }
 
+
+
+/** Species */
+
+// Navigation Item
+var speciesNav = document.getElementById('species');
+speciesNav.onclick = function(){
+
+    // Clear page data
+    bjørneparkappen.adminconsole.species.list.clearPageData();
+
+    // Select Species nav item
+    bjørneparkappen.adminconsole.navigation.selectNavItem(speciesNav);
+
+    // Load Species list page
+    bjørneparkappen.adminconsole.species.list.loadPage();
+
+    // Display List Species page
+    bjørneparkappen.adminconsole.navigation.displayPage(listSpeciesPage);
+}
+
+
+// List Species Page and elements
+var listSpeciesPage = document.getElementById('list_species_page');
+var createSpeciesButton = document.getElementById('list_species_create');
+createSpeciesButton.onclick = function(){
+
+    // Clear Create Species page data
+    bjørneparkappen.adminconsole.species.create.clearPageData();
+
+    // Display Create Species page
+    bjørneparkappen.adminconsole.navigation.displayPage(speciesDetailPage);
+}
+
+// Clears the List Species page
+bjørneparkappen.adminconsole.species.list.clearPageData = function(){
+
+    // Clear search bar
+    document.getElementById('list_species_search').value = "";
+
+    // Retrieve table to empty
+    var table = document.getElementById('list_species_table');
+
+    // Empty table
+    while(table.rows.length > 1) {
+
+        table.deleteRow(1);
+    }
+};
+
+// Loads the Species List page
+bjørneparkappen.adminconsole.species.list.loadPage = function(){
+
+    // Retrieve the list of species
+    bjørneparkappen.adminconsole.api.listSpecies();
+
+    // Display the update page
+    bjørneparkappen.adminconsole.navigation.displayPage(listSpeciesPage);
+};
+
+// Adds a row to the Species table
+bjørneparkappen.adminconsole.species.addToTable = function(id, commonName, latin, description, image){
+
+    var table = document.getElementById("list_species_table");
+
+    // Create new table row
+    var row = table.insertRow();
+
+    // Create cells to insert into the table
+    var idCell = row.insertCell(0);
+    var commonNameCell = row.insertCell(1);
+    var latinCell = row.insertCell(2);
+    var descriptionCell = row.insertCell(3);
+    var deleteCell = row.insertCell(4);
+
+    // Provide values to the new row
+    idCell.innerHTML = id;
+    idCell.style.display = HIDDEN;
+    commonNameCell.innerHTML = commonName;
+    latinCell.innerHTML = latin;
+    descriptionCell.innerHTML = description;
+    descriptionCell.style.display = HIDDEN;
+    deleteCell.innerHTML = "<a href='#'>Delete</a>"
+
+    row.onclick = function(){
+
+        // Load the update page with data
+        bjørneparkappen.adminconsole.species.update.loadPage(id, commonName, latin, description);
+    }
+};
+
 // Filter Species table
 bjørneparkappen.adminconsole.species.search = function(){
 
-    var search = document.getElementById("species-search");
-    var table = document.getElementById("species-table");
+    var search = document.getElementById("list_species_search");
+    var table = document.getElementById("list_species_table");
 
     bjørneparkappen.adminconsole.lookup(search, table);
 }
 
-// Filter Areas table
-bjørneparkappen.adminconsole.areas.search = function(){
 
-    var search = document.getElementById("area-search");
-    var table = document.getElementById("areas-table");
-
-    bjørneparkappen.adminconsole.lookup(search, table);
-}
-
-// Filter Animals table
-bjørneparkappen.adminconsole.animals.search = function(){
-
-    var search = document.getElementById("animal-search");
-    var table = document.getElementById("animals-table");
-
-    bjørneparkappen.adminconsole.lookup(search, table);
-}
-
-// Filter Events table
-bjørneparkappen.adminconsole.events.search = function(){
-
-    var search = document.getElementById("event-search");
-    var table = document.getElementById("events-table");
-
-    bjørneparkappen.adminconsole.lookup(search, table);
-}
-
-// Filter Keepers table
-bjørneparkappen.adminconsole.keepers.search = function(){
-
-    var search = document.getElementById("keeper-search");
-    var table = document.getElementById("keepers-table");
-
-    bjørneparkappen.adminconsole.lookup(search, table);
-}
-
-// Create buttons
-var createSpeciesButton = document.getElementById('species-create');
-var createAreaButton = document.getElementById('area-create');
-var createAnimalButton = document.getElementById('animal-create');
-var createEventButton = document.getElementById('event-create');
-var createKeeperButton = document.getElementById('keeper-create');
-
-// Create Species onclick event
-createSpeciesButton.onclick = function(){
-
-    // Clear page data
-    bjørneparkappen.adminconsole.species.clearPageData();
-
-    // Display Create Species page
-    bjørneparkappen.adminconsole.navigation.displayPage(createSpeciesPage);
-}
-
-// Create Area onclick event
-createAreaButton.onclick = function(){
-
-    // Clear page data
-    bjørneparkappen.adminconsole.areas.clearPageData();
-
-    // Display Create Area page
-    bjørneparkappen.adminconsole.navigation.displayPage(createAreaPage);
-}
-
-// Create Animal onclick event
-createAnimalButton.onclick = function(){
-
-    // Clear page data
-    bjørneparkappen.adminconsole.animals.clearPageData();
-
-    // Display Create Animal page
-    bjørneparkappen.adminconsole.navigation.displayPage(createAnimalPage);
-}
-
-// Create Event onclick event
-createEventButton.onclick = function(){
-
-    // Clear page data
-    bjørneparkappen.adminconsole.events.clearPageData();
-
-    // Display Create Event page
-    bjørneparkappen.adminconsole.navigation.displayPage(createEventPage);
-}
-
-// Create Keeper onclick event
-createKeeperButton.onclick = function(){
-
-    // Clear page data
-    bjørneparkappen.adminconsole.keepers.clearPageData();
-
-    // Display Create Keeper page
-    bjørneparkappen.adminconsole.navigation.displayPage(createKeeperPage);
-}
-
-// Cancel buttons
-var cancelSpeciesButton = document.getElementById('species-create-cancel');
-var cancelAreaButton = document.getElementById('area-create-cancel');
-var cancelAnimalButton = document.getElementById('animal-create-cancel');
-var cancelEventButton = document.getElementById('event-create-cancel');
-var cancelKeeperButton = document.getElementById('keeper-create-cancel');
-
-// Cancel Species onclick event
+// Species Detail Page and elements
+var speciesDetailPage = document.getElementById('species_detail_page');
+var cancelSpeciesButton = document.getElementById('species_detail_cancel');
 cancelSpeciesButton.onclick = function(){
 
     // Display List Species page
     bjørneparkappen.adminconsole.navigation.displayPage(listSpeciesPage);
 }
 
-// Cancel Area onclick event
+// Clears the Species Detail page
+bjørneparkappen.adminconsole.species.update.clearPageData = function(){
+
+    // TODO Implement
+};
+
+// Loads the Update Species page
+bjørneparkappen.adminconsole.species.update.loadPage = function(id, commonName, latin, description){
+
+    // Set update page title
+    var updateSpeciesTitle = document.getElementById('species_detail_title');
+    updateSpeciesTitle.innerHTML = "Update Species";
+
+    // Set update page confim button text
+    var updateSpeciesButton = document.getElementById('species_detail_confirm');
+    updateSpeciesButton.value = "Save";
+
+    // Populate form with new data
+    var commonNameInput = document.getElementById('species_name');
+    var latinInput = document.getElementById('species_latin');
+    var descriptionInput = document.getElementById('species_description');
+
+    commonNameInput.value = commonName;
+    latinInput.value = latin;
+    descriptionInput.value = description;
+
+    // Display the update page
+    bjørneparkappen.adminconsole.navigation.displayPage(speciesDetailPage);
+}
+
+
+
+/** Areas */
+
+// Navigation Item
+var areasNav = document.getElementById('areas');
+areasNav.onclick = function(){
+
+    // Clear page data
+    bjørneparkappen.adminconsole.areas.clearPageData();
+
+    // Select Areas nav item
+    bjørneparkappen.adminconsole.navigation.selectNavItem(areasNav);
+
+    // List all species once page has loaded
+    bjørneparkappen.adminconsole.api.listAreas();
+
+    // Display List Areas page
+    bjørneparkappen.adminconsole.navigation.displayPage(listAreasPage);
+};
+
+
+// List Areas Page and elements
+var listAreasPage = document.getElementById('list_areas_page');
+var createAreaButton = document.getElementById('list_areas_create');
+createAreaButton.onclick = function(){
+
+    // Clear page data
+    bjørneparkappen.adminconsole.areas.clearPageData();
+
+    // Display Create Area page
+    bjørneparkappen.adminconsole.navigation.displayPage(areaDetailPage);
+}
+
+// Clears the Areas page
+bjørneparkappen.adminconsole.areas.clearPageData = function(){
+
+    // Clear search bar
+    document.getElementById('list_areas_search').value = "";
+
+    // Retrieve table to empty
+    var table = document.getElementById('list_areas_table');
+
+    // Empty table
+    while(table.rows.length > 1) {
+
+        table.deleteRow(1);
+    }
+};
+
+// Adds a row to the Areas table
+bjørneparkappen.adminconsole.areas.addToTable = function(id, label, type){
+
+    var table = document.getElementById("list_areas_table");
+
+    // Create new table row
+    var row = table.insertRow();
+
+    // Create cells to insert into the table
+    var idCell = row.insertCell(0);
+    var labelCell = row.insertCell(1);
+    var typeCell = row.insertCell(2);
+    var deleteCell = row.insertCell(3);
+
+    // Provide values to the new row
+    idCell.innerHTML = id;
+    idCell.style.display = HIDDEN;
+    labelCell.innerHTML = label;
+    typeCell.innerHTML = type;
+    deleteCell.innerHTML = "<a href='#'>Delete</a>"
+};
+
+// Filter Areas table
+bjørneparkappen.adminconsole.areas.search = function(){
+
+    var search = document.getElementById("list_areas_search");
+    var table = document.getElementById("list_areas_table");
+
+    bjørneparkappen.adminconsole.lookup(search, table);
+}
+
+
+// Area Detail Page and elements
+var areaDetailPage = document.getElementById('area_detail_page');
+var cancelAreaButton = document.getElementById('area_detail_cancel');
 cancelAreaButton.onclick = function(){
 
     // Display List Areas page
     bjørneparkappen.adminconsole.navigation.displayPage(listAreasPage);
 }
-
-// Cancel Animal onclick event
-cancelAnimalButton.onclick = function(){
-
-     // Display List Animals page
-     bjørneparkappen.adminconsole.navigation.displayPage(listAnimalsPage);
-}
-
-// Cancel Event onclick event
-cancelEventButton.onclick = function(){
-    // Display List Events page
-    bjørneparkappen.adminconsole.navigation.displayPage(listEventsPage);
-}
-
-// Cancel Keeper onclick event
-cancelKeeperButton.onclick = function(){
-
-    // Display List Keepers page
-    bjørneparkappen.adminconsole.navigation.displayPage(listKeepersPage);
-}
-
-// Selectors
 var areaTypeSelector = document.getElementById('area_type_selector');
-
 areaTypeSelector.onchange = function(){
 
     var amenity_fields = document.getElementById('amenity_fields');
@@ -643,7 +407,307 @@ areaTypeSelector.onchange = function(){
 }
 
 
-// API
+
+/** Animals */
+
+// Navigation Item
+var animalsNav = document.getElementById('animals');
+animalsNav.onclick = function(){
+
+    // Clear page data
+    bjørneparkappen.adminconsole.animals.clearPageData();
+
+    // List all animals once page has loaded
+    bjørneparkappen.adminconsole.api.listAnimals();
+
+    // Select Animals nav item
+    bjørneparkappen.adminconsole.navigation.selectNavItem(animalsNav);
+
+    // Display List Animals page
+    bjørneparkappen.adminconsole.navigation.displayPage(listAnimalsPage);
+};
+
+
+// List Animals Page and elements
+var listAnimalsPage = document.getElementById('list_animals_page');
+var createAnimalButton = document.getElementById('list_animals_create');
+createAnimalButton.onclick = function(){
+
+    // Clear page data
+    bjørneparkappen.adminconsole.animals.clearPageData();
+
+    // Display Create Animal page
+    bjørneparkappen.adminconsole.navigation.displayPage(animalDetailPage);
+}
+
+// Clears the Animals page
+bjørneparkappen.adminconsole.animals.clearPageData = function(){
+
+    // Clear search bar
+    document.getElementById('list_animals_search').value = "";
+
+    // Retrieve table to empty
+    var table = document.getElementById('list_animals_table');
+
+    // Empty table
+    while(table.rows.length > 1) {
+
+        table.deleteRow(1);
+    }
+};
+
+// Adds a row to the Animals table
+bjørneparkappen.adminconsole.animals.addToTable = function(id, name, species, description, available){
+
+    var table = document.getElementById("list_animals_table");
+
+    // Create new table row
+    var row = table.insertRow();
+
+    // Create cells to insert into the table
+    var idCell = row.insertCell(0);
+    var nameCell = row.insertCell(1);
+    var speciesCell = row.insertCell(2);
+    var descriptionCell = row.insertCell(3);
+    var availableCell = row.insertCell(4);
+    var deleteCell = row.insertCell(5);
+
+    // Provide values to the new row
+    idCell.innerHTML = id;
+    idCell.style.display = HIDDEN;
+    nameCell.innerHTML = name;
+    speciesCell.innerHTML = species.common_name;
+    descriptionCell.innerHTML = description;
+    descriptionCell.style.display = HIDDEN;
+
+    var checkbox = document.createElement('input');
+    checkbox.type = "checkbox";
+    checkbox.checked = available;
+    availableCell.appendChild(checkbox);
+    deleteCell.innerHTML = "<a href='#'>Delete</a>"
+};
+
+// Filter Animals table
+bjørneparkappen.adminconsole.animals.search = function(){
+
+    var search = document.getElementById("list_animals_search");
+    var table = document.getElementById("list_animals_table");
+
+    bjørneparkappen.adminconsole.lookup(search, table);
+}
+
+
+// Animal Detail Page and elements
+var animalDetailPage = document.getElementById('animal_detail_page');
+var cancelAnimalButton = document.getElementById('animal_detail_cancel');
+cancelAnimalButton.onclick = function(){
+
+     // Display List Animals page
+     bjørneparkappen.adminconsole.navigation.displayPage(listAnimalsPage);
+}
+
+
+
+/** Events */
+
+// Navigation Item
+var eventsNav = document.getElementById('events');
+eventsNav.onclick = function(){
+
+    // Clear page data
+    bjørneparkappen.adminconsole.events.clearPageData();
+
+    // List all events once page has loaded
+    bjørneparkappen.adminconsole.api.listEvents();
+
+    // Select Events nav item
+    bjørneparkappen.adminconsole.navigation.selectNavItem(eventsNav);
+
+    // Display List Events page
+    bjørneparkappen.adminconsole.navigation.displayPage(listEventsPage);
+};
+
+
+// List Events Page and elements
+var listEventsPage = document.getElementById('list_events_page');
+var createEventButton = document.getElementById('list_events_create');
+createEventButton.onclick = function(){
+
+    // Clear page data
+    bjørneparkappen.adminconsole.events.clearPageData();
+
+    // Display Create Event page
+    bjørneparkappen.adminconsole.navigation.displayPage(eventDetailPage);
+}
+
+// Clears the Events page
+bjørneparkappen.adminconsole.events.clearPageData = function(){
+
+    // Clear search bar
+    document.getElementById('list_events_search').value = "";
+
+    // Retrieve table to empty
+    var table = document.getElementById('list_events_table');
+
+    // Empty table
+    while(table.rows.length > 1) {
+
+        table.deleteRow(1);
+    }
+};
+
+// Adds a row to the Events table
+bjørneparkappen.adminconsole.events.addToTable = function(id, label, startTime, endTime, description, keeper, active){
+
+    var table = document.getElementById("list_events_table");
+
+    // Create new table row
+    var row = table.insertRow();
+
+    // Create cells to insert into the table
+    var idCell = row.insertCell(0);
+    var labelCell = row.insertCell(1);
+    var startTimeCell = row.insertCell(2);
+    var endTimeCell = row.insertCell(3);
+    var descriptionCell = row.insertCell(4);
+    var keeperCell = row.insertCell(5);
+    var activeCell = row.insertCell(6);
+    var deleteCell = row.insertCell(7);
+
+    // Provide values to the new row
+    idCell.innerHTML = id;
+    idCell.style.display = HIDDEN;
+    labelCell.innerHTML = label;
+    startTimeCell.innerHTML = startTime;
+    endTimeCell.innerHTML = endTime;
+    descriptionCell.innerHTML = description;
+    descriptionCell.style.display = HIDDEN;
+    if (keeper != null){
+
+        keeperCell.innerHTML = keeper.name;
+
+    } else {
+
+        keeperCell.innerHTML = "-";
+    }
+    var checkbox = document.createElement('input');
+    checkbox.type = "checkbox";
+    checkbox.checked = active;
+    activeCell.appendChild(checkbox);
+    deleteCell.innerHTML = "<a href='#'>Delete</a>"
+};
+
+// Filter Events table
+bjørneparkappen.adminconsole.events.search = function(){
+
+    var search = document.getElementById("list_events_search");
+    var table = document.getElementById("list_events_table");
+
+    bjørneparkappen.adminconsole.lookup(search, table);
+}
+
+
+// Event Detail Page and elements
+var eventDetailPage = document.getElementById('event_detail_page');
+var cancelEventButton = document.getElementById('event_detail_cancel');
+cancelEventButton.onclick = function(){
+    // Display List Events page
+    bjørneparkappen.adminconsole.navigation.displayPage(listEventsPage);
+}
+
+
+
+/** Keepers */
+
+// Navigation Item
+var keepersNav = document.getElementById('keepers');
+keepersNav.onclick = function(){
+
+    // Clear page data
+    bjørneparkappen.adminconsole.keepers.clearPageData();
+
+    // List all keepers once page has loaded
+    bjørneparkappen.adminconsole.api.listKeepers();
+
+    // Select Keepers nav item
+    bjørneparkappen.adminconsole.navigation.selectNavItem(keepersNav);
+
+    // Display List Keepers page
+    bjørneparkappen.adminconsole.navigation.displayPage(listKeepersPage);
+};
+
+// List Keepers Page and elements
+var listKeepersPage = document.getElementById('list_keepers_page');
+var createKeeperButton = document.getElementById('list_keepers_create');
+createKeeperButton.onclick = function(){
+
+    // Clear page data
+    bjørneparkappen.adminconsole.keepers.clearPageData();
+
+    // Display Create Keeper page
+    bjørneparkappen.adminconsole.navigation.displayPage(keeperDetailPage);
+}
+
+// Clears the Keepers page
+bjørneparkappen.adminconsole.keepers.clearPageData = function(){
+
+    // Clear search bar
+    document.getElementById('list_keepers_search').value = "";
+
+    // Retrieve table to empty
+    var table = document.getElementById('list_keepers_table');
+
+    // Empty table
+    while(table.rows.length > 1) {
+
+        table.deleteRow(1);
+    }
+};
+
+// Adds a row to the Keepers table
+bjørneparkappen.adminconsole.keepers.addToTable = function(id, name, bio){
+
+    var table = document.getElementById("list_keepers_table");
+
+    // Create new table row
+    var row = table.insertRow();
+
+    // Create cells to insert into the table
+    var idCell = row.insertCell(0);
+    var nameCell = row.insertCell(1);
+    var bioCell = row.insertCell(2);
+    var deleteCell = row.insertCell(3);
+
+    // Provide values to the new row
+    idCell.innerHTML = id;
+    idCell.style.display = HIDDEN;
+    nameCell.innerHTML = name;
+    bioCell.innerHTML = bio;
+    deleteCell.innerHTML = "<a href='#'>Delete</a>"
+};
+
+// Filter Keepers table
+bjørneparkappen.adminconsole.keepers.search = function(){
+
+    var search = document.getElementById("list_keepers_search");
+    var table = document.getElementById("list_keepers_table");
+
+    bjørneparkappen.adminconsole.lookup(search, table);
+}
+
+
+// Keeper Detail Page and elements
+var keeperDetailPage = document.getElementById('keeper_detail_page');
+var cancelKeeperButton = document.getElementById('keeper_detail_cancel');
+cancelKeeperButton.onclick = function(){
+
+    // Display List Keepers page
+    bjørneparkappen.adminconsole.navigation.displayPage(listKeepersPage);
+}
+
+
+
+/** API Calls */
 bjørneparkappen.adminconsole.api.listSpecies = function(){
 
     // Put UI into wait state
