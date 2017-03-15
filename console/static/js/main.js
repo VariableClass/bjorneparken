@@ -121,6 +121,9 @@ bjørneparkappen.adminconsole.navigation.displayPage = function(page){
     // Hide all pages
     bjørneparkappen.adminconsole.navigation.hideAllPages();
 
+    // Scroll to top of page
+    window.scrollTo(0, 0);
+
     // Display selected page
     page.style.display = DISPLAYED;
 };
