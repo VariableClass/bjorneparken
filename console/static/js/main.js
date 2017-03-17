@@ -176,6 +176,93 @@ bjørneparkappen.adminconsole.lookup = function(search, table){
     }
 }
 
+bjørneparkappen.adminconsole.addTranslation = function(item, itemProperty, textInput, languageInput, translationsSpan, addButton){
+
+    if (textInput.value != "" && languageInput.value != ""){
+
+        // Create visual representation of translation
+        var translationParagraph = document.createElement('p');
+        var selectedLanguage = languageInput.options[languageInput.selectedIndex];
+        var translationText = textInput.value;
+        var translationLanguage = selectedLanguage.value;
+        translationParagraph.innerHTML = "<label for='translation_" + translationLanguage + "'></label><i class='translation' id='translation_" + translationLanguage + "'>" + translationText + " (" + selectedLanguage.text + ")" + "</i>";
+
+        // Add to translation tag
+        translationsSpan.appendChild(translationParagraph);
+
+        // Clear textbox
+        textInput.value = "";
+
+        // Remove language option
+        languageInput.remove(translationLanguage);
+
+        // Add item to array
+        var translation = {};
+        translation.text = translationText;
+        translation.language_code = translationLanguage;
+
+        if (item[itemProperty] == null){
+
+            item[itemProperty] = [];
+        }
+        item[itemProperty].push(translation);
+
+        // Disable input box if no more translations available to add
+        if (languageInput.length == 0) {
+
+            textInput.disabled = true;
+            languageInput.disabled = true;
+            addButton.disabled = true;
+        }
+    }
+}
+
+bjørneparkappen.adminconsole.getTranslation = function(item, itemProperty, languageCode) {
+
+    for (i = 0; i < item[itemProperty].length; i++){
+
+        if (item[itemProperty][i].language_code == languageCode){
+
+            return item[itemProperty][i].text;
+        }
+    }
+}
+
+bjørneparkappen.adminconsole.updateTranslation = function(item, itemProperty, newValue, languageCode){
+
+    if (newValue != "" && languageCode != ""){
+
+        for (i = 0; i < item[itemProperty].length; i++){
+
+            if (item[itemProperty][i].language_code == languageCode) {
+
+                item[itemProperty][i].text = newValue;
+                alert("Updated!");
+                break;
+            }
+        }
+    }
+}
+
+bjørneparkappen.adminconsole.clearTranslations = function(textInput, languageInput, translationsSpan, addButton){
+
+    translationsSpan.innerHTML = "";
+    textInput.disabled = false;
+
+    var english = document.createElement('option');
+    english.value = "en";
+    english.text = "English";
+    var norwegian = document.createElement('option');
+    norwegian.value = "no";
+    norwegian.text = "Norwegian";
+    languageInput.innerHTML = "";
+    languageInput.appendChild(english);
+    languageInput.appendChild(norwegian);
+    languageInput.disabled = false;
+
+    addButton.disabled = false;
+}
+
 
 
 /** API Calls */
@@ -188,7 +275,7 @@ bjørneparkappen.adminconsole.api.getSpecies = function(){
     var xhr = new XMLHttpRequest();
 
     // Open new GET request
-    xhr.open('GET', BASE_URL + "species/all?language_code=" + LANGUAGE_CODE + "&key=" + API_KEY);
+    xhr.open('GET', BASE_URL + "species/all_languages?key=" + API_KEY);
 
     // GET request state change callback event
     xhr.onreadystatechange = function() {
@@ -201,11 +288,153 @@ bjørneparkappen.adminconsole.api.getSpecies = function(){
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
-                species = resp.species || [];
+                speciesList = resp.species || [];
             }
 
             // Terminate UI wait state
             bjørneparkappen.adminconsole.endWait();
+        }
+    };
+
+    // Send request
+    xhr.send();
+};
+bjørneparkappen.adminconsole.api.createSpecies = function(species){
+
+    // Put UI into wait state
+    bjørneparkappen.adminconsole.startWait();
+
+    // Create new request
+    var xhr = new XMLHttpRequest();
+
+    // Open new POST request
+    xhr.open('POST', BASE_URL + "species/create?key=" + API_KEY);
+
+    // POST request state change callback event
+    xhr.onreadystatechange = function() {
+
+        // If request has completed
+        if (xhr.readyState == XMLHttpRequest.DONE){
+
+            // If request status is 200
+            if (xhr.status == 200) {
+
+                // Parse response JSON
+                resp = JSON.parse(xhr.responseText);
+                speciesList = resp.species || [];
+
+                // Load the List Species page with new data
+                bjørneparkappen.adminconsole.species.list.loadPage();
+
+                // Display the List Species page
+                bjørneparkappen.adminconsole.navigation.displayPage(listSpeciesPage);
+
+            } else {
+
+                // Display error message
+                resp = JSON.parse(xhr.responseText);
+                alert(resp.error.message);
+            }
+
+            // Terminate UI wait state
+            bjørneparkappen.adminconsole.endWait();
+        }
+    };
+
+    // Set content type
+    xhr.setRequestHeader("Content-type", "application/json");
+
+    // Send request
+    xhr.send(JSON.stringify(species));
+}
+bjørneparkappen.adminconsole.api.updateSpecies = function(species){
+
+    // Put UI into wait state
+    bjørneparkappen.adminconsole.startWait();
+
+    // Create new request
+    var xhr = new XMLHttpRequest();
+
+    // Open new POST request
+    xhr.open('POST', BASE_URL + "species/update?id=" + species.id + "&key=" + API_KEY);
+
+    // POST request state change callback event
+    xhr.onreadystatechange = function() {
+
+        // If request has completed
+        if (xhr.readyState == XMLHttpRequest.DONE){
+
+            // If request status is 200
+            if (xhr.status == 200) {
+
+                // Parse response JSON
+                resp = JSON.parse(xhr.responseText);
+                speciesList = resp.species || [];
+
+                // Load the List Species page with new data
+                bjørneparkappen.adminconsole.species.list.loadPage();
+
+                // Display the List Species page
+                bjørneparkappen.adminconsole.navigation.displayPage(listSpeciesPage);
+
+            } else {
+
+                // Display error message
+                resp = JSON.parse(xhr.responseText);
+                alert(resp.error.message);
+            }
+
+            // Terminate UI wait state
+            bjørneparkappen.adminconsole.endWait();
+        }
+    };
+
+    // Set content type
+    xhr.setRequestHeader("Content-type", "application/json");
+
+    // Send request
+    xhr.send(JSON.stringify(species));
+}
+bjørneparkappen.adminconsole.api.deleteSpecies = function(species){
+
+    // Put UI into wait state
+    bjørneparkappen.adminconsole.startWait();
+
+    // Create new request
+    var xhr = new XMLHttpRequest();
+
+    // Open new DELETE request
+    xhr.open('DELETE', BASE_URL + "species/delete?id=" + species.id + "&language_code=" + LANGUAGE_CODE + "&key=" + API_KEY);
+
+    // DELETE request state change callback event
+    xhr.onreadystatechange = function() {
+
+        // If request has completed
+        if (xhr.readyState == XMLHttpRequest.DONE){
+
+            // If request status is 200
+            if (xhr.status == 200){
+
+                // Parse response JSON
+                resp = JSON.parse(xhr.responseText);
+                speciesList = resp.species || [];
+
+                // Load the List Species page with new data
+                bjørneparkappen.adminconsole.species.list.loadPage();
+
+                // Display the List Species page
+                bjørneparkappen.adminconsole.navigation.displayPage(listSpeciesPage);
+
+            } else {
+
+                // Display error message
+                resp = JSON.parse(xhr.responseText);
+                alert(resp.error.message);
+            }
+
+            // Terminate UI wait state
+            bjørneparkappen.adminconsole.endWait();
+
         }
     };
 
@@ -348,7 +577,7 @@ bjørneparkappen.adminconsole.api.getKeepers = function(){
 
 
 /** Species */
-var species = [];
+var speciesList = [];
 
 // Navigation Item
 var speciesNav = document.getElementById('species');
@@ -397,16 +626,16 @@ bjørneparkappen.adminconsole.species.list.loadPage = function(){
     bjørneparkappen.adminconsole.species.list.clearPageData();
 
     // If no species were found
-    if (species.length == 0){
+    if (speciesList.length == 0){
 
         // Retrieve the list of species
         bjørneparkappen.adminconsole.api.getSpecies();
     }
 
     // Iterate the species list and add each to the table
-    for (var i = 0; i < species.length; i++) {
+    for (var i = 0; i < speciesList.length; i++) {
 
-        bjørneparkappen.adminconsole.species.addToTable(species[i]);
+        bjørneparkappen.adminconsole.species.addToTable(speciesList[i]);
     }
 
     // Display the page
@@ -427,7 +656,15 @@ bjørneparkappen.adminconsole.species.addToTable = function(species){
     var deleteCell = row.insertCell(2);
 
     // Provide values to the new row
-    commonNameCell.innerHTML = species.common_name;
+    for (i = 0; i < species.common_name.length; i++){
+
+        if (species.common_name[i].language_code == "en"){
+
+            commonNameCell.innerHTML = species.common_name[i].text;
+            break;
+        }
+    }
+
     latinCell.innerHTML = species.latin;
 
     // Create link to delete item
@@ -436,10 +673,7 @@ bjørneparkappen.adminconsole.species.addToTable = function(species){
     deleteLink.innerHTML = "Delete"
     deleteLink.onclick = function(){
 
-        if (confirm("Are you sure?")){
-
-            bjørneparkappen.adminconsole.species.delete(species);
-        }
+        bjørneparkappen.adminconsole.species.delete(species);
     }
 
     deleteCell.appendChild(deleteLink);
@@ -467,11 +701,15 @@ bjørneparkappen.adminconsole.species.search = function(){
 // Deletes a Species
 bjørneparkappen.adminconsole.species.delete = function(species){
 
-    alert(species.id);
+    if (confirm("Are you sure?")){
+
+        bjørneparkappen.adminconsole.api.deleteSpecies(species);
+    }
 }
 
 
 // Species Detail Page and elements
+var speciesDetailSpecies = {};
 var speciesDetailPage = document.getElementById('species_detail_page');
 var speciesDetailTitle = document.getElementById('species_detail_title');
 var speciesDetailConfirm = document.getElementById('species_detail_confirm');
@@ -483,11 +721,71 @@ speciesDetailCancel.onclick = function(){
 }
 var speciesDetailForm = document.getElementById('species_detail_form');
 var speciesCommonNameInput = document.getElementById('species_name');
+var speciesCommonNameLanguageInput = document.getElementById('species_common_name_language');
+speciesCommonNameLanguageInput.onchange = function(){
+
+    if (speciesDetailSpecies.id != null){
+
+        // Update textbox value
+        speciesCommonNameInput.value = bjørneparkappen.adminconsole.getTranslation(speciesDetailSpecies, 'common_name', speciesCommonNameLanguageInput.value);
+    }
+}
+var speciesCommonNameTranslations = document.getElementById('species_common_name_translations');
+var speciesCommonNameAddTranslation = document.getElementById('species_add_common_name_translation');
+speciesCommonNameAddTranslation.onclick = function(){
+
+    // If creating
+    if (speciesDetailSpecies.id == null){
+
+        // Add translation to list of displayed translations
+        bjørneparkappen.adminconsole.addTranslation(speciesDetailSpecies, 'common_name', speciesCommonNameInput, speciesCommonNameLanguageInput, speciesCommonNameTranslations, speciesCommonNameAddTranslation);
+
+    } else {    // Else if updating
+
+        // Update existing translation
+        bjørneparkappen.adminconsole.updateTranslation(speciesDetailSpecies, 'common_name', speciesCommonNameInput.value, speciesCommonNameLanguageInput.value);
+    }
+}
+var speciesDescriptionInput = document.getElementById('species_description');
+var speciesDescriptionLanguageInput = document.getElementById('species_description_language');
+speciesDescriptionLanguageInput.onchange = function(){
+
+    if (speciesDetailSpecies.id != null){
+
+        // Update textbox value
+        speciesDescriptionInput.value = bjørneparkappen.adminconsole.getTranslation(speciesDetailSpecies, 'description', speciesDescriptionLanguageInput.value);
+    }
+}
+var speciesDescriptionTranslations = document.getElementById('species_description_translations');
+var speciesDescriptionAddTranslation = document.getElementById('species_add_description_translation');
+speciesDescriptionAddTranslation.onclick = function(){
+
+    // If creating
+    if (speciesDetailSpecies.id == null){
+
+        // Add translation to list of displayed translations
+        bjørneparkappen.adminconsole.addTranslation(speciesDetailSpecies, 'description', speciesDescriptionInput, speciesDescriptionLanguageInput, speciesDescriptionTranslations, speciesDescriptionAddTranslation);
+
+    } else {    // Else if updating
+
+        // Update existing translation
+        bjørneparkappen.adminconsole.updateTranslation(speciesDetailSpecies, 'description', speciesDescriptionInput.value, speciesDescriptionLanguageInput.value);
+    }
+}
 var speciesLatinInput = document.getElementById('species_latin');
 var speciesDescriptionInput = document.getElementById('species_description');
 
 // Clears the Species Detail page
 bjørneparkappen.adminconsole.species.detail.clearPageData = function(){
+
+    // Reset species object
+    speciesDetailSpecies = {};
+
+    // Clear translation inputs and re-enable associated controls
+    bjørneparkappen.adminconsole.clearTranslations(speciesCommonNameInput, speciesCommonNameLanguageInput, speciesCommonNameTranslations, speciesCommonNameAddTranslation);
+
+    // Clear translation inputs and re-enable associated controls
+    bjørneparkappen.adminconsole.clearTranslations(speciesDescriptionInput, speciesDescriptionLanguageInput, speciesDescriptionTranslations, speciesDescriptionAddTranslation);
 
     // Clear form
     speciesDetailForm.reset();
@@ -502,6 +800,30 @@ bjørneparkappen.adminconsole.species.detail.loadCreatePage = function(){
     // Set page title and confirm button to create
     speciesDetailTitle.innerHTML = "Create Species";
     speciesDetailConfirm.value = "Create";
+    speciesCommonNameAddTranslation.innerHTML = "Add";
+    speciesDescriptionAddTranslation.innerHTML = "Add";
+
+    speciesDetailConfirm.onclick = function(){
+
+        speciesDetailSpecies.latin = speciesLatinInput.value;
+
+        if (speciesCommonNameLanguageInput.length > 0){
+
+            alert("Please enter all translations for the species' common name.")
+
+        } else if (speciesDetailSpecies.latin == ""){
+
+            alert("Please enter a latin name.");
+
+        } else if (speciesDescriptionLanguageInput.length > 0) {
+
+            alert("Please enter all translations for the species' description.");
+
+        } else {
+
+            bjørneparkappen.adminconsole.api.createSpecies(speciesDetailSpecies);
+        }
+    }
 
     // Display the detail page
     bjørneparkappen.adminconsole.navigation.displayPage(speciesDetailPage);
@@ -516,11 +838,35 @@ bjørneparkappen.adminconsole.species.detail.loadUpdatePage = function(species){
     // Set page title and confirm button to update
     speciesDetailTitle.innerHTML = "Update Species";
     speciesDetailConfirm.value = "Save";
+    speciesCommonNameAddTranslation.innerHTML = "Update";
+    speciesDescriptionAddTranslation.innerHTML = "Update";
+
+    // Set species object
+    speciesDetailSpecies = species;
+
+    speciesDetailConfirm.onclick = function(){
+
+        if (speciesLatinInput.value != speciesDetailSpecies.latin){
+
+            speciesDetailSpecies.latin = speciesLatinInput.value;
+        }
+
+        bjørneparkappen.adminconsole.api.updateSpecies(speciesDetailSpecies);
+    }
 
     // Populate form with new data
-    speciesCommonNameInput.value = species.common_name;
-    speciesLatinInput.value = species.latin;
-    speciesDescriptionInput.value = species.description;
+    speciesCommonNameInput.value = bjørneparkappen.adminconsole.getTranslation(speciesDetailSpecies, 'common_name', speciesCommonNameLanguageInput.value)
+
+    speciesLatinInput.value = speciesDetailSpecies.latin;
+
+    for (i = 0; i < speciesDetailSpecies.description.length; i++){
+
+        if (speciesDetailSpecies.description[i].language_code == speciesDescriptionLanguageInput.value){
+
+            speciesDescriptionInput.value = speciesDetailSpecies.description[i].text;
+            break;
+        }
+    }
 
     // Display the detail page
     bjørneparkappen.adminconsole.navigation.displayPage(speciesDetailPage);
