@@ -61,6 +61,16 @@ class SpeciesResponse(messages.Message):
 
 class SpeciesListResponse(messages.Message):
     species = messages.MessageField(SpeciesResponse, 1, repeated=True)
+
+class SpeciesTranslationResponse(messages.Message):
+    id = messages.IntegerField(1)
+    common_name = messages.MessageField(InternationalMessage, 2, repeated=True)
+    latin = messages.StringField(3)
+    description = messages.MessageField(InternationalMessage, 4, repeated=True)
+    image = messages.StringField(5)
+
+class SpeciesTranslationListResponse(messages.Message):
+    species = messages.MessageField(SpeciesTranslationResponse, 1, repeated=True)
 # [END species messages]
 
 # [START animal messages]
@@ -537,7 +547,7 @@ class SpeciesApi(remote.Service):
 
     @endpoints.method(
         SpeciesRequest,
-        message_types.VoidMessage,
+        SpeciesTranslationListResponse,
         path='create',
         http_method='POST',
         name='species.create')
@@ -574,11 +584,11 @@ class SpeciesApi(remote.Service):
         # Update version
         ApiHelper.update_version()
 
-        return message_types.VoidMessage()
+        return SpeciesApi.list_species_with_translations()
 
     @endpoints.method(
         UPDATE_SPECIES_REQUEST,
-        message_types.VoidMessage,
+        SpeciesTranslationListResponse,
         path='update',
         http_method='POST',
         name='species.update')
@@ -624,11 +634,11 @@ class SpeciesApi(remote.Service):
         # Update version
         ApiHelper.update_version()
 
-        return message_types.VoidMessage()
+        return SpeciesApi.list_species_with_translations()
 
     @endpoints.method(
         ID_REQUEST,
-        message_types.VoidMessage,
+        SpeciesTranslationListResponse,
         path='delete',
         http_method='DELETE',
         name='species.delete')
@@ -667,7 +677,54 @@ class SpeciesApi(remote.Service):
         # Update version
         ApiHelper.update_version()
 
-        return message_types.VoidMessage()
+        return SpeciesApi.list_species_with_translations()
+
+    @endpoints.method(
+        message_types.VoidMessage,
+        SpeciesTranslationListResponse,
+        path='all_languages',
+        http_method='GET',
+        name='species.all_languages')
+    def list_species_all_languages(self, request):
+        return SpeciesApi.list_species_with_translations()
+
+    @staticmethod
+    def list_species_with_translations():
+
+        # Retrieve all species
+        all_species = Species.get_all()
+
+        response = SpeciesTranslationListResponse()
+
+        # Build up response of all species
+        for species in all_species:
+
+            # Translate translatable species resources
+            species_common_name_translations = []
+            for common_name_translation in species.common_name:
+                translation = InternationalMessage(text=common_name_translation.text, language_code=common_name_translation.language_code)
+                species_common_name_translations.append(translation)
+
+            species_description_translations = []
+            for description_translation in species.description:
+                translation = InternationalMessage(text=description_translation.text, language_code=description_translation.language_code)
+                species_description_translations.append(translation)
+
+            image = None
+
+            # If species has an image
+            if not species.image is None:
+                image = species.image.get()
+
+            # Add species to return list
+            response.species.append(SpeciesTranslationResponse(
+                id=species.key.id(),
+                common_name=species_common_name_translations,
+                latin=species.latin,
+                description=species_description_translations,
+                image=image))
+
+        return response
 # [END Species API]
 
 # [START Animals API]
