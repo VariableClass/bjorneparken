@@ -930,7 +930,7 @@ bjørneparkappen.adminconsole.api.getKeepers = function(){
     var xhr = new XMLHttpRequest();
 
     // Open new GET request
-    xhr.open('GET', BASE_URL + "keepers/all?language_code=" + LANGUAGE_CODE + "&key=" + API_KEY);
+    xhr.open('GET', BASE_URL + "keepers/all_languages?key=" + API_KEY);
 
     // GET request state change callback event
     xhr.onreadystatechange = function() {
@@ -943,11 +943,153 @@ bjørneparkappen.adminconsole.api.getKeepers = function(){
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
-                keepers = resp.keepers || [];
+                keepersList = resp.keepers || [];
             }
 
             // Terminate UI wait state
             bjørneparkappen.adminconsole.endWait();
+        }
+    };
+
+    // Send request
+    xhr.send();
+};
+bjørneparkappen.adminconsole.api.createKeeper = function(keeper){
+
+    // Put UI into wait state
+    bjørneparkappen.adminconsole.startWait();
+
+    // Create new request
+    var xhr = new XMLHttpRequest();
+
+    // Open new POST request
+    xhr.open('POST', BASE_URL + "keepers/create?key=" + API_KEY);
+
+    // POST request state change callback event
+    xhr.onreadystatechange = function() {
+
+        // If request has completed
+        if (xhr.readyState == XMLHttpRequest.DONE){
+
+            // If request status is 200
+            if (xhr.status == 200) {
+
+                // Parse response JSON
+                resp = JSON.parse(xhr.responseText);
+                keepersList = resp.keepers || [];
+
+                // Load the List Keepers page with new data
+                bjørneparkappen.adminconsole.keepers.list.loadPage();
+
+                // Display the List Keepers page
+                bjørneparkappen.adminconsole.navigation.displayPage(listKeepersPage);
+
+            } else {
+
+                // Display error message
+                resp = JSON.parse(xhr.responseText);
+                alert(resp.error.message);
+            }
+
+            // Terminate UI wait state
+            bjørneparkappen.adminconsole.endWait();
+        }
+    };
+
+    // Set content type
+    xhr.setRequestHeader("Content-type", "application/json");
+
+    // Send request
+    xhr.send(JSON.stringify(keeper));
+}
+bjørneparkappen.adminconsole.api.updateKeeper = function(keeper){
+
+    // Put UI into wait state
+    bjørneparkappen.adminconsole.startWait();
+
+    // Create new request
+    var xhr = new XMLHttpRequest();
+
+    // Open new POST request
+    xhr.open('POST', BASE_URL + "keepers/update?id=" + keeper.id + "&key=" + API_KEY);
+
+    // POST request state change callback event
+    xhr.onreadystatechange = function() {
+
+        // If request has completed
+        if (xhr.readyState == XMLHttpRequest.DONE){
+
+            // If request status is 200
+            if (xhr.status == 200) {
+
+                // Parse response JSON
+                resp = JSON.parse(xhr.responseText);
+                keepersList = resp.keepers || [];
+
+                // Load the List Keeper page with new data
+                bjørneparkappen.adminconsole.keepers.list.loadPage();
+
+                // Display the List Keeper page
+                bjørneparkappen.adminconsole.navigation.displayPage(listKeepersPage);
+
+            } else {
+
+                // Display error message
+                resp = JSON.parse(xhr.responseText);
+                alert(resp.error.message);
+            }
+
+            // Terminate UI wait state
+            bjørneparkappen.adminconsole.endWait();
+        }
+    };
+
+    // Set content type
+    xhr.setRequestHeader("Content-type", "application/json");
+
+    // Send request
+    xhr.send(JSON.stringify(keeper));
+}
+bjørneparkappen.adminconsole.api.deleteKeeper = function(keeper){
+
+    // Put UI into wait state
+    bjørneparkappen.adminconsole.startWait();
+
+    // Create new request
+    var xhr = new XMLHttpRequest();
+
+    // Open new DELETE request
+    xhr.open('DELETE', BASE_URL + "keepers/delete?id=" + keeper.id + "&key=" + API_KEY);
+
+    // DELETE request state change callback event
+    xhr.onreadystatechange = function() {
+
+        // If request has completed
+        if (xhr.readyState == XMLHttpRequest.DONE){
+
+            // If request status is 200
+            if (xhr.status == 200){
+
+                // Parse response JSON
+                resp = JSON.parse(xhr.responseText);
+                keepersList = resp.keepers || [];
+
+                // Load the List Keepers page with new data
+                bjørneparkappen.adminconsole.keepers.list.loadPage();
+
+                // Display the List Keepers page
+                bjørneparkappen.adminconsole.navigation.displayPage(listKeepersPage);
+
+            } else {
+
+                // Display error message
+                resp = JSON.parse(xhr.responseText);
+                alert(resp.error.message);
+            }
+
+            // Terminate UI wait state
+            bjørneparkappen.adminconsole.endWait();
+
         }
     };
 
@@ -1241,7 +1383,8 @@ bjørneparkappen.adminconsole.species.detail.validate = function(){
 
         alert("Please enter all translations for the speces' description.");
 
-    }
+    } else {
+
         valid = true;
     }
 
@@ -1679,7 +1822,7 @@ bjørneparkappen.adminconsole.animals.list.loadPage = function(){
     // Clear page data
     bjørneparkappen.adminconsole.animals.list.clearPageData();
 
-    // If animals returned
+    // If no animals returned
     if (animalsList.length == 0) {
 
         // Retrieve the list of animals
@@ -1731,10 +1874,7 @@ bjørneparkappen.adminconsole.animals.addToTable = function(animal){
     deleteLink.innerHTML = "Delete"
     deleteLink.onclick = function(){
 
-        if (confirm("Are you sure?")){
-
             bjørneparkappen.adminconsole.animals.delete(animal);
-        }
     }
 
     deleteCell.appendChild(deleteLink);
@@ -2239,7 +2379,7 @@ bjørneparkappen.adminconsole.events.detail.loadUpdatePage = function(event){
 
 
 /** Keepers */
-var keepers = [];
+var keepersList = [];
 
 // Navigation Item
 var keepersNav = document.getElementById('keepers');
@@ -2286,20 +2426,20 @@ bjørneparkappen.adminconsole.keepers.list.loadPage = function(){
     // Clear page data
     bjørneparkappen.adminconsole.keepers.list.clearPageData();
 
-    // For each keepers
-    if (keepers.length > 0) {
-
-        // Iterate through each one and add it to the table
-        for (var i = 0; i < keepers.length; i++) {
-
-            // Add keeper to table
-            bjørneparkappen.adminconsole.keepers.addToTable(keepers[i]);
-        }
-
-    } else {
+    // If no keepers returned
+    if (keepersList.length == 0) {
 
         // Retrieve list of keepers
         bjørneparkappen.adminconsole.api.getKeepers();
+
+    } else {
+
+        // Iterate through each one and add it to the table
+        for (var i = 0; i < keepersList.length; i++) {
+
+            // Add keeper to table
+            bjørneparkappen.adminconsole.keepers.addToTable(keepersList[i]);
+        }
     }
 
     // Display the page
@@ -2321,7 +2461,7 @@ bjørneparkappen.adminconsole.keepers.addToTable = function(keeper){
 
     // Provide values to the new row
     nameCell.innerHTML = keeper.name;
-    bioCell.innerHTML = keeper.bio;
+    bioCell.innerHTML = bjørneparkappen.adminconsole.getTranslation(keeper, 'bio', LANGUAGE_CODE);
 
     // Create link to delete item
     var deleteLink = document.createElement('a');
@@ -2329,10 +2469,7 @@ bjørneparkappen.adminconsole.keepers.addToTable = function(keeper){
     deleteLink.innerHTML = "Delete"
     deleteLink.onclick = function(){
 
-        if (confirm("Are you sure?")){
-
-            bjørneparkappen.adminconsole.keepers.delete(keeper);
-        }
+        bjørneparkappen.adminconsole.keepers.delete(keeper);
     }
 
     deleteCell.appendChild(deleteLink);
@@ -2360,10 +2497,14 @@ bjørneparkappen.adminconsole.keepers.search = function(){
 // Deletes a Keeper
 bjørneparkappen.adminconsole.keepers.delete = function(keeper){
 
-    alert(keeper.id);
+    if (confirm("Are you sure?")){
+
+        bjørneparkappen.adminconsole.api.deleteKeeper(keeper);
+    }
 }
 
 // Keeper Detail Page and elements
+var keeperDetailKeeper = {};
 var keeperDetailPage = document.getElementById('keeper_detail_page');
 var keeperDetailTitle = document.getElementById('keeper_detail_title');
 var keeperDetailConfirm = document.getElementById('keeper_detail_confirm');
@@ -2376,9 +2517,40 @@ keeperDetailCancel.onclick = function(){
 var keeperDetailForm = document.getElementById('keeper_detail_form');
 var keeperNameInput = document.getElementById('keeper_name');
 var keeperBioInput = document.getElementById('keeper_bio');
+var keeperBioLanguageInput = document.getElementById('keeper_bio_language');
+keeperBioLanguageInput.onchange = function(){
+
+    if (keeperDetailKeeper.id != null){
+
+        // Update textbox value
+        keeperBioInput.value = bjørneparkappen.adminconsole.getTranslation(keeperDetailKeeper, 'bio', keeperBioLanguageInput.value);
+    }
+}
+var keeperBioTranslations = document.getElementById('keeper_bio_translations');
+var keeperBioAddTranslation = document.getElementById('keeper_add_bio_translation');
+keeperBioAddTranslation.onclick = function(){
+
+    // If creating
+    if (keeperDetailKeeper.id == null){
+
+        // Add translation to list of displayed translations
+        bjørneparkappen.adminconsole.addTranslation(keeperDetailKeeper, 'bio', keeperBioInput, keeperBioLanguageInput, keeperBioTranslations, keeperBioAddTranslation);
+
+    } else {    // Else if updating
+
+        // Update existing translation
+        bjørneparkappen.adminconsole.updateTranslation(keeperDetailKeeper, 'bio', keeperBioInput.value, keeperBioLanguageInput.value);
+    }
+}
 
 // Clears the Keeper Detail page
 bjørneparkappen.adminconsole.keepers.detail.clearPageData = function(){
+
+    // Reset keeper object
+    keeperDetailKeeper = {};
+
+    // Clear translation inputs and re-enable associated controls
+    bjørneparkappen.adminconsole.clearTranslations(keeperBioInput, keeperBioLanguageInput, keeperBioTranslations, keeperBioAddTranslation);
 
     // Clear the form
     keeperDetailForm.reset();
@@ -2393,6 +2565,17 @@ bjørneparkappen.adminconsole.keepers.detail.loadCreatePage = function(){
     // Set page title and confirm button to create
     keeperDetailTitle.innerHTML = "Create Keeper";
     keeperDetailConfirm.value = "Create";
+    keeperBioAddTranslation.innerHTML = "Add";
+
+    keeperDetailConfirm.onclick = function(){
+
+        keeperDetailKeeper.name = keeperNameInput.value;
+
+        if (bjørneparkappen.adminconsole.keepers.detail.validate()) {
+
+            bjørneparkappen.adminconsole.api.createKeeper(keeperDetailKeeper);
+        }
+    }
 
     // Display the detail page
     bjørneparkappen.adminconsole.navigation.displayPage(keeperDetailPage);
@@ -2401,13 +2584,51 @@ bjørneparkappen.adminconsole.keepers.detail.loadCreatePage = function(){
 // Loads the Update Keeper page
 bjørneparkappen.adminconsole.keepers.detail.loadUpdatePage = function(keeper){
 
+    // Clear page data
+    bjørneparkappen.adminconsole.keepers.detail.clearPageData();
+
     // Set page title and confirm button to update
     keeperDetailTitle.innerHTML = "Update Keeper";
     keeperDetailConfirm.value = "Save";
+    keeperBioAddTranslation.innerHTML = "Update";
+
+    // Set keeper object
+    keeperDetailKeeper = keeper;
+
+    keeperDetailConfirm.onclick = function(){
+
+        keeperDetailKeeper.name = keeperNameInput.value;
+
+        if (bjørneparkappen.adminconsole.keepers.detail.validate()) {
+
+            bjørneparkappen.adminconsole.api.updateKeeper(keeperDetailKeeper);
+        }
+    }
 
     keeperNameInput.value = keeper.name;
-    keeperBioInput.value = keeper.bio;
+    keeperBioInput.value = bjørneparkappen.adminconsole.getTranslation(keeperDetailKeeper, 'bio', LANGUAGE_CODE);
 
     // Display the detail page
     bjørneparkappen.adminconsole.navigation.displayPage(keeperDetailPage);
+}
+
+// Validates detail input
+bjørneparkappen.adminconsole.keepers.detail.validate = function(){
+
+    var valid = false;
+
+    if (keeperDetailKeeper.name == ""){
+
+        alert("Please enter a name.")
+
+    } else if (keeperDetailKeeper.bio.length < keeperBioLanguageInput.length) {
+
+        alert("Please enter all translations for the keeper bio.");
+
+    } else {
+
+        valid = true;
+    }
+
+    return valid;
 }
