@@ -104,7 +104,7 @@ public class DetailFragment extends Fragment implements DialogConfirmFragment.On
 
         // Set image
         byte[] imageBytes = item.getImageBytes();
-        if (imageBytes.length <= 0){
+        if (imageBytes != null && imageBytes.length >= 0){
 
             Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
 

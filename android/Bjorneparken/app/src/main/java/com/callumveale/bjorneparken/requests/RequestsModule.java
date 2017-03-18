@@ -67,7 +67,7 @@ public class RequestsModule {
 
     public void checkServerAvailability(){
 
-        CheckConnectionTask checkConnection = new CheckConnectionTask(HOST, mActivity);
+        CheckConnectionTask checkConnection = new CheckConnectionTask(ROOT_URL, mActivity);
         checkConnection.execute();
     }
 

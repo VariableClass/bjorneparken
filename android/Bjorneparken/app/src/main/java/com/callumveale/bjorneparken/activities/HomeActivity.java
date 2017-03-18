@@ -430,7 +430,7 @@ public class HomeActivity
         } else {
 
             // If server is not available, return
-            if (!available) {
+            if (!mServerAvailable) {
 
                 return;
             }
