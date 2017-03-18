@@ -657,10 +657,8 @@ class ApiHelper():
             name=keeper.name,
             bio=keeper_bio_translations)
 
-    ### Class Methods
-
-    @classmethod
-    def get_event_response(cls, event, language_code):
+    @staticmethod
+    def get_event_response(event, language_code):
 
         # Translate translatable event resources
         event_label_translation = InternationalText.get_translation(
@@ -683,8 +681,34 @@ class ApiHelper():
             end_time=event.end_time,
             is_active=event.is_active)
 
-    @classmethod
-    def get_feeding_response(cls, feeding, language_code):
+    @staticmethod
+    def get_event_response_with_translations(event):
+
+        # Translate translatable event resources
+        event_label_translations = []
+        for label_translation in event.label:
+            translation = InternationalMessage(text=label_translation.text, language_code=label_translation.language_code)
+            event_label_translations.append(translation)
+
+        event_description_translations = []
+        for description_translation in event.description:
+            translation = InternationalMessage(text=description_translation.text, language_code=description_translation.language_code)
+            event_description_translations.append(translation)
+
+        # Retrieve location
+        location = ApiHelper.get_amenity_response_with_translations(event.key.parent().get())
+
+        return EventTranslationResponse(
+            id=event.key.id(),
+            label=event_label_translations,
+            description=event_description_translations,
+            location=location,
+            start_time=event.start_time,
+            end_time=event.end_time,
+            is_active=event.is_active)
+
+    @staticmethod
+    def get_feeding_response(feeding, language_code):
 
         # Translate translatable event resources
         feeding_label_translation = InternationalText.get_translation(
@@ -704,7 +728,7 @@ class ApiHelper():
             feeding.put()
 
         # Get formatted location response
-        location_response = cls.get_enclosure_response(feeding.key.parent().get(), language_code)
+        location_response = ApiHelper.get_enclosure_response(feeding.key.parent().get(), language_code)
 
         # Retrieve keeper
         keeper = ndb.Key(Keeper, feeding.keeper_id).get()
@@ -724,6 +748,46 @@ class ApiHelper():
             id=feeding.key.id(),
             label=feeding_label_translation,
             description=feeding_description_translation,
+            location=location_response,
+            start_time=feeding.start_time,
+            end_time=feeding.end_time,
+            is_active=feeding.is_active,
+            keeper=keeper_response)
+
+    @staticmethod
+    def get_feeding_response_with_translations(feeding):
+
+        # Translate translatable event resources
+        feeding_label_translations = []
+        for label_translation in feeding.label:
+            translation = InternationalMessage(text=label_translation.text, language_code=label_translation.language_code)
+            feeding_label_translations.append(translation)
+
+        feeding_description_translations = []
+        for description_translation in feeding.description:
+            translation = InternationalMessage(text=description_translation.text, language_code=description_translation.language_code)
+            feeding_description_translations.append(translation)
+
+        # Retrieve location
+        location = feeding.key.parent().get()
+
+        # If enclosure inactive update feeding active state
+        if not location.is_active():
+            feeding.is_active = False
+            feeding.put()
+
+        # Get formatted location response
+        location_response = ApiHelper.get_enclosure_response_with_translations(feeding.key.parent().get())
+
+        # Retrieve keeper
+        keeper = ndb.Key(Keeper, feeding.keeper_id).get()
+
+        keeper_response = ApiHelper.get_keeper_response_with_translations(keeper)
+
+        return FeedingTranslationResponse(
+            id=feeding.key.id(),
+            label=feeding_label_translations,
+            description=feeding_description_translations,
             location=location_response,
             start_time=feeding.start_time,
             end_time=feeding.end_time,
@@ -1817,7 +1881,7 @@ class EventsApi(remote.Service):
 
     @endpoints.method(
         EventRequest,
-        message_types.VoidMessage,
+        EventTranslationListResponse,
         path='create',
         http_method='POST',
         name='events.create')
@@ -1857,11 +1921,11 @@ class EventsApi(remote.Service):
         # Update version
         ApiHelper.update_version()
 
-        return message_types.VoidMessage()
+        return EventsApi.list_all_events_with_translations()
 
     @endpoints.method(
         UPDATE_EVENT_REQUEST,
-        message_types.VoidMessage,
+        EventTranslationListResponse,
         path='update',
         http_method='POST',
         name='events.update')
@@ -1940,11 +2004,11 @@ class EventsApi(remote.Service):
         # Update version
         ApiHelper.update_version()
 
-        return message_types.VoidMessage()
+        return EventsApi.list_all_events_with_translations()
 
     @endpoints.method(
         FeedingRequest,
-        message_types.VoidMessage,
+        EventTranslationListResponse,
         path='feedings/create',
         http_method='POST',
         name='events.feedings.create')
@@ -2011,11 +2075,11 @@ class EventsApi(remote.Service):
         # Update version
         ApiHelper.update_version()
 
-        return message_types.VoidMessage()
+        return EventsApi.list_all_events_with_translations()
 
     @endpoints.method(
         UPDATE_FEEDING_REQUEST,
-        message_types.VoidMessage,
+        EventTranslationListResponse,
         path='feedings/update',
         http_method='POST',
         name='events.feedings.update')
@@ -2107,11 +2171,11 @@ class EventsApi(remote.Service):
         # Update version
         ApiHelper.update_version()
 
-        return message_types.VoidMessage()
+        return EventsApi.list_all_events_with_translations()
 
     @endpoints.method(
         EVENT_ID_REQUEST,
-        message_types.VoidMessage,
+        EventTranslationListResponse,
         path='delete',
         http_method='DELETE',
         name='events.delete')
@@ -2157,7 +2221,48 @@ class EventsApi(remote.Service):
         # Update version
         ApiHelper.update_version()
 
-        return message_types.VoidMessage()
+        return EventsApi.list_all_events_with_translations()
+
+    @endpoints.method(
+        message_types.VoidMessage,
+        EventTranslationListResponse,
+        path='all_languages',
+        http_method='GET',
+        name='events.all_languages')
+    def list_all_events_all_languages(self, request):
+        return EventsApi.list_all_events_with_translations()
+
+    @staticmethod
+    def list_all_events_with_translations():
+
+        # Retrieve all events
+        events = Event.get_all()
+
+        response = EventTranslationListResponse()
+
+        # Build up response of all events
+        for event in events:
+
+            # If event is an Event
+            if type(event) is Event:
+
+                # Retrieve an Event response
+                event_response = ApiHelper.get_event_response_with_translations(event)
+
+                # Add event to return list
+                response.events.append(event_response)
+
+            # Else if event is a Feeding
+            elif type(event) is Feeding:
+
+                # Retrieve a Feeding response
+                feeding_response = ApiHelper.get_feeding_response_with_translations(event)
+
+                # Add feeding to return list
+                response.feedings.append(feeding_response)
+
+        return response
+
 # [END Events API]
 
 # [START Keepers API]
