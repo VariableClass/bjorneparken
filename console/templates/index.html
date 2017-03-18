@@ -80,6 +80,10 @@
                 <p>
                     <label for="area_label">Label:</label>
                     <input name="area_label" id="area_label" type="text" size="20" required autofocus/>
+                    <select id="area_label_language" style="align">
+                    </select>
+                    <button id="area_add_label_translation">Add</button>
+                    <span id="area_label_translations" />
                 </p>
                 <p>
                     <label for="area_visitor_destination">Visitor Destination:</label>
@@ -101,6 +105,10 @@
                     <p>
                         <label for="amenity_description">Description:</label>
                         <input name="amenity_description" id="amenity_description" type="text" size="20" />
+                        <select id="amenity_description_language" style="align">
+                        </select>
+                        <button id="amenity_add_description_translation">Add</button>
+                        <span id="amenity_description_translations" />
                     </p>
                 </div>
                 <p>
@@ -136,10 +144,19 @@
                 <p>
                     <label for="animal_description">Description:</label>
                     <input name="animal_description" id="animal_description" type="text" size="20" required/>
+                    <select id="animal_description_language" style="align">
+                    </select>
+                    <button id="animal_add_description_translation">Add</button>
+                    <span id="animal_description_translations" />
                 </p>
                 <p>
                     <label for="animal_species">Species:</label>
                     <select name="animal_species" id="animal_species" form="animal_detail_form" required>
+                    </select>
+                </p>
+                <p>
+                    <label for="animal_enclosure">Enclosure:</label>
+                    <select name="animal_enclosure" id="animal_enclosure" form="animal_detail_form" required>
                     </select>
                 </p>
                 <p>

@@ -404,7 +404,7 @@ bjørneparkappen.adminconsole.api.deleteSpecies = function(species){
     var xhr = new XMLHttpRequest();
 
     // Open new DELETE request
-    xhr.open('DELETE', BASE_URL + "species/delete?id=" + species.id + "&language_code=" + LANGUAGE_CODE + "&key=" + API_KEY);
+    xhr.open('DELETE', BASE_URL + "species/delete?id=" + species.id + "&key=" + API_KEY);
 
     // DELETE request state change callback event
     xhr.onreadystatechange = function() {
@@ -449,7 +449,7 @@ bjørneparkappen.adminconsole.api.getAreas = function(){
     var xhr = new XMLHttpRequest();
 
     // Open new GET request
-    xhr.open('GET', BASE_URL + "areas/all?language_code=" + LANGUAGE_CODE + "&key=" + API_KEY);
+    xhr.open('GET', BASE_URL + "areas/all_languages?key=" + API_KEY);
 
     // GET request state change callback event
     xhr.onreadystatechange = function() {
@@ -462,12 +462,251 @@ bjørneparkappen.adminconsole.api.getAreas = function(){
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
-                amenities = resp.amenities || [];
-                enclosures = resp.enclosures || [];
+                amenitiesList = resp.amenities || [];
+                enclosuresList = resp.enclosures || [];
             }
 
             // Terminate UI wait state
             bjørneparkappen.adminconsole.endWait();
+        }
+    };
+
+    // Send request
+    xhr.send();
+};
+bjørneparkappen.adminconsole.api.createAmenity = function(amenity){
+
+    // Put UI into wait state
+    bjørneparkappen.adminconsole.startWait();
+
+    // Create new request
+    var xhr = new XMLHttpRequest();
+
+    // Open new POST request
+    xhr.open('POST', BASE_URL + "areas/amenities/create?key=" + API_KEY);
+
+    // POST request state change callback event
+    xhr.onreadystatechange = function() {
+
+        // If request has completed
+        if (xhr.readyState == XMLHttpRequest.DONE){
+
+            // If request status is 200
+            if (xhr.status == 200) {
+
+                // Parse response JSON
+                resp = JSON.parse(xhr.responseText);
+                amenitiesList = resp.amenities || [];
+
+                // Load the List Areas page with new data
+                bjørneparkappen.adminconsole.areas.list.loadPage();
+
+                // Display the List Areas page
+                bjørneparkappen.adminconsole.navigation.displayPage(listAreasPage);
+
+            } else {
+
+                // Display error message
+                resp = JSON.parse(xhr.responseText);
+                alert(resp.error.message);
+            }
+
+            // Terminate UI wait state
+            bjørneparkappen.adminconsole.endWait();
+        }
+    };
+
+    // Set content type
+    xhr.setRequestHeader("Content-type", "application/json");
+
+    // Send request
+    xhr.send(JSON.stringify(amenity));
+}
+bjørneparkappen.adminconsole.api.updateAmenity = function(amenity){
+
+    // Put UI into wait state
+    bjørneparkappen.adminconsole.startWait();
+
+    // Create new request
+    var xhr = new XMLHttpRequest();
+
+    // Open new POST request
+    xhr.open('POST', BASE_URL + "areas/amenities/update?id=" + amenity.id + "&key=" + API_KEY);
+
+    // POST request state change callback event
+    xhr.onreadystatechange = function() {
+
+        // If request has completed
+        if (xhr.readyState == XMLHttpRequest.DONE){
+
+            // If request status is 200
+            if (xhr.status == 200) {
+
+                // Parse response JSON
+                resp = JSON.parse(xhr.responseText);
+                amenitiesList = resp.amenities || [];
+
+                // Load the List Areas page with new data
+                bjørneparkappen.adminconsole.areas.list.loadPage();
+
+                // Display the List Areas page
+                bjørneparkappen.adminconsole.navigation.displayPage(listAreasPage);
+
+            } else {
+
+                // Display error message
+                resp = JSON.parse(xhr.responseText);
+                alert(resp.error.message);
+            }
+
+            // Terminate UI wait state
+            bjørneparkappen.adminconsole.endWait();
+        }
+    };
+
+    // Set content type
+    xhr.setRequestHeader("Content-type", "application/json");
+
+    // Send request
+    xhr.send(JSON.stringify(amenity));
+}
+bjørneparkappen.adminconsole.api.createEnclosure = function(enclosure){
+
+    // Put UI into wait state
+    bjørneparkappen.adminconsole.startWait();
+
+    // Create new request
+    var xhr = new XMLHttpRequest();
+
+    // Open new POST request
+    xhr.open('POST', BASE_URL + "areas/enclosures/create?key=" + API_KEY);
+
+    // POST request state change callback event
+    xhr.onreadystatechange = function() {
+
+        // If request has completed
+        if (xhr.readyState == XMLHttpRequest.DONE){
+
+            // If request status is 200
+            if (xhr.status == 200) {
+
+                // Parse response JSON
+                resp = JSON.parse(xhr.responseText);
+                enclosuresList = resp.enclosures || [];
+
+                // Load the List Areas page with new data
+                bjørneparkappen.adminconsole.areas.list.loadPage();
+
+                // Display the List Areas page
+                bjørneparkappen.adminconsole.navigation.displayPage(listAreasPage);
+
+            } else {
+
+                // Display error message
+                resp = JSON.parse(xhr.responseText);
+                alert(resp.error.message);
+            }
+
+            // Terminate UI wait state
+            bjørneparkappen.adminconsole.endWait();
+        }
+    };
+
+    // Set content type
+    xhr.setRequestHeader("Content-type", "application/json");
+
+    // Send request
+    xhr.send(JSON.stringify(enclosure));
+}
+bjørneparkappen.adminconsole.api.updateEnclosure = function(enclosure){
+
+    // Put UI into wait state
+    bjørneparkappen.adminconsole.startWait();
+
+    // Create new request
+    var xhr = new XMLHttpRequest();
+
+    // Open new POST request
+    xhr.open('POST', BASE_URL + "areas/enclosures/update?id=" + enclosure.id + "&key=" + API_KEY);
+
+    // POST request state change callback event
+    xhr.onreadystatechange = function() {
+
+        // If request has completed
+        if (xhr.readyState == XMLHttpRequest.DONE){
+
+            // If request status is 200
+            if (xhr.status == 200) {
+
+                // Parse response JSON
+                resp = JSON.parse(xhr.responseText);
+                enclosuresList = resp.enclosures || [];
+
+                // Load the List Areas page with new data
+                bjørneparkappen.adminconsole.areas.list.loadPage();
+
+                // Display the List Areas page
+                bjørneparkappen.adminconsole.navigation.displayPage(listAreasPage);
+
+            } else {
+
+                // Display error message
+                resp = JSON.parse(xhr.responseText);
+                alert(resp.error.message);
+            }
+
+            // Terminate UI wait state
+            bjørneparkappen.adminconsole.endWait();
+        }
+    };
+
+    // Set content type
+    xhr.setRequestHeader("Content-type", "application/json");
+
+    // Send request
+    xhr.send(JSON.stringify(enclosure));
+}
+bjørneparkappen.adminconsole.api.deleteArea = function(area){
+
+    // Put UI into wait state
+    bjørneparkappen.adminconsole.startWait();
+
+    // Create new request
+    var xhr = new XMLHttpRequest();
+
+    // Open new DELETE request
+    xhr.open('DELETE', BASE_URL + "areas/delete?id=" + area.id + "&key=" + API_KEY);
+
+    // DELETE request state change callback event
+    xhr.onreadystatechange = function() {
+
+        // If request has completed
+        if (xhr.readyState == XMLHttpRequest.DONE){
+
+            // If request status is 200
+            if (xhr.status == 200){
+
+                // Parse response JSON
+                resp = JSON.parse(xhr.responseText);
+                amenitiesList = resp.amenities || [];
+                enclosuresList = resp.enclosures || [];
+
+                // Load the List Areas page with new data
+                bjørneparkappen.adminconsole.areas.list.loadPage();
+
+                // Display the List Areas page
+                bjørneparkappen.adminconsole.navigation.displayPage(listAreasPage);
+
+            } else {
+
+                // Display error message
+                resp = JSON.parse(xhr.responseText);
+                alert(resp.error.message);
+            }
+
+            // Terminate UI wait state
+            bjørneparkappen.adminconsole.endWait();
+
         }
     };
 
@@ -516,7 +755,7 @@ bjørneparkappen.adminconsole.api.getAnimals = function(){
     var xhr = new XMLHttpRequest();
 
     // Open new GET request
-    xhr.open('GET', BASE_URL + "animals/all?language_code=" + LANGUAGE_CODE + "&key=" + API_KEY);
+    xhr.open('GET', BASE_URL + "animals/all_languages?key=" + API_KEY);
 
     // GET request state change callback event
     xhr.onreadystatechange = function() {
@@ -529,11 +768,153 @@ bjørneparkappen.adminconsole.api.getAnimals = function(){
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
-                animals = resp.animals || [];
+                animalsList = resp.animals || [];
             }
 
             // Terminate UI wait state
             bjørneparkappen.adminconsole.endWait();
+        }
+    };
+
+    // Send request
+    xhr.send();
+};
+bjørneparkappen.adminconsole.api.createAnimal = function(animal){
+
+    // Put UI into wait state
+    bjørneparkappen.adminconsole.startWait();
+
+    // Create new request
+    var xhr = new XMLHttpRequest();
+
+    // Open new POST request
+    xhr.open('POST', BASE_URL + "animals/create?key=" + API_KEY);
+
+    // POST request state change callback event
+    xhr.onreadystatechange = function() {
+
+        // If request has completed
+        if (xhr.readyState == XMLHttpRequest.DONE){
+
+            // If request status is 200
+            if (xhr.status == 200) {
+
+                // Parse response JSON
+                resp = JSON.parse(xhr.responseText);
+                animalsList = resp.animals || [];
+
+                // Load the List Animals page with new data
+                bjørneparkappen.adminconsole.animals.list.loadPage();
+
+                // Display the List Animals page
+                bjørneparkappen.adminconsole.navigation.displayPage(listAnimalsPage);
+
+            } else {
+
+                // Display error message
+                resp = JSON.parse(xhr.responseText);
+                alert(resp.error.message);
+            }
+
+            // Terminate UI wait state
+            bjørneparkappen.adminconsole.endWait();
+        }
+    };
+
+    // Set content type
+    xhr.setRequestHeader("Content-type", "application/json");
+
+    // Send request
+    xhr.send(JSON.stringify(animal));
+}
+bjørneparkappen.adminconsole.api.updateAnimal = function(animal){
+
+    // Put UI into wait state
+    bjørneparkappen.adminconsole.startWait();
+
+    // Create new request
+    var xhr = new XMLHttpRequest();
+
+    // Open new POST request
+    xhr.open('POST', BASE_URL + "animals/update?animal_id=" + animal.id + "&species_id=" + animal.species.id + "&enclosure_id=" + animal.enclosure_id + "&key=" + API_KEY);
+
+    // POST request state change callback event
+    xhr.onreadystatechange = function() {
+
+        // If request has completed
+        if (xhr.readyState == XMLHttpRequest.DONE){
+
+            // If request status is 200
+            if (xhr.status == 200) {
+
+                // Parse response JSON
+                resp = JSON.parse(xhr.responseText);
+                animalsList = resp.animals || [];
+
+                // Load the List Animals page with new data
+                bjørneparkappen.adminconsole.animals.list.loadPage();
+
+                // Display the List Animals page
+                bjørneparkappen.adminconsole.navigation.displayPage(listAnimalsPage);
+
+            } else {
+
+                // Display error message
+                resp = JSON.parse(xhr.responseText);
+                alert(resp.error.message);
+            }
+
+            // Terminate UI wait state
+            bjørneparkappen.adminconsole.endWait();
+        }
+    };
+
+    // Set content type
+    xhr.setRequestHeader("Content-type", "application/json");
+
+    // Send request
+    xhr.send(JSON.stringify(animal));
+}
+bjørneparkappen.adminconsole.api.deleteAnimal = function(animal){
+
+    // Put UI into wait state
+    bjørneparkappen.adminconsole.startWait();
+
+    // Create new request
+    var xhr = new XMLHttpRequest();
+
+    // Open new DELETE request
+    xhr.open('DELETE', BASE_URL + "animals/delete?animal_id=" + animal.id + "&species_id=" + animal.species.id + "key=" + API_KEY);
+
+    // DELETE request state change callback event
+    xhr.onreadystatechange = function() {
+
+        // If request has completed
+        if (xhr.readyState == XMLHttpRequest.DONE){
+
+            // If request status is 200
+            if (xhr.status == 200){
+
+                // Parse response JSON
+                resp = JSON.parse(xhr.responseText);
+                animalsList = resp.animals || [];
+
+                // Load the List Animals page with new data
+                bjørneparkappen.adminconsole.animals.list.loadPage();
+
+                // Display the List Animals page
+                bjørneparkappen.adminconsole.navigation.displayPage(listAnimalsPage);
+
+            } else {
+
+                // Display error message
+                resp = JSON.parse(xhr.responseText);
+                alert(resp.error.message);
+            }
+
+            // Terminate UI wait state
+            bjørneparkappen.adminconsole.endWait();
+
         }
     };
 
@@ -656,15 +1037,7 @@ bjørneparkappen.adminconsole.species.addToTable = function(species){
     var deleteCell = row.insertCell(2);
 
     // Provide values to the new row
-    for (i = 0; i < species.common_name.length; i++){
-
-        if (species.common_name[i].language_code == "en"){
-
-            commonNameCell.innerHTML = species.common_name[i].text;
-            break;
-        }
-    }
-
+    commonNameCell.innerHTML = bjørneparkappen.adminconsole.getTranslation(species, 'common_name', LANGUAGE_CODE);
     latinCell.innerHTML = species.latin;
 
     // Create link to delete item
@@ -807,19 +1180,7 @@ bjørneparkappen.adminconsole.species.detail.loadCreatePage = function(){
 
         speciesDetailSpecies.latin = speciesLatinInput.value;
 
-        if (speciesCommonNameLanguageInput.length > 0){
-
-            alert("Please enter all translations for the species' common name.")
-
-        } else if (speciesDetailSpecies.latin == ""){
-
-            alert("Please enter a latin name.");
-
-        } else if (speciesDescriptionLanguageInput.length > 0) {
-
-            alert("Please enter all translations for the species' description.");
-
-        } else {
+        if (bjørneparkappen.adminconsole.species.detail.validate()){
 
             bjørneparkappen.adminconsole.api.createSpecies(speciesDetailSpecies);
         }
@@ -846,37 +1207,52 @@ bjørneparkappen.adminconsole.species.detail.loadUpdatePage = function(species){
 
     speciesDetailConfirm.onclick = function(){
 
-        if (speciesLatinInput.value != speciesDetailSpecies.latin){
+        speciesDetailSpecies.latin = speciesLatinInput.value;
 
-            speciesDetailSpecies.latin = speciesLatinInput.value;
+        if (bjørneparkappen.adminconsole.species.detail.validate()){
+
+            bjørneparkappen.adminconsole.api.updateSpecies(speciesDetailSpecies);
         }
-
-        bjørneparkappen.adminconsole.api.updateSpecies(speciesDetailSpecies);
     }
 
     // Populate form with new data
-    speciesCommonNameInput.value = bjørneparkappen.adminconsole.getTranslation(speciesDetailSpecies, 'common_name', speciesCommonNameLanguageInput.value)
-
+    speciesCommonNameInput.value = bjørneparkappen.adminconsole.getTranslation(speciesDetailSpecies, 'common_name', speciesCommonNameLanguageInput.value);
     speciesLatinInput.value = speciesDetailSpecies.latin;
-
-    for (i = 0; i < speciesDetailSpecies.description.length; i++){
-
-        if (speciesDetailSpecies.description[i].language_code == speciesDescriptionLanguageInput.value){
-
-            speciesDescriptionInput.value = speciesDetailSpecies.description[i].text;
-            break;
-        }
-    }
+    speciesDescriptionInput.value = bjørneparkappen.adminconsole.getTranslation(speciesDetailSpecies, 'description', speciesDescriptionLanguageInput.value);
 
     // Display the detail page
     bjørneparkappen.adminconsole.navigation.displayPage(speciesDetailPage);
 }
 
+// Validates detail input
+bjørneparkappen.adminconsole.species.detail.validate = function(){
+
+    var valid = false;
+
+    if (speciesDetailSpecies.common_name.length < speciesCommonNameLanguageInput.length){
+
+        alert("Please enter all translations for the species' common name.")
+
+    } else if (speciesDetailSpecies.latin == ""){
+
+        alert("Please enter a latin name.");
+
+    } else if (speciesDetailSpecies.description.length < speciesDescriptionLanguageInput.length) {
+
+        alert("Please enter all translations for the speces' description.");
+
+    }
+        valid = true;
+    }
+
+    return valid;
+}
+
 
 
 /** Areas */
-var amenities = [];
-var enclosures = [];
+var amenitiesList = [];
+var enclosuresList = [];
 
 // Navigation Item
 var areasNav = document.getElementById('areas');
@@ -925,27 +1301,27 @@ bjørneparkappen.adminconsole.areas.list.loadPage = function(){
     bjørneparkappen.adminconsole.areas.list.clearPageData();
 
     // If no amenities or enclosures, retrieve from server
-    if (amenities.length > 0 || enclosures.length > 0){
+    if (amenitiesList.length > 0 || enclosuresList.length > 0){
 
         // If amenities returned
-        if (amenities.length > 0) {
+        if (amenitiesList.length > 0) {
 
             // Iterate through each one and add it to the table
-            for (var i = 0; i < amenities.length; i++) {
+            for (var i = 0; i < amenitiesList.length; i++) {
 
                 // Add event to table
-                bjørneparkappen.adminconsole.areas.addToTable(amenities[i]);
+                bjørneparkappen.adminconsole.areas.addToTable(amenitiesList[i]);
             }
         }
 
         // If enclosures returned
-        if (enclosures.length > 0) {
+        if (enclosuresList.length > 0) {
 
             // Iterate through each one and add it to the table
-            for (var i = 0; i < enclosures.length; i++) {
+            for (var i = 0; i < enclosuresList.length; i++) {
 
                 // Add event to table
-                bjørneparkappen.adminconsole.areas.addToTable(enclosures[i]);
+                bjørneparkappen.adminconsole.areas.addToTable(enclosuresList[i]);
             }
 
         }
@@ -974,7 +1350,7 @@ bjørneparkappen.adminconsole.areas.addToTable = function(area){
     var deleteCell = row.insertCell(2);
 
     // Provide values to the new row
-    labelCell.innerHTML = area.label;
+    labelCell.innerHTML = bjørneparkappen.adminconsole.getTranslation(area, 'label', LANGUAGE_CODE);
 
     if (area.amenity_type != null){
 
@@ -1022,11 +1398,15 @@ bjørneparkappen.adminconsole.areas.search = function(){
 // Deletes an Area
 bjørneparkappen.adminconsole.areas.delete = function(area){
 
-    alert(area.id);
+    if (confirm("Are you sure?")){
+
+        bjørneparkappen.adminconsole.api.deleteArea(area);
+    }
 }
 
 
 // Area Detail Page and elements
+var areaDetailArea = {};
 var areaDetailPage = document.getElementById('area_detail_page');
 var areaDetailTitle = document.getElementById('area_detail_title');
 var areaDetailConfirm = document.getElementById('area_detail_confirm');
@@ -1052,13 +1432,72 @@ areaTypeSelector.onchange = function(){
 }
 var areaDetailForm = document.getElementById('area_detail_form');
 var areaLabelInput = document.getElementById('area_label');
+var areaLabelLanguageInput = document.getElementById('area_label_language');
+areaLabelLanguageInput.onchange = function(){
+
+    if (areaDetailArea.id != null){
+
+        // Update textbox value
+        areaLabelInput.value = bjørneparkappen.adminconsole.getTranslation(areaDetailArea, 'label', areaLabelLanguageInput.value);
+    }
+}
+var areaLabelTranslations = document.getElementById('area_label_translations');
+var areaLabelAddTranslation = document.getElementById('area_add_label_translation');
+areaLabelAddTranslation.onclick = function(){
+
+    // If creating
+    if (areaDetailArea.id == null){
+
+        // Add translation to list of displayed translations
+        bjørneparkappen.adminconsole.addTranslation(areaDetailArea, 'label', areaLabelInput, areaLabelLanguageInput, areaLabelTranslations, areaLabelAddTranslation);
+
+    } else {    // Else if updating
+
+        // Update existing translation
+        bjørneparkappen.adminconsole.updateTranslation(areaDetailArea, 'label', areaLabelInput.value, areaLabelLanguageInput.value);
+    }
+}
 var areaVisitorDestinationInput = document.getElementById('area_visitor_destination');
 var amenityTypeInput = document.getElementById('amenity_type');
 var amenityDescriptionInput = document.getElementById('amenity_description');
+var amenityDescriptionLanguageInput = document.getElementById('amenity_description_language');
+amenityDescriptionLanguageInput.onchange = function(){
+
+    if (areaDetailArea.id != null){
+
+        // Update textbox value
+        amenityDescriptionInput.value = bjørneparkappen.adminconsole.getTranslation(areaDetailArea, 'description', amenityDescriptionLanguageInput.value);
+    }
+}
+var amenityDescriptionTranslations = document.getElementById('amenity_description_translations');
+var amenityDescriptionAddTranslation = document.getElementById('amenity_add_description_translation');
+amenityDescriptionAddTranslation.onclick = function(){
+
+    // If creating
+    if (areaDetailArea.id == null){
+
+        // Add translation to list of displayed translations
+        bjørneparkappen.adminconsole.addTranslation(areaDetailArea, 'description', amenityDescriptionInput, amenityDescriptionLanguageInput, amenityDescriptionTranslations, amenityDescriptionAddTranslation);
+
+    } else {    // Else if updating
+
+        // Update existing translation
+        bjørneparkappen.adminconsole.updateTranslation(areaDetailArea, 'description', amenityDescriptionInput.value, amenityDescriptionLanguageInput.value);
+    }
+}
 var amenityImage = document.getElementById('amenity_image');
 
 // Clears the Area Detail page
 bjørneparkappen.adminconsole.areas.detail.clearPageData = function(){
+
+    // Reset area object
+    areaDetailArea = {};
+
+    // Clear translation inputs and re-enable associated controls
+    bjørneparkappen.adminconsole.clearTranslations(areaLabelInput, areaLabelLanguageInput, areaLabelTranslations, areaLabelAddTranslation);
+
+    // Clear translation inputs and re-enable associated controls
+    bjørneparkappen.adminconsole.clearTranslations(amenityDescriptionInput, amenityDescriptionLanguageInput, amenityDescriptionTranslations, amenityDescriptionAddTranslation);
 
     // Clear form
     areaDetailForm.reset();
@@ -1073,6 +1512,26 @@ bjørneparkappen.adminconsole.areas.detail.loadCreatePage = function(){
     // Set page title and confirm button to create
     areaDetailTitle.innerHTML = "Create Area";
     areaDetailConfirm.value = "Create";
+    areaLabelAddTranslation.innerHTML = "Add";
+    amenityDescriptionAddTranslation.innerHTML = "Add";
+
+    areaDetailConfirm.onclick = function(){
+
+        areaDetailArea.visitor_destination = areaVisitorDestinationInput.value;
+
+        if (bjørneparkappen.adminconsole.areas.detail.validate()){
+
+            if (areaTypeSelector.value == "amenity") {
+
+                areaDetailArea.amenity_type = amenityTypeInput.value;
+                bjørneparkappen.adminconsole.api.createAmenity(areaDetailArea);
+
+            } else {
+
+                bjørneparkappen.adminconsole.api.createEnclosure(areaDetailArea);
+            }
+        }
+    }
 
     // Display the detail page
     bjørneparkappen.adminconsole.navigation.displayPage(areaDetailPage);
@@ -1087,6 +1546,11 @@ bjørneparkappen.adminconsole.areas.detail.loadUpdatePage = function(area){
     // Set page title and confirm button to update
     areaDetailTitle.innerHTML = "Update Area";
     areaDetailConfirm.value = "Save";
+    areaLabelAddTranslation.innerHTML = "Update";
+    amenityDescriptionAddTranslation.innerHTML = "Update";
+
+    // Set area object
+    areaDetailArea = area;
 
     if (area.amenity_type != null){
 
@@ -1094,7 +1558,7 @@ bjørneparkappen.adminconsole.areas.detail.loadUpdatePage = function(area){
         amenity_fields.style.display = DISPLAYED;
 
         amenityTypeInput.value = area.amenity_type;
-        amenityDescriptionInput.value = area.description;
+        amenityDescriptionInput.value = bjørneparkappen.adminconsole.getTranslation(area, 'description', LANGUAGE_CODE);
 
     } else {
 
@@ -1102,18 +1566,72 @@ bjørneparkappen.adminconsole.areas.detail.loadUpdatePage = function(area){
         amenity_fields.style.display = HIDDEN;
     }
 
+    areaDetailConfirm.onclick = function(){
+
+        areaDetailArea.visitor_destination = areaVisitorDestinationInput.value;
+
+        if (bjørneparkappen.adminconsole.areas.detail.validate()){
+
+            if (areaTypeSelector.value == "amenity") {
+
+                areaDetailArea.amenity_type = amenityTypeInput.value;
+                bjørneparkappen.adminconsole.api.updateAmenity(areaDetailArea);
+
+            } else {
+
+                bjørneparkappen.adminconsole.api.updateEnclosure(areaDetailArea);
+            }
+        }
+    }
+
     // Populate form with new data
-    areaLabelInput.value = area.label;
+    areaLabelInput.value = bjørneparkappen.adminconsole.getTranslation(area, 'label', LANGUAGE_CODE);
     areaVisitorDestinationInput.value = area.visitor_destination;
 
     // Display the detail page
     bjørneparkappen.adminconsole.navigation.displayPage(areaDetailPage);
 }
 
+// Validates detail input
+bjørneparkappen.adminconsole.areas.detail.validate = function(){
+
+    var valid = false;
+
+    if (areaDetailArea.label.length < areaLabelLanguageInput.length){
+
+        alert("Please enter all translations for the area label.")
+
+    } else if (areaDetailArea.visitor_destination == ""){
+
+        alert("Please enter a set of visitor destination co-ordinates.");
+
+    } else if (areaTypeSelector.value == "amenity"){
+
+        if (areaDetailArea.amenity_type == ""){
+
+            alert("Please select an amenity type.");
+
+        } else if (areaDetailArea.description.length < amenityDescriptionLanguageInput.length){
+
+            alert("Please enter all translations for the amenity description");
+
+        } else {
+
+            valid = true;
+        }
+
+    } else {
+
+        valid = true;
+    }
+
+    return valid;
+}
+
 
 
 /** Animals */
-var animals = [];
+var animalsList = [];
 
 // Navigation Item
 var animalsNav = document.getElementById('animals');
@@ -1162,19 +1680,17 @@ bjørneparkappen.adminconsole.animals.list.loadPage = function(){
     bjørneparkappen.adminconsole.animals.list.clearPageData();
 
     // If animals returned
-    if (animals.length > 0) {
-
-        // Iterate through each one and display it
-        for (var i = 0; i < animals.length; i++) {
-
-            // Add animal to table
-            bjørneparkappen.adminconsole.animals.addToTable(animals[i]);
-        }
-
-    } else {
+    if (animalsList.length == 0) {
 
         // Retrieve the list of animals
         bjørneparkappen.adminconsole.api.getAnimals();
+    }
+
+    // Iterate through each one and add each to the table
+    for (var i = 0; i < animalsList.length; i++) {
+
+        // Add animal to table
+        bjørneparkappen.adminconsole.animals.addToTable(animalsList[i]);
     }
 
     // Display the page
@@ -1197,11 +1713,16 @@ bjørneparkappen.adminconsole.animals.addToTable = function(animal){
 
     // Provide values to the new row
     nameCell.innerHTML = animal.name;
-    speciesCell.innerHTML = animal.species.common_name;
+    speciesCell.innerHTML = bjørneparkappen.adminconsole.getTranslation(animal.species, 'common_name', LANGUAGE_CODE);
 
     var checkbox = document.createElement('input');
     checkbox.type = "checkbox";
     checkbox.checked = animal.is_available;
+    checkbox.onclick = function(){
+
+        animal.is_available = !animal.is_available;
+        bjørneparkappen.adminconsole.api.updateAnimal(animal);
+    }
     availableCell.appendChild(checkbox);
 
     // Create link to delete item
@@ -1241,10 +1762,15 @@ bjørneparkappen.adminconsole.animals.search = function(){
 // Deletes an Animal
 bjørneparkappen.adminconsole.animals.delete = function(animal){
 
-    alert(animal.id);
+    if (confirm("Are you sure?")){
+
+        bjørneparkappen.adminconsole.api.deleteAnimal(animal);
+    }
 }
 
+
 // Animal Detail Page and elements
+var animalDetailAnimal = {};
 var animalDetailPage = document.getElementById('animal_detail_page');
 var animalDetailTitle = document.getElementById('animal_detail_title');
 var animalDetailConfirm = document.getElementById('animal_detail_confirm');
@@ -1257,11 +1783,43 @@ animalDetailCancel.onclick = function(){
 var animalDetailForm = document.getElementById('animal_detail_form');
 var animalNameInput = document.getElementById('animal_name');
 var animalDescriptionInput = document.getElementById('animal_description');
+var animalDescriptionLanguageInput = document.getElementById('animal_description_language');
+animalDescriptionLanguageInput.onchange = function(){
+
+    if (animalDetailAnimal.id != null){
+
+        // Update textbox value
+        animalDescriptionInput.value = bjørneparkappen.adminconsole.getTranslation(animalDetailAnimal, 'description', animalDescriptionLanguageInput.value);
+    }
+}
+var animalDescriptionTranslations = document.getElementById('animal_description_translations');
+var animalDescriptionAddTranslation = document.getElementById('animal_add_description_translation');
+animalDescriptionAddTranslation.onclick = function(){
+
+    // If creating
+    if (animalDetailAnimal.id == null){
+
+        // Add translation to list of displayed translations
+        bjørneparkappen.adminconsole.addTranslation(animalDetailAnimal, 'description', animalDescriptionInput, animalDescriptionLanguageInput, animalDescriptionTranslations, animalDescriptionAddTranslation);
+
+    } else {    // Else if updating
+
+        // Update existing translation
+        bjørneparkappen.adminconsole.updateTranslation(animalDetailAnimal, 'description', animalDescriptionInput.value, animalDescriptionLanguageInput.value);
+    }
+}
 var animalSpeciesInput = document.getElementById('animal_species');
+var animalEnclosureInput = document.getElementById('animal_enclosure');
 var animalAvailableInput = document.getElementById('animal_available');
 
 // Clears the Animal Detail page
 bjørneparkappen.adminconsole.animals.detail.clearPageData = function(){
+
+    // Reset animal object
+    animalDetailAnimal = {};
+
+    // Clear translation inputs and re-enable associated controls
+    bjørneparkappen.adminconsole.clearTranslations(animalDescriptionInput, animalDescriptionLanguageInput, animalDescriptionTranslations, animalDescriptionAddTranslation);
 
     // Clear the form
     animalDetailForm.reset();
@@ -1270,13 +1828,28 @@ bjørneparkappen.adminconsole.animals.detail.clearPageData = function(){
     animalSpeciesInput.length = 0;
 
     // Add species options to dropdown
-    for (i = 0; i < species.length; i++){
+    for (speciesCount = 0; speciesCount < speciesList.length; speciesCount++){
 
         var option = document.createElement("option");
-        option.value = species[i].id;
-        option.text = species[i].common_name;
+        option.value = speciesList[speciesCount].id;
+        option.text = bjørneparkappen.adminconsole.getTranslation(speciesList[speciesCount], 'common_name', LANGUAGE_CODE);
 
         animalSpeciesInput.add(option);
+    }
+
+    animalSpeciesInput.disabled = false;
+
+    // Clear enclosures dropdown
+    animalEnclosureInput.length = 0;
+
+    // Add enclosure options to dropdown
+    for (enclosureCount = 0; enclosureCount < enclosuresList.length; enclosureCount++){
+
+        var option = document.createElement("option");
+        option.value = enclosuresList[enclosureCount].id;
+        option.text = bjørneparkappen.adminconsole.getTranslation(enclosuresList[enclosureCount], 'label', LANGUAGE_CODE);
+
+        animalEnclosureInput.add(option);
     }
 };
 
@@ -1289,6 +1862,19 @@ bjørneparkappen.adminconsole.animals.detail.loadCreatePage = function(){
     // Set page title and confirm button to create
     animalDetailTitle.innerHTML = "Create Animal";
     animalDetailConfirm.value = "Create";
+    animalDescriptionAddTranslation.innerHTML = "Add";
+
+    animalDetailConfirm.onclick = function(){
+
+        animalDetailAnimal.name = animalNameInput.value;
+        animalDetailAnimal.enclosure_id = animalEnclosureInput.value;
+        animalDetailAnimal.is_available = animalAvailableInput.checked;
+
+        if (bjørneparkappen.adminconsole.animals.detail.validate()) {
+
+            bjørneparkappen.adminconsole.api.createAnimal(animalDetailAnimal);
+        }
+    }
 
     // Display the detail page
     bjørneparkappen.adminconsole.navigation.displayPage(animalDetailPage);
@@ -1303,15 +1889,62 @@ bjørneparkappen.adminconsole.animals.detail.loadUpdatePage = function(animal){
     // Set page title and confirm button to update
     animalDetailTitle.innerHTML = "Update Animal";
     animalDetailConfirm.value = "Save";
+    animalDescriptionAddTranslation.innerHTML = "Update";
+    animalSpeciesInput.disabled = true;
+
+    // Set animal object
+    animalDetailAnimal = animal;
+
+    animalDetailConfirm.onclick = function(){
+
+        animalDetailAnimal.name = animalNameInput.value;
+        animalDetailAnimal.enclosure_id = animalEnclosureInput.value;
+        animalDetailAnimal.is_available = animalAvailableInput.checked;
+
+        if (bjørneparkappen.adminconsole.animals.detail.validate()) {
+
+            bjørneparkappen.adminconsole.api.updateAnimal(animalDetailAnimal);
+        }
+    }
 
     // Populate page with new data
-    animalNameInput.value = animal.name;
-    animalDescriptionInput.value = animal.description;
-    animalSpeciesInput.value = animal.species.id;
-    animalAvailableInput.checked = animal.is_available;
+    animalNameInput.value = animalDetailAnimal.name;
+    animalSpeciesInput.value = animalDetailAnimal.species.id;
+    animalDescriptionInput.value = bjørneparkappen.adminconsole.getTranslation(animalDetailAnimal, 'description', animalDescriptionLanguageInput.value);
+    animalEnclosureInput.value = animalDetailAnimal.enclosure_id;
+    animalAvailableInput.checked = animalDetailAnimal.is_available;
 
     // Display the detail page
     bjørneparkappen.adminconsole.navigation.displayPage(animalDetailPage);
+}
+
+// Validates detail input
+bjørneparkappen.adminconsole.animals.detail.validate = function(){
+
+    var valid = false;
+
+    if (animalDetailAnimal.name == ""){
+
+        alert("Please enter a name.")
+
+    } else if (animalDetailAnimal.species_id == ""){
+
+        alert("Please enter a species.");
+
+    } else if (animalDetailAnimal.description.length < animalDescriptionLanguageInput.length) {
+
+        alert("Please enter all translations for the animal description.");
+
+    } else if (animalDetailAnimal.enclosure_id == ""){
+
+        alert("Please enter an enclosure.");
+
+    } else {
+
+        valid = true;
+    }
+
+    return valid;
 }
 
 
@@ -1519,21 +2152,21 @@ bjørneparkappen.adminconsole.events.detail.clearPageData = function(){
     eventAreaInput.length = 0;
 
     // Add amenity options to dropdown
-    for (i = 0; i < amenities.length; i++){
+    for (i = 0; i < amenitiesList.length; i++){
 
         var option = document.createElement("option");
-        option.value = amenities[i].id;
-        option.text = amenities[i].label;
+        option.value = amenitiesList[i].id;
+        option.text = amenitiesList[i].label;
 
         eventAreaInput.add(option);
     }
 
     // Add enclosure options to dropdown
-    for (i = 0; i < enclosures.length; i++){
+    for (i = 0; i < enclosuresList.length; i++){
 
         var option = document.createElement("option");
-        option.value = enclosures[i].id;
-        option.text = enclosures[i].label;
+        option.value = enclosuresList[i].id;
+        option.text = enclosuresList[i].label;
 
         eventAreaInput.add(option);
     }
