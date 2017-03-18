@@ -632,6 +632,31 @@ class ApiHelper():
             description=area_description_translations,
             amenity_type=area.amenity_type)
 
+    @staticmethod
+    def get_keeper_response(keeper, language_code):
+        # Translate translatable keeper resources
+        keeper_bio_translation = InternationalText.get_translation(
+                language_code,
+                keeper.bio)
+
+        return KeeperResponse(
+            id=keeper.key.id(),
+            name=keeper.name,
+            bio=keeper_bio_translation)
+
+    @staticmethod
+    def get_keeper_response_with_translations(keeper):
+        # Translate translatable keeper resources
+        keeper_bio_translations = []
+        for bio_translation in keeper.bio:
+            translation = InternationalMessage(text=bio_translation.text, language_code=bio_translation.language_code)
+            keeper_bio_translations.append(translation)
+
+        return KeeperTranslationResponse(
+            id=keeper.key.id(),
+            name=keeper.name,
+            bio=keeper_bio_translations)
+
     ### Class Methods
 
     @classmethod
@@ -2158,22 +2183,16 @@ class KeepersApi(remote.Service):
         # Build up response of all keepers
         for keeper in keepers:
 
-            # Translate translatable keeper resources
-            keeper_bio_translation = InternationalText.get_translation(
-                    request.language_code,
-                    keeper.bio)
+            keeper_response = ApiHelper.get_keeper_response(keeper, request.language_code)
 
             # Add keeper to return list
-            response.keepers.append(KeeperResponse(
-                id=keeper.key.id(),
-                name=keeper.name,
-                bio=keeper_bio_translation))
+            response.keepers.append(keeper_response)
 
         return response
 
     @endpoints.method(
         KeeperRequest,
-        message_types.VoidMessage,
+        KeeperTranslationListResponse,
         path='create',
         http_method='POST',
         name='keepers.create')
@@ -2194,11 +2213,11 @@ class KeepersApi(remote.Service):
         # Update version
         ApiHelper.update_version()
 
-        return message_types.VoidMessage()
+        return KeepersApi.list_keepers_with_translations()
 
     @endpoints.method(
         UPDATE_KEEPER_REQUEST,
-        message_types.VoidMessage,
+        KeeperTranslationListResponse,
         path='update',
         http_method='POST',
         name='keepers.update')
@@ -2231,11 +2250,11 @@ class KeepersApi(remote.Service):
         # Update version
         ApiHelper.update_version()
 
-        return message_types.VoidMessage()
+        return KeepersApi.list_keepers_with_translations()
 
     @endpoints.method(
         ID_REQUEST,
-        message_types.VoidMessage,
+        KeeperTranslationListResponse,
         path='delete',
         http_method='DELETE',
         name='keepers.delete')
@@ -2254,7 +2273,34 @@ class KeepersApi(remote.Service):
         # Update version
         ApiHelper.update_version()
 
-        return message_types.VoidMessage()
+        return KeepersApi.list_keepers_with_translations()
+
+    @endpoints.method(
+        message_types.VoidMessage,
+        KeeperTranslationListResponse,
+        path='all_languages',
+        http_method='GET',
+        name='keepers.all_languages')
+    def list_keepers_all_languages(self, request):
+        return KeepersApi.list_keepers_with_translations()
+
+    @staticmethod
+    def list_keepers_with_translations():
+
+        # Retrieve all keepers
+        keepers = Keeper.get_all()
+
+        response = KeeperTranslationListResponse()
+
+        # Build up response of all keepers
+        for keeper in keepers:
+
+            keeper_response = ApiHelper.get_keeper_response_with_translations(keeper)
+
+            # Add keeper to return list
+            response.keepers.append(keeper_response)
+
+        return response
 # [END Keepers API]
 
 # [START Versions API]
