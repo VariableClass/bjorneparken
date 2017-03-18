@@ -187,7 +187,7 @@
             <h2 id="event_detail_title">Create Event</h2>
             <form id="event_detail_form" class="section-content" action="javascript:void(0)" enctype="multipart/form-data">
                 <p>
-                    <label for="event_type_selector"><i>Create a </i></label>
+                    <label for="event_type_selector"><i>Create </i></label>
                     <select id="event_type_selector" style="align" required/>
                         <option value="feeding">Feeding</option>
                         <option value="event">Event</option>
@@ -196,6 +196,10 @@
                 <p>
                     <label for="event_label">Label:</label>
                     <input name="event_label" id="event_label" type="text" size="20" required autofocus/>
+                    <select id="event_label_language" style="align">
+                    </select>
+                    <button id="event_add_label_translation">Add</button>
+                    <span id="event_label_translations" />
                 </p>
                 <p>
                     <label for="event_start_time">Start Time:</label>
@@ -213,12 +217,14 @@
                 <p>
                     <label for="event_description">Description:</label>
                     <input name="event_description" id="event_description" type="text" size="20" required/>
+                    <select id="event_description_language" style="align">
+                    </select>
+                    <button id="event_add_description_translation">Add</button>
+                    <span id="event_description_translations" />
                 </p>
                 <p id="feeding_fields">
                     <label for="event_keeper">Keeper:</label>
                     <select name="event_keeper" id="event_keeper" form="event_detail_form" >
-                        <option value="0119484879548958">Magnhild</option>
-                        <option value="0309405934059039">Callum</option>
                     </select>
                 </p>
                 <p>

@@ -721,7 +721,7 @@ bjørneparkappen.adminconsole.api.getEvents = function(){
     var xhr = new XMLHttpRequest();
 
     // Open new GET request
-    xhr.open('GET', BASE_URL + "events/all?language_code=" + LANGUAGE_CODE + "&key=" + API_KEY);
+    xhr.open('GET', BASE_URL + "events/all_languages?key=" + API_KEY);
 
     // GET request state change callback event
     xhr.onreadystatechange = function() {
@@ -734,12 +734,251 @@ bjørneparkappen.adminconsole.api.getEvents = function(){
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
-                events = resp.events || [];
-                feedings = resp.feedings || [];
+                eventsList = resp.events || [];
+                feedingsList = resp.feedings || [];
             }
 
             // Terminate UI wait state
             bjørneparkappen.adminconsole.endWait();
+        }
+    };
+
+    // Send request
+    xhr.send();
+};
+bjørneparkappen.adminconsole.api.createEvent = function(event){
+
+    // Put UI into wait state
+    bjørneparkappen.adminconsole.startWait();
+
+    // Create new request
+    var xhr = new XMLHttpRequest();
+
+    // Open new POST request
+    xhr.open('POST', BASE_URL + "events/create?key=" + API_KEY);
+
+    // POST request state change callback event
+    xhr.onreadystatechange = function() {
+
+        // If request has completed
+        if (xhr.readyState == XMLHttpRequest.DONE){
+
+            // If request status is 200
+            if (xhr.status == 200) {
+
+                // Parse response JSON
+                resp = JSON.parse(xhr.responseText);
+                eventsList = resp.events || [];
+
+                // Load the List Events page with new data
+                bjørneparkappen.adminconsole.events.list.loadPage();
+
+                // Display the List Events page
+                bjørneparkappen.adminconsole.navigation.displayPage(listEventsPage);
+
+            } else {
+
+                // Display error message
+                resp = JSON.parse(xhr.responseText);
+                alert(resp.error.message);
+            }
+
+            // Terminate UI wait state
+            bjørneparkappen.adminconsole.endWait();
+        }
+    };
+
+    // Set content type
+    xhr.setRequestHeader("Content-type", "application/json");
+
+    // Send request
+    xhr.send(JSON.stringify(event));
+}
+bjørneparkappen.adminconsole.api.updateEvent = function(event){
+
+    // Put UI into wait state
+    bjørneparkappen.adminconsole.startWait();
+
+    // Create new request
+    var xhr = new XMLHttpRequest();
+
+    // Open new POST request
+    xhr.open('POST', BASE_URL + "events/update?event_id=" + event.id + "&location_id=" + event.location.id + "&key=" + API_KEY);
+
+    // POST request state change callback event
+    xhr.onreadystatechange = function() {
+
+        // If request has completed
+        if (xhr.readyState == XMLHttpRequest.DONE){
+
+            // If request status is 200
+            if (xhr.status == 200) {
+
+                // Parse response JSON
+                resp = JSON.parse(xhr.responseText);
+                eventsList = resp.events || [];
+
+                // Load the List Events page with new data
+                bjørneparkappen.adminconsole.events.list.loadPage();
+
+                // Display the List Events page
+                bjørneparkappen.adminconsole.navigation.displayPage(listEventsPage);
+
+            } else {
+
+                // Display error message
+                resp = JSON.parse(xhr.responseText);
+                alert(resp.error.message);
+            }
+
+            // Terminate UI wait state
+            bjørneparkappen.adminconsole.endWait();
+        }
+    };
+
+    // Set content type
+    xhr.setRequestHeader("Content-type", "application/json");
+
+    // Send request
+    xhr.send(JSON.stringify(event));
+}
+bjørneparkappen.adminconsole.api.createFeeding = function(feeding){
+
+    // Put UI into wait state
+    bjørneparkappen.adminconsole.startWait();
+
+    // Create new request
+    var xhr = new XMLHttpRequest();
+
+    // Open new POST request
+    xhr.open('POST', BASE_URL + "events/feedings/create?key=" + API_KEY);
+
+    // POST request state change callback event
+    xhr.onreadystatechange = function() {
+
+        // If request has completed
+        if (xhr.readyState == XMLHttpRequest.DONE){
+
+            // If request status is 200
+            if (xhr.status == 200) {
+
+                // Parse response JSON
+                resp = JSON.parse(xhr.responseText);
+                feedingsList = resp.feedings || [];
+
+                // Load the List Events page with new data
+                bjørneparkappen.adminconsole.events.list.loadPage();
+
+                // Display the List Events page
+                bjørneparkappen.adminconsole.navigation.displayPage(listEventsPage);
+
+            } else {
+
+                // Display error message
+                resp = JSON.parse(xhr.responseText);
+                alert(resp.error.message);
+            }
+
+            // Terminate UI wait state
+            bjørneparkappen.adminconsole.endWait();
+        }
+    };
+
+    // Set content type
+    xhr.setRequestHeader("Content-type", "application/json");
+
+    // Send request
+    xhr.send(JSON.stringify(feeding));
+}
+bjørneparkappen.adminconsole.api.updateFeeding = function(feeding){
+
+    // Put UI into wait state
+    bjørneparkappen.adminconsole.startWait();
+
+    // Create new request
+    var xhr = new XMLHttpRequest();
+
+    // Open new POST request
+    xhr.open('POST', BASE_URL + "events/feedings/update?feeding_id=" + feeding.id + "&location_id=" + feeding.location.id + "&key=" + API_KEY);
+
+    // POST request state change callback event
+    xhr.onreadystatechange = function() {
+
+        // If request has completed
+        if (xhr.readyState == XMLHttpRequest.DONE){
+
+            // If request status is 200
+            if (xhr.status == 200) {
+
+                // Parse response JSON
+                resp = JSON.parse(xhr.responseText);
+                feedingsList = resp.feedings || [];
+
+                // Load the List Events page with new data
+                bjørneparkappen.adminconsole.events.list.loadPage();
+
+                // Display the List Events page
+                bjørneparkappen.adminconsole.navigation.displayPage(listEventsPage);
+
+            } else {
+
+                // Display error message
+                resp = JSON.parse(xhr.responseText);
+                alert(resp.error.message);
+            }
+
+            // Terminate UI wait state
+            bjørneparkappen.adminconsole.endWait();
+        }
+    };
+
+    // Set content type
+    xhr.setRequestHeader("Content-type", "application/json");
+
+    // Send request
+    xhr.send(JSON.stringify(feeding));
+}
+bjørneparkappen.adminconsole.api.deleteEvent = function(event){
+
+    // Put UI into wait state
+    bjørneparkappen.adminconsole.startWait();
+
+    // Create new request
+    var xhr = new XMLHttpRequest();
+
+    // Open new DELETE request
+    xhr.open('DELETE', BASE_URL + "events/delete?event_id=" + event.id + "&location_id=" + event.location.id + "&key=" + API_KEY);
+
+    // DELETE request state change callback event
+    xhr.onreadystatechange = function() {
+
+        // If request has completed
+        if (xhr.readyState == XMLHttpRequest.DONE){
+
+            // If request status is 200
+            if (xhr.status == 200){
+
+                // Parse response JSON
+                resp = JSON.parse(xhr.responseText);
+                eventsList = resp.events || [];
+                feedingsList = resp.feedings || [];
+
+                // Load the List Events page with new data
+                bjørneparkappen.adminconsole.events.list.loadPage();
+
+                // Display the List Events page
+                bjørneparkappen.adminconsole.navigation.displayPage(listEventsPage);
+
+            } else {
+
+                // Display error message
+                resp = JSON.parse(xhr.responseText);
+                alert(resp.error.message);
+            }
+
+            // Terminate UI wait state
+            bjørneparkappen.adminconsole.endWait();
+
         }
     };
 
@@ -1443,7 +1682,7 @@ bjørneparkappen.adminconsole.areas.list.loadPage = function(){
     // Clear page data
     bjørneparkappen.adminconsole.areas.list.clearPageData();
 
-    // If no amenities or enclosures, retrieve from server
+    // If amenities or enclosures, retrieve from server
     if (amenitiesList.length > 0 || enclosuresList.length > 0){
 
         // If amenities returned
@@ -1642,6 +1881,8 @@ bjørneparkappen.adminconsole.areas.detail.clearPageData = function(){
     // Clear translation inputs and re-enable associated controls
     bjørneparkappen.adminconsole.clearTranslations(amenityDescriptionInput, amenityDescriptionLanguageInput, amenityDescriptionTranslations, amenityDescriptionAddTranslation);
 
+    areaTypeSelector.disabled = false;
+
     // Clear form
     areaDetailForm.reset();
 };
@@ -1691,6 +1932,7 @@ bjørneparkappen.adminconsole.areas.detail.loadUpdatePage = function(area){
     areaDetailConfirm.value = "Save";
     areaLabelAddTranslation.innerHTML = "Update";
     amenityDescriptionAddTranslation.innerHTML = "Update";
+    areaTypeSelector.disabled = true;
 
     // Set area object
     areaDetailArea = area;
@@ -1728,7 +1970,7 @@ bjørneparkappen.adminconsole.areas.detail.loadUpdatePage = function(area){
     }
 
     // Populate form with new data
-    areaLabelInput.value = bjørneparkappen.adminconsole.getTranslation(area, 'label', LANGUAGE_CODE);
+    areaLabelInput.value = bjørneparkappen.adminconsole.getTranslation(area, 'label', areaLabelLanguageInput.value);
     areaVisitorDestinationInput.value = area.visitor_destination;
 
     // Display the detail page
@@ -2090,8 +2332,8 @@ bjørneparkappen.adminconsole.animals.detail.validate = function(){
 
 
 /** Events */
-var events = [];
-var feedings = [];
+var eventsList = [];
+var feedingsList = [];
 
 // Navigation Item
 var eventsNav = document.getElementById('events');
@@ -2139,27 +2381,28 @@ bjørneparkappen.adminconsole.events.list.loadPage = function(){
     // Clear page data
     bjørneparkappen.adminconsole.events.list.clearPageData();
 
-    if (events.length > 0){
+    // If events or feedings, display them
+    if (eventsList.length > 0 || enclosuresList.length > 0){
 
         // If events returned
-        if (events.length > 0) {
+        if (eventsList.length > 0) {
 
             // Iterate through each one and display it
-            for (var i = 0; i < events.length; i++) {
+            for (var i = 0; i < eventsList.length; i++) {
 
                 // Add event to table
-                bjørneparkappen.adminconsole.events.addToTable(events[i]);
+                bjørneparkappen.adminconsole.events.addToTable(eventsList[i]);
             }
         }
 
         // If feedings returned
-        if (feedings.length > 0) {
+        if (feedingsList.length > 0) {
 
             // Iterate through each one and display it
-            for (var i = 0; i < feedings.length; i++) {
+            for (var i = 0; i < feedingsList.length; i++) {
 
                 // Add event to table
-                bjørneparkappen.adminconsole.events.addToTable(feedings[i]);
+                bjørneparkappen.adminconsole.events.addToTable(feedingsList[i]);
             }
 
         }
@@ -2191,7 +2434,7 @@ bjørneparkappen.adminconsole.events.addToTable = function(event){
     var deleteCell = row.insertCell(5);
 
     // Provide values to the new row
-    labelCell.innerHTML = event.label;
+    labelCell.innerHTML = bjørneparkappen.adminconsole.getTranslation(event, 'label', LANGUAGE_CODE);
     startTimeCell.innerHTML = event.start_time;
     endTimeCell.innerHTML = event.end_time;
 
@@ -2207,6 +2450,11 @@ bjørneparkappen.adminconsole.events.addToTable = function(event){
     var checkbox = document.createElement('input');
     checkbox.type = "checkbox";
     checkbox.checked = event.is_active;
+    checkbox.onclick = function(){
+
+        event.is_available = !event.is_available;
+        bjørneparkappen.adminconsole.api.updateEvent(event);
+    }
     activeCell.appendChild(checkbox);
 
     // Create link to delete item
@@ -2215,10 +2463,7 @@ bjørneparkappen.adminconsole.events.addToTable = function(event){
     deleteLink.innerHTML = "Delete"
     deleteLink.onclick = function(){
 
-        if (confirm("Are you sure?")){
-
-            bjørneparkappen.adminconsole.events.delete(event);
-        }
+        bjørneparkappen.adminconsole.events.delete(event);
     }
 
     deleteCell.appendChild(deleteLink);
@@ -2246,11 +2491,15 @@ bjørneparkappen.adminconsole.events.search = function(){
 // Deletes an Event
 bjørneparkappen.adminconsole.events.delete = function(event){
 
-    alert(event.id);
+    if (confirm("Are you sure?")){
+
+        bjørneparkappen.adminconsole.api.deleteEvent(event);
+    }
 }
 
 
 // Event Detail Page and elements
+var eventDetailEvent = {};
 var eventDetailPage = document.getElementById('event_detail_page');
 var eventDetailTitle = document.getElementById('event_detail_title');
 var eventDetailConfirm = document.getElementById('event_detail_confirm');
@@ -2264,26 +2513,110 @@ eventTypeSelector.onchange = function(){
 
     var feeding_fields = document.getElementById('feeding_fields');
 
-    if (areaTypeSelector.value == "event"){
+    // Clear areas dropdown
+    eventAreaInput.length = 0;
+
+    if (eventTypeSelector.value == "event"){
 
         feeding_fields.style.display = HIDDEN;
+
+        // Add amenity options to dropdown
+        for (amenityCount = 0; amenityCount < amenitiesList.length; amenityCount++){
+
+            var option = document.createElement("option");
+            option.value = amenitiesList[amenityCount].id;
+            option.text = bjørneparkappen.adminconsole.getTranslation(amenitiesList[amenityCount], 'label', LANGUAGE_CODE);
+
+            eventAreaInput.add(option);
+        }
 
     } else {
 
         feeding_fields.style.display = DISPLAYED;
+
+        // Add enclosure options to dropdown
+        for (enclosureCount = 0; enclosureCount < enclosuresList.length; enclosureCount++){
+
+            var option = document.createElement("option");
+            option.value = enclosuresList[enclosureCount].id;
+            option.text = bjørneparkappen.adminconsole.getTranslation(enclosuresList[enclosureCount], 'label', LANGUAGE_CODE);
+
+            eventAreaInput.add(option);
+        }
     }
 }
 var eventDetailForm = document.getElementById('event_detail_form');
 var eventLabelInput = document.getElementById('event_label');
+var eventLabelLanguageInput = document.getElementById('event_label_language');
+eventLabelLanguageInput.onchange = function(){
+
+    if (eventDetailEvent.id != null){
+
+        // Update textbox value
+        eventLabelInput.value = bjørneparkappen.adminconsole.getTranslation(eventDetailEvent, 'label', eventLabelLanguageInput.value);
+    }
+}
+var eventLabelTranslations = document.getElementById('event_label_translations');
+var eventLabelAddTranslation = document.getElementById('event_add_label_translation');
+eventLabelAddTranslation.onclick = function(){
+
+    // If creating
+    if (eventDetailEvent.id == null){
+
+        // Add translation to list of displayed translations
+        bjørneparkappen.adminconsole.addTranslation(eventDetailEvent, 'label', eventLabelInput, eventLabelLanguageInput, eventLabelTranslations, eventLabelAddTranslation);
+
+    } else {    // Else if updating
+
+        // Update existing translation
+        bjørneparkappen.adminconsole.updateTranslation(eventDetailEvent, 'label', eventLabelInput.value, eventLabelLanguageInput.value);
+    }
+}
 var eventStartTimeInput = document.getElementById('event_start_time');
 var eventEndTimeInput = document.getElementById('event_end_time');
 var eventAreaInput = document.getElementById('event_area');
 var eventDescriptionInput = document.getElementById('event_description');
+var eventDescriptionLanguageInput = document.getElementById('event_description_language');
+eventDescriptionLanguageInput.onchange = function(){
+
+    if (eventDetailEvent.id != null){
+
+        // Update textbox value
+        eventDescriptionInput.value = bjørneparkappen.adminconsole.getTranslation(eventDetailEvent, 'description', eventDescriptionLanguageInput.value);
+    }
+}
+var eventDescriptionTranslations = document.getElementById('event_description_translations');
+var eventDescriptionAddTranslation = document.getElementById('event_add_description_translation');
+eventDescriptionAddTranslation.onclick = function(){
+
+    // If creating
+    if (eventDetailEvent.id == null){
+
+        // Add translation to list of displayed translations
+        bjørneparkappen.adminconsole.addTranslation(eventDetailEvent, 'description', eventDescriptionInput, eventDescriptionLanguageInput, eventDescriptionTranslations, eventDescriptionAddTranslation);
+
+    } else {    // Else if updating
+
+        // Update existing translation
+        bjørneparkappen.adminconsole.updateTranslation(eventDetailEvent, 'description', eventDescriptionInput.value, eventDescriptionLanguageInput.value);
+    }
+}
 var eventKeeperInput = document.getElementById('event_keeper');
 var eventActiveInput = document.getElementById('event_active');
 
 // Clears the Event Detail page
 bjørneparkappen.adminconsole.events.detail.clearPageData = function(){
+
+    // Reset event object
+    eventDetailEvent = {};
+
+    eventTypeSelector.disabled = false;
+
+    // Clear translation inputs and re-enable associated controls
+    bjørneparkappen.adminconsole.clearTranslations(eventLabelInput, eventLabelLanguageInput, eventLabelTranslations, eventLabelAddTranslation);
+
+    // Clear translation inputs and re-enable associated controls
+    bjørneparkappen.adminconsole.clearTranslations(eventDescriptionInput, eventDescriptionLanguageInput, eventDescriptionTranslations, eventDescriptionAddTranslation);
 
     // Clear the form
     eventDetailForm.reset();
@@ -2291,35 +2624,17 @@ bjørneparkappen.adminconsole.events.detail.clearPageData = function(){
     // Clear areas dropdown
     eventAreaInput.length = 0;
 
-    // Add amenity options to dropdown
-    for (i = 0; i < amenitiesList.length; i++){
-
-        var option = document.createElement("option");
-        option.value = amenitiesList[i].id;
-        option.text = amenitiesList[i].label;
-
-        eventAreaInput.add(option);
-    }
-
-    // Add enclosure options to dropdown
-    for (i = 0; i < enclosuresList.length; i++){
-
-        var option = document.createElement("option");
-        option.value = enclosuresList[i].id;
-        option.text = enclosuresList[i].label;
-
-        eventAreaInput.add(option);
-    }
+    eventAreaInput.disabled = false;
 
     // Clear keepers dropdown
     eventKeeperInput.length = 0;
 
     // Add keeper options to dropdown
-    for (i = 0; i < keepers.length; i++){
+    for (keeperCount = 0; keeperCount < keepersList.length; keeperCount++){
 
         var option = document.createElement("option");
-        option.value = keepers[i].id;
-        option.text = keepers[i].name;
+        option.value = keepersList[keeperCount].id;
+        option.text = keepersList[keeperCount].name;
 
         eventKeeperInput.add(option);
     }
@@ -2331,9 +2646,55 @@ bjørneparkappen.adminconsole.events.detail.loadCreatePage = function(){
     // Clear page data
     bjørneparkappen.adminconsole.events.detail.clearPageData();
 
+    if (eventTypeSelector.value == "event"){
+
+        // Add amenity options to dropdown
+        for (amenityCount = 0; amenityCount < amenitiesList.length; amenityCount++){
+
+            var option = document.createElement("option");
+            option.value = amenitiesList[amenityCount].id;
+            option.text = bjørneparkappen.adminconsole.getTranslation(amenitiesList[amenityCount], 'label', LANGUAGE_CODE);
+
+            eventAreaInput.add(option);
+        }
+
+    } else {
+
+        // Add enclosure options to dropdown
+        for (enclosureCount = 0; enclosureCount < enclosuresList.length; enclosureCount++){
+
+            var option = document.createElement("option");
+            option.value = enclosuresList[enclosureCount].id;
+            option.text = bjørneparkappen.adminconsole.getTranslation(enclosuresList[enclosureCount], 'label', LANGUAGE_CODE);
+
+            eventAreaInput.add(option);
+        }
+    }
+
     // Set page title and confirm button to create
     eventDetailTitle.innerHTML = "Create Event";
     eventDetailConfirm.value = "Create";
+    eventLabelAddTranslation.innerHTML = "Add";
+    eventDescriptionAddTranslation.innerHTML = "Add";
+
+    eventDetailConfirm.onclick = function(){
+
+        eventDetailEvent.start_time = eventStartTimeInput.value;
+        eventDetailEvent.end_time = eventEndTimeInput.value;
+        eventDetailEvent.location_id = eventAreaInput.value;
+        eventDetailEvent.is_active = eventActiveInput.checked;
+
+        if (eventTypeSelector.value == "event"){
+
+            bjørneparkappen.adminconsole.api.createEvent(eventDetailEvent);
+
+        } else {
+
+            eventDetailEvent.keeper_id = eventKeeperInput.value;
+
+            bjørneparkappen.adminconsole.api.createFeeding(eventDetailEvent);
+        }
+    }
 
     // Display the detail page
     bjørneparkappen.adminconsole.navigation.displayPage(eventDetailPage);
@@ -2348,34 +2709,110 @@ bjørneparkappen.adminconsole.events.detail.loadUpdatePage = function(event){
     // Set confirm button to update
     eventDetailTitle.innerHTML = "Update Event";
     eventDetailConfirm.value = "Save";
+    eventLabelAddTranslation.innerHTML = "Update";
+    eventDescriptionAddTranslation.innerHTML = "Update";
+    eventAreaInput.disabled = true;
+    eventTypeSelector.disabled = true;
+
+    // Set event item
+    eventDetailEvent = event;
 
     // Populate page with new data
-    eventLabelInput.value = event.label;
-    eventStartTimeInput.value = event.start_time;
-    eventEndTimeInput.value = event.end_time;
-    eventAreaInput.value = event.location.id;
-    eventDescriptionInput.value = event.description;
+    eventLabelInput.value = bjørneparkappen.adminconsole.getTranslation(eventDetailEvent, 'label', eventLabelLanguageInput.value);
+    eventStartTimeInput.value = eventDetailEvent.start_time;
+    eventEndTimeInput.value = eventDetailEvent.end_time;
+    eventAreaInput.value = eventDetailEvent.location.id;
+    eventDescriptionInput.value = bjørneparkappen.adminconsole.getTranslation(eventDetailEvent, 'description', eventLabelLanguageInput.value);
 
     // If item is a feeding
-    if (event.keeper != null){
+    if (eventDetailEvent.keeper != null){
 
         eventTypeSelector.value = "feeding";
         feeding_fields.style.display = DISPLAYED;
 
-        eventKeeperInput.value = event.keeper.id;
+        eventKeeperInput.value = eventDetailEvent.keeper.id;
+
+        // Add enclosure options to dropdown
+        for (enclosureCount = 0; enclosureCount < enclosuresList.length; enclosureCount++){
+
+            var option = document.createElement("option");
+            option.value = enclosuresList[enclosureCount].id;
+            option.text = bjørneparkappen.adminconsole.getTranslation(enclosuresList[enclosureCount], 'label', LANGUAGE_CODE);
+
+            eventAreaInput.add(option);
+        }
 
     } else {
 
         eventTypeSelector.value = "event";
         feeding_fields.style.display = HIDDEN;
+
+        // Add amenity options to dropdown
+        for (amenityCount = 0; amenityCount < amenitiesList.length; amenityCount++){
+
+            var option = document.createElement("option");
+            option.value = amenitiesList[amenityCount].id;
+            option.text = bjørneparkappen.adminconsole.getTranslation(amenitiesList[amenityCount], 'label', LANGUAGE_CODE);
+
+            eventAreaInput.add(option);
+        }
     }
 
-    eventActiveInput.checked = event.is_active;
+    eventActiveInput.checked = eventDetailEvent.is_active;
+
+    eventDetailConfirm.onclick = function(){
+
+        eventDetailEvent.start_time = eventStartTimeInput.value;
+        eventDetailEvent.end_time = eventEndTimeInput.value;
+        eventDetailEvent.is_active = eventActiveInput.checked;
+
+        if (bjørneparkappen.adminconsole.events.detail.validate()) {
+
+            if (eventTypeSelector.value == "event"){
+
+                bjørneparkappen.adminconsole.api.updateEvent(eventDetailEvent);
+
+            } else {
+
+                eventDetailEvent.keeper_id = eventKeeperInput.value;
+
+                bjørneparkappen.adminconsole.api.updateFeeding(eventDetailEvent);
+            }
+        }
+    }
 
     // Display the detail page
     bjørneparkappen.adminconsole.navigation.displayPage(eventDetailPage);
 }
 
+// Validates detail input
+bjørneparkappen.adminconsole.events.detail.validate = function(){
+
+    var valid = false;
+
+    if (eventDetailEvent.label.length < eventLabelLanguageInput.length){
+
+        alert("Please enter all translations for the event label.")
+
+    } else if (eventDetailEvent.start_time == ""){
+
+        alert("Please enter the event start time.");
+
+    } else if (eventDetailEvent.end_time == ""){
+
+        alert("Please enter the event end time.");
+
+    } else if (eventDetailEvent.description.length < eventDescriptionLanguageInput.length) {
+
+        alert("Please enter all translations for the event description.");
+
+    } else {
+
+        valid = true;
+    }
+
+    return valid;
+}
 
 
 /** Keepers */
