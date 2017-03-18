@@ -27,6 +27,7 @@ from protorpc import remote
 class InternationalMessage(messages.Message):
     text = messages.StringField(1, required=True)
     language_code = messages.StringField(2, required=True)
+
 class VersionResponse(messages.Message):
     version = message_types.DateTimeField(1)
 # [END api messages]
@@ -43,9 +44,17 @@ class KeeperResponse(messages.Message):
 
 class KeeperListResponse(messages.Message):
     keepers = messages.MessageField(KeeperResponse, 1, repeated=True)
+
+class KeeperTranslationResponse(messages.Message):
+    id = messages.IntegerField(1)
+    name = messages.StringField(2)
+    bio = messages.MessageField(InternationalMessage, 3, repeated=True)
+
+class KeeperTranslationListResponse(messages.Message):
+    keepers = messages.MessageField(KeeperTranslationResponse, 1, repeated=True)
 # [END keeper messages]
 
-# [START species messages]
+# [START species messages]
 class SpeciesRequest(messages.Message):
     common_name = messages.MessageField(InternationalMessage, 1, repeated=True)
     latin = messages.StringField(2)
@@ -67,7 +76,6 @@ class SpeciesTranslationResponse(messages.Message):
     common_name = messages.MessageField(InternationalMessage, 2, repeated=True)
     latin = messages.StringField(3)
     description = messages.MessageField(InternationalMessage, 4, repeated=True)
-    image = messages.StringField(5)
 
 class SpeciesTranslationListResponse(messages.Message):
     species = messages.MessageField(SpeciesTranslationResponse, 1, repeated=True)
@@ -98,11 +106,23 @@ class AnimalResponse(messages.Message):
 
 class AnimalListResponse(messages.Message):
     animals = messages.MessageField(AnimalResponse, 1, repeated=True)
+
+class AnimalTranslationResponse(messages.Message):
+    id = messages.IntegerField(1)
+    name = messages.StringField(2)
+    species = messages.MessageField(SpeciesTranslationResponse, 3)
+    enclosure_id = messages.IntegerField(4)
+    description = messages.MessageField(InternationalMessage, 5, repeated=True)
+    is_available = messages.BooleanField(6)
+
+class AnimalTranslationListResponse(messages.Message):
+    animals = messages.MessageField(AnimalTranslationResponse, 1, repeated=True)
 # [END animal messages]
 
 # [START area messages]
 # All Enclosure and Amenity messages appear to duplicate unnecessarily.
 # This has been done because ProtoRPC messages do not support inheritance
+
 class EnclosureRequest(messages.Message):
     label = messages.MessageField(InternationalMessage, 1, repeated=True)
     visitor_destination = messages.StringField(2)
@@ -133,6 +153,25 @@ class AmenityResponse(messages.Message):
 class AreaListResponse(messages.Message):
     enclosures = messages.MessageField(EnclosureResponse, 1, repeated=True)
     amenities = messages.MessageField(AmenityResponse, 2, repeated=True)
+
+class EnclosureTranslationResponse(messages.Message):
+    id = messages.IntegerField(1)
+    label = messages.MessageField(InternationalMessage, 2, repeated=True)
+    visitor_destination = messages.StringField(3)
+    coordinates = messages.StringField(4, repeated=True)
+    animals = messages.MessageField(AnimalTranslationResponse, 5, repeated=True)
+
+class AmenityTranslationResponse(messages.Message):
+    id = messages.IntegerField(1)
+    label = messages.MessageField(InternationalMessage, 2, repeated=True)
+    visitor_destination = messages.StringField(3)
+    coordinates = messages.StringField(4, repeated=True)
+    description = messages.MessageField(InternationalMessage, 5, repeated=True)
+    amenity_type = messages.StringField(6)
+
+class AreaTranslationListResponse(messages.Message):
+    enclosures = messages.MessageField(EnclosureTranslationResponse, 1, repeated=True)
+    amenities = messages.MessageField(AmenityTranslationResponse, 2, repeated=True)
 # [END area messages]
 
 # [START event messages]
@@ -153,7 +192,6 @@ class EventRequest(messages.Message):
 class UpdateEventRequest(messages.Message):
     label = messages.MessageField(InternationalMessage, 1, repeated=True)
     description = messages.MessageField(InternationalMessage, 2, repeated=True)
-
     start_time = messages.StringField(3)
     end_time = messages.StringField(4)
     is_active = messages.BooleanField(5)
@@ -197,6 +235,29 @@ class FeedingResponse(messages.Message):
 class EventListResponse(messages.Message):
     events = messages.MessageField(EventResponse, 1, repeated=True)
     feedings = messages.MessageField(FeedingResponse, 2, repeated=True)
+
+class EventTranslationResponse(messages.Message):
+    id = messages.IntegerField(1)
+    label = messages.MessageField(InternationalMessage, 2, repeated=True)
+    description = messages.MessageField(InternationalMessage, 3, repeated=True)
+    location = messages.MessageField(AmenityTranslationResponse, 4)
+    start_time = messages.StringField(5)
+    end_time = messages.StringField(6)
+    is_active = messages.BooleanField(7)
+
+class FeedingTranslationResponse(messages.Message):
+    id = messages.IntegerField(1)
+    label = messages.MessageField(InternationalMessage, 2, repeated=True)
+    description = messages.MessageField(InternationalMessage, 3, repeated=True)
+    location = messages.MessageField(EnclosureTranslationResponse, 4)
+    start_time = messages.StringField(5)
+    end_time = messages.StringField(6)
+    is_active = messages.BooleanField(7)
+    keeper = messages.MessageField(KeeperTranslationResponse, 8)
+
+class EventTranslationListResponse(messages.Message):
+    events = messages.MessageField(EventTranslationResponse, 1, repeated=True)
+    feedings = messages.MessageField(FeedingTranslationResponse, 2, repeated=True)
 # [END event messages]
 
 # [START visitor messages]
@@ -208,6 +269,7 @@ class VisitorResponse(messages.Message):
     id = messages.IntegerField(1)
 # [END visitor messages]
 # [END messages]
+
 
 # [START request resources]
 # [START list request resources]
@@ -338,6 +400,93 @@ class ApiHelper():
         return international_texts
 
     @staticmethod
+    def get_species_response(species, language_code):
+        # Translate translatable species resources
+        species_common_name_translation = InternationalText.get_translation(
+                language_code,
+                species.common_name)
+        species_description_translation = InternationalText.get_translation(
+                language_code,
+                species.description)
+
+        image = None
+
+        # If species has an image
+        if not species.image is None:
+            image = species.image.get()
+
+        return SpeciesResponse(
+            id=species.key.id(),
+            common_name=species_common_name_translation,
+            latin=species.latin,
+            description=species_description_translation,
+            image=image)
+
+    @staticmethod
+    def get_species_response_with_translations(species):
+
+        # Translate translatable species resources
+        species_common_name_translations = []
+        for common_name_translation in species.common_name:
+            translation = InternationalMessage(text=common_name_translation.text, language_code=common_name_translation.language_code)
+            species_common_name_translations.append(translation)
+
+        species_description_translations = []
+        for description_translation in species.description:
+            translation = InternationalMessage(text=description_translation.text, language_code=description_translation.language_code)
+            species_description_translations.append(translation)
+
+        return SpeciesTranslationResponse(
+            id=species.key.id(),
+            common_name=species_common_name_translations,
+            latin=species.latin,
+            description=species_description_translations)
+
+    @staticmethod
+    def get_animal_response(animal, language_code):
+
+        # Retrieve species
+        species = animal.key.parent().get()
+
+        # Create species response to include in animal response
+        species_response = ApiHelper.get_species_response(species, language_code)
+
+        # Translate translatable animal resources
+        animal_description_translation = InternationalText.get_translation(
+                language_code,
+                animal.description)
+
+        return AnimalResponse(
+            id=animal.key.id(),
+            name=animal.name,
+            species=species_response,
+            description=animal_description_translation,
+            is_available=animal.is_available)
+
+    @staticmethod
+    def get_animal_response_with_translations(animal):
+        # Retrieve species
+        species = animal.key.parent().get()
+        species_response = ApiHelper.get_species_response_with_translations(species)
+
+        # Retrieve enclosure
+        enclosure = Enclosure.get_for_animal(animal.key.id(), species.key.id())
+
+        # Translate translatable animal resources
+        animal_description_translations = []
+        for description_translation in animal.description:
+            translation = InternationalMessage(text=description_translation.text, language_code=description_translation.language_code)
+            animal_description_translations.append(translation)
+
+        return AnimalTranslationResponse(
+            id=animal.key.id(),
+            name=animal.name,
+            species=species_response,
+            enclosure_id=enclosure.key.id(),
+            description=animal_description_translations,
+            is_available=animal.is_available)
+
+    @staticmethod
     def get_enclosure_response(area, language_code):
 
         # Translate translatable area resources
@@ -358,37 +507,10 @@ class ApiHelper():
 
             # Retrieve animal
             animal = Animal.get_by_id(animal_reference.animal_id, parent=ndb.Key(Species, animal_reference.species_id))
-
-            # Retrieve species
-            species = animal.key.parent().get()
-
-            # Translate translatable species resources
-            species_common_name_translation = InternationalText.get_translation(
-                    language_code,
-                    species.common_name)
-            species_description_translation = InternationalText.get_translation(
-                    language_code,
-                    species.description)
-
-            # Create species response to include in animal response
-            species_response = SpeciesResponse(
-                id=species.key.id(),
-                common_name=species_common_name_translation,
-                latin=species.latin,
-                description=species_description_translation)
-
-            # Translate translatable animal resources
-            animal_description_translation = InternationalText.get_translation(
-                    language_code,
-                    animal.description)
+            animal_response = ApiHelper.get_animal_response(animal, language_code)
 
             # Add animal to return list
-            animals.append(AnimalResponse(
-                id=animal.key.id(),
-                name=animal.name,
-                species=species_response,
-                description=animal_description_translation,
-                is_available=animal.is_available))
+            animals.append(animal_response)
 
         return EnclosureResponse(
             id=area.key.id(),
@@ -423,6 +545,92 @@ class ApiHelper():
             description=amenity_description_translation,
             amenity_type=area.amenity_type)
 
+    @staticmethod
+    def get_enclosure_response_with_translations(area):
+
+        # Translate translatable area resources
+        area_label_translations = []
+        for label_translation in area.label:
+            translation = InternationalMessage(text=label_translation.text, language_code=label_translation.language_code)
+            area_label_translations.append(translation)
+
+        coordinates = []
+
+        # Convert co-ordinate pairs to strings
+        for coordinate in area.coordinates:
+            coordinates.append(str(coordinate.lon) + ", " + str(coordinate.lat))
+
+        animals = []
+
+        # For each animal/species key set
+        for animal_reference in area.animals:
+
+            # Retrieve animal
+            animal = Animal.get_by_id(animal_reference.animal_id, parent=ndb.Key(Species, animal_reference.species_id))
+            animal_response = ApiHelper.get_animal_response_with_translations(animal)
+            animals.append(animal_response)
+
+        return EnclosureTranslationResponse(
+            id=area.key.id(),
+            label=area_label_translations,
+            visitor_destination=str(area.visitor_destination.lon) + ", " + str(area.visitor_destination.lat),
+            coordinates=coordinates,
+            animals=animals)
+
+    @staticmethod
+    def get_amenity_response(area, language_code):
+
+        # Translate translatable area resources
+        area_label_translation = InternationalText.get_translation(
+                language_code,
+                area.label)
+
+        amenity_description_translation = InternationalText.get_translation(
+                language_code,
+                area.description)
+
+        coordinates = []
+
+        # Convert co-ordinate pairs to strings
+        for coordinate in area.coordinates:
+            coordinates.append(str(coordinate.lon) + ", " + str(coordinate.lat))
+
+        return AmenityResponse(
+            id=area.key.id(),
+            label=area_label_translation,
+            visitor_destination=str(area.visitor_destination.lon) + ", " + str(area.visitor_destination.lat),
+            coordinates=coordinates,
+            description=amenity_description_translation,
+            amenity_type=area.amenity_type)
+
+    @staticmethod
+    def get_amenity_response_with_translations(area):
+
+        # Translate translatable area resources
+        area_label_translations = []
+        for label_translation in area.label:
+            translation = InternationalMessage(text=label_translation.text, language_code=label_translation.language_code)
+            area_label_translations.append(translation)
+
+        # Translate translatable area resources
+        area_description_translations = []
+        for description_translation in area.description:
+            translation = InternationalMessage(text=description_translation.text, language_code=description_translation.language_code)
+            area_description_translations.append(translation)
+
+        coordinates = []
+
+        # Convert co-ordinate pairs to strings
+        for coordinate in area.coordinates:
+            coordinates.append(str(coordinate.lon) + ", " + str(coordinate.lat))
+
+        return AmenityTranslationResponse(
+            id=area.key.id(),
+            label=area_label_translations,
+            visitor_destination=str(area.visitor_destination.lon) + ", " + str(area.visitor_destination.lat),
+            coordinates=coordinates,
+            description=area_description_translations,
+            amenity_type=area.amenity_type)
 
     ### Class Methods
 
@@ -521,27 +729,10 @@ class SpeciesApi(remote.Service):
         # Build up response of all species
         for species in all_species:
 
-            # Translate translatable species resources
-            species_common_name_translation = InternationalText.get_translation(
-                    request.language_code,
-                    species.common_name)
-            species_description_translation = InternationalText.get_translation(
-                    request.language_code,
-                    species.description)
-
-            image = None
-
-            # If species has an image
-            if not species.image is None:
-                image = species.image.get()
+            species_response = ApiHelper.get_species_response(species, request.language_code)
 
             # Add species to return list
-            response.species.append(SpeciesResponse(
-                id=species.key.id(),
-                common_name=species_common_name_translation,
-                latin=species.latin,
-                description=species_description_translation,
-                image=image))
+            response.species.append(species_response)
 
         return response
 
@@ -699,30 +890,10 @@ class SpeciesApi(remote.Service):
         # Build up response of all species
         for species in all_species:
 
-            # Translate translatable species resources
-            species_common_name_translations = []
-            for common_name_translation in species.common_name:
-                translation = InternationalMessage(text=common_name_translation.text, language_code=common_name_translation.language_code)
-                species_common_name_translations.append(translation)
-
-            species_description_translations = []
-            for description_translation in species.description:
-                translation = InternationalMessage(text=description_translation.text, language_code=description_translation.language_code)
-                species_description_translations.append(translation)
-
-            image = None
-
-            # If species has an image
-            if not species.image is None:
-                image = species.image.get()
+            species_response = ApiHelper.get_species_response_with_translations(species)
 
             # Add species to return list
-            response.species.append(SpeciesTranslationResponse(
-                id=species.key.id(),
-                common_name=species_common_name_translations,
-                latin=species.latin,
-                description=species_description_translations,
-                image=image))
+            response.species.append(species_response)
 
         return response
 # [END Species API]
@@ -750,42 +921,16 @@ class AnimalsApi(remote.Service):
         # Build up response of all animals
         for animal in animals:
 
-            # Retrieve species
-            species = animal.key.parent().get()
-
-            # Translate translatable species resources
-            species_common_name_translation = InternationalText.get_translation(
-                    request.language_code,
-                    species.common_name)
-            species_description_translation = InternationalText.get_translation(
-                    request.language_code,
-                    species.description)
-
-            # Create species response to include in animal response
-            species_response = SpeciesResponse(
-                id=species.key.id(),
-                common_name=species_common_name_translation,
-                latin=species.latin,
-                description=species_description_translation)
-
-            # Translate translatable animal resources
-            animal_description_translation = InternationalText.get_translation(
-                    request.language_code,
-                    animal.description)
+            animal_response = ApiHelper.get_animal_response(animal, request.language_code)
 
             # Add animal to return list
-            response.animals.append(AnimalResponse(
-                id=animal.key.id(),
-                name=animal.name,
-                species=species_response,
-                description=animal_description_translation,
-                is_available=animal.is_available))
+            response.animals.append(animal_response)
 
         return response
 
     @endpoints.method(
         CREATE_ANIMAL_REQUEST,
-        message_types.VoidMessage,
+        AnimalTranslationListResponse,
         path='create',
         http_method='POST',
         name='animals.create')
@@ -825,11 +970,11 @@ class AnimalsApi(remote.Service):
         # Update version
         ApiHelper.update_version()
 
-        return message_types.VoidMessage()
+        return AnimalsApi.list_animals_with_translations()
 
     @endpoints.method(
         UPDATE_ANIMAL_REQUEST,
-        message_types.VoidMessage,
+        AnimalTranslationListResponse,
         path='update',
         http_method='POST',
         name='animals.update')
@@ -883,11 +1028,11 @@ class AnimalsApi(remote.Service):
         # Update version
         ApiHelper.update_version()
 
-        return message_types.VoidMessage()
+        return AnimalsApi.list_animals_with_translations()
 
     @endpoints.method(
         ANIMAL_ID_REQUEST,
-        message_types.VoidMessage,
+        AnimalTranslationListResponse,
         path='delete',
         http_method='DELETE',
         name='animals.delete')
@@ -927,7 +1072,34 @@ class AnimalsApi(remote.Service):
         # Update version
         ApiHelper.update_version()
 
-        return message_types.VoidMessage()
+        return AnimalsApi.list_animals_with_translations()
+
+    @endpoints.method(
+        message_types.VoidMessage,
+        AnimalTranslationListResponse,
+        path='all_languages',
+        http_method='GET',
+        name='animals.all_languages')
+    def list_animals_all_languages(self, request):
+        return AnimalsApi.list_animals_with_translations()
+
+    @staticmethod
+    def list_animals_with_translations():
+
+        # Retrieve all animals
+        animals = Animal.get_all()
+
+        response = AnimalTranslationListResponse()
+
+        # Build up response of all animals
+        for animal in animals:
+
+            animal_response = ApiHelper.get_animal_response_with_translations(animal)
+
+            # Add animal to return list
+            response.animals.append(animal_response)
+
+        return response
 # [END Animals API]
 
 # [START Areas API]
@@ -950,7 +1122,7 @@ class AreasApi(remote.Service):
 
         response = AreaListResponse()
 
-        # Build up response of all enclosures
+        # Build up response of all areas
         for area in areas:
 
             # If area is an Enclosure
@@ -1080,7 +1252,7 @@ class AreasApi(remote.Service):
 
     @endpoints.method(
         EnclosureRequest,
-        message_types.VoidMessage,
+        AreaTranslationListResponse,
         path='enclosures/create',
         http_method='POST',
         name='areas.enclosures.create')
@@ -1118,11 +1290,11 @@ class AreasApi(remote.Service):
         # Update version
         ApiHelper.update_version()
 
-        return message_types.VoidMessage()
+        return AreasApi.list_areas_with_translations()
 
     @endpoints.method(
         AmenityRequest,
-        message_types.VoidMessage,
+        AreaTranslationListResponse,
         path='amenities/create',
         http_method='POST',
         name='areas.amenities.create')
@@ -1179,11 +1351,11 @@ class AreasApi(remote.Service):
         # Update version
         ApiHelper.update_version()
 
-        return message_types.VoidMessage()
+        return AreasApi.list_areas_with_translations()
 
     @endpoints.method(
         UPDATE_ENCLOSURE_REQUEST,
-        message_types.VoidMessage,
+        AreaTranslationListResponse,
         path='enclosures/update',
         http_method='POST',
         name='areas.enclosures.update')
@@ -1235,7 +1407,7 @@ class AreasApi(remote.Service):
         # Update version
         ApiHelper.update_version()
 
-        return message_types.VoidMessage()
+        return AreasApi.list_areas_with_translations()
 
     @endpoints.method(
         ADD_REMOVE_ANIMAL_REQUEST,
@@ -1293,7 +1465,7 @@ class AreasApi(remote.Service):
 
     @endpoints.method(
         UPDATE_AMENITY_REQUEST,
-        message_types.VoidMessage,
+        AreaTranslationListResponse,
         path='amenities/update',
         http_method='POST',
         name='areas.amenities.update')
@@ -1369,11 +1541,11 @@ class AreasApi(remote.Service):
         # Update version
         ApiHelper.update_version()
 
-        return message_types.VoidMessage()
+        return AreasApi.list_areas_with_translations()
 
     @endpoints.method(
         ID_REQUEST,
-        message_types.VoidMessage,
+        AreaTranslationListResponse,
         path='delete',
         http_method='DELETE',
         name='areas.delete')
@@ -1399,7 +1571,51 @@ class AreasApi(remote.Service):
         # Update version
         ApiHelper.update_version()
 
-        return message_types.VoidMessage()
+        return AreasApi.list_areas_with_translations()
+
+    @endpoints.method(
+        message_types.VoidMessage,
+        AreaTranslationListResponse,
+        path='all_languages',
+        http_method='GET',
+        name='areas.all_languages')
+    def list_areas_all_languages(self, request):
+        return AreasApi.list_areas_with_translations()
+
+    @staticmethod
+    def list_areas_with_translations():
+
+        # Retrieve all areas
+        areas = Area.get_all()
+
+        response = AreaTranslationListResponse()
+
+        # Build up response of all areas
+        for area in areas:
+
+            # If area is an Enclosure
+            if type(area) is Enclosure:
+
+                # Retrieve an Enclosure response
+                area_response = ApiHelper.get_enclosure_response_with_translations(area)
+
+                # Add area to return list
+                response.enclosures.append(area_response)
+
+            # Else if area is an Amenity
+            elif type(area) is Amenity:
+
+                # Retrieve an Amenity response
+                area_response = ApiHelper.get_amenity_response_with_translations(area)
+
+                # Add area to return list
+                response.amenities.append(area_response)
+
+            else:
+                raise endpoints.UnexpectedException("Area found which is neither Enclosure nor Amenity, consult developer.")
+
+        return response
+
 # [END Areas API]
 
 # [START Events API]
