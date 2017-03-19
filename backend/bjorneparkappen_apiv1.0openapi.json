@@ -60,6 +60,39 @@
       },
       "type": "object"
     },
+    "MainAmenityTranslationResponse": {
+      "properties": {
+        "amenity_type": {
+          "type": "string"
+        },
+        "coordinates": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "description": {
+          "items": {
+            "$ref": "#/definitions/MainInternationalMessage"
+          },
+          "type": "array"
+        },
+        "id": {
+          "format": "int64",
+          "type": "string"
+        },
+        "label": {
+          "items": {
+            "$ref": "#/definitions/MainInternationalMessage"
+          },
+          "type": "array"
+        },
+        "visitor_destination": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
     "MainAnimalListResponse": {
       "properties": {
         "animals": {
@@ -92,6 +125,45 @@
       },
       "type": "object"
     },
+    "MainAnimalTranslationListResponse": {
+      "properties": {
+        "animals": {
+          "items": {
+            "$ref": "#/definitions/MainAnimalTranslationResponse"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "MainAnimalTranslationResponse": {
+      "properties": {
+        "description": {
+          "items": {
+            "$ref": "#/definitions/MainInternationalMessage"
+          },
+          "type": "array"
+        },
+        "enclosure_id": {
+          "format": "int64",
+          "type": "string"
+        },
+        "id": {
+          "format": "int64",
+          "type": "string"
+        },
+        "is_available": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "species": {
+          "$ref": "#/definitions/MainSpeciesTranslationResponse"
+        }
+      },
+      "type": "object"
+    },
     "MainAreaListResponse": {
       "properties": {
         "amenities": {
@@ -103,6 +175,23 @@
         "enclosures": {
           "items": {
             "$ref": "#/definitions/MainEnclosureResponse"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "MainAreaTranslationListResponse": {
+      "properties": {
+        "amenities": {
+          "items": {
+            "$ref": "#/definitions/MainAmenityTranslationResponse"
+          },
+          "type": "array"
+        },
+        "enclosures": {
+          "items": {
+            "$ref": "#/definitions/MainEnclosureTranslationResponse"
           },
           "type": "array"
         }
@@ -149,6 +238,36 @@
         },
         "label": {
           "type": "string"
+        },
+        "visitor_destination": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "MainEnclosureTranslationResponse": {
+      "properties": {
+        "animals": {
+          "items": {
+            "$ref": "#/definitions/MainAnimalTranslationResponse"
+          },
+          "type": "array"
+        },
+        "coordinates": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "id": {
+          "format": "int64",
+          "type": "string"
+        },
+        "label": {
+          "items": {
+            "$ref": "#/definitions/MainInternationalMessage"
+          },
+          "type": "array"
         },
         "visitor_destination": {
           "type": "string"
@@ -230,6 +349,56 @@
       },
       "type": "object"
     },
+    "MainEventTranslationListResponse": {
+      "properties": {
+        "events": {
+          "items": {
+            "$ref": "#/definitions/MainEventTranslationResponse"
+          },
+          "type": "array"
+        },
+        "feedings": {
+          "items": {
+            "$ref": "#/definitions/MainFeedingTranslationResponse"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "MainEventTranslationResponse": {
+      "properties": {
+        "description": {
+          "items": {
+            "$ref": "#/definitions/MainInternationalMessage"
+          },
+          "type": "array"
+        },
+        "end_time": {
+          "type": "string"
+        },
+        "id": {
+          "format": "int64",
+          "type": "string"
+        },
+        "is_active": {
+          "type": "boolean"
+        },
+        "label": {
+          "items": {
+            "$ref": "#/definitions/MainInternationalMessage"
+          },
+          "type": "array"
+        },
+        "location": {
+          "$ref": "#/definitions/MainAmenityTranslationResponse"
+        },
+        "start_time": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
     "MainFeedingRequest": {
       "properties": {
         "description": {
@@ -294,6 +463,42 @@
       },
       "type": "object"
     },
+    "MainFeedingTranslationResponse": {
+      "properties": {
+        "description": {
+          "items": {
+            "$ref": "#/definitions/MainInternationalMessage"
+          },
+          "type": "array"
+        },
+        "end_time": {
+          "type": "string"
+        },
+        "id": {
+          "format": "int64",
+          "type": "string"
+        },
+        "is_active": {
+          "type": "boolean"
+        },
+        "keeper": {
+          "$ref": "#/definitions/MainKeeperTranslationResponse"
+        },
+        "label": {
+          "items": {
+            "$ref": "#/definitions/MainInternationalMessage"
+          },
+          "type": "array"
+        },
+        "location": {
+          "$ref": "#/definitions/MainEnclosureTranslationResponse"
+        },
+        "start_time": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
     "MainInternationalMessage": {
       "properties": {
         "language_code": {
@@ -349,6 +554,35 @@
       },
       "type": "object"
     },
+    "MainKeeperTranslationListResponse": {
+      "properties": {
+        "keepers": {
+          "items": {
+            "$ref": "#/definitions/MainKeeperTranslationResponse"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "MainKeeperTranslationResponse": {
+      "properties": {
+        "bio": {
+          "items": {
+            "$ref": "#/definitions/MainInternationalMessage"
+          },
+          "type": "array"
+        },
+        "id": {
+          "format": "int64",
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
     "MainSpeciesListResponse": {
       "properties": {
         "species": {
@@ -374,6 +608,9 @@
           },
           "type": "array"
         },
+        "image": {
+          "type": "string"
+        },
         "latin": {
           "type": "string"
         }
@@ -387,6 +624,44 @@
         },
         "description": {
           "type": "string"
+        },
+        "id": {
+          "format": "int64",
+          "type": "string"
+        },
+        "image": {
+          "type": "string"
+        },
+        "latin": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "MainSpeciesTranslationListResponse": {
+      "properties": {
+        "species": {
+          "items": {
+            "$ref": "#/definitions/MainSpeciesTranslationResponse"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "MainSpeciesTranslationResponse": {
+      "properties": {
+        "common_name": {
+          "items": {
+            "$ref": "#/definitions/MainInternationalMessage"
+          },
+          "type": "array"
+        },
+        "description": {
+          "items": {
+            "$ref": "#/definitions/MainInternationalMessage"
+          },
+          "type": "array"
         },
         "id": {
           "format": "int64",
@@ -431,29 +706,31 @@
     },
     "ProtorpcMessagesCombinedContainer": {
       "properties": {
+        "common_name": {
+          "items": {
+            "$ref": "#/definitions/MainInternationalMessage"
+          },
+          "type": "array"
+        },
         "description": {
           "items": {
             "$ref": "#/definitions/MainInternationalMessage"
           },
           "type": "array"
         },
-        "enclosure_id": {
+        "id": {
           "format": "int64",
           "type": "string"
         },
-        "is_available": {
-          "type": "boolean"
-        },
-        "name": {
+        "image": {
           "type": "string"
         },
-        "species_id": {
-          "format": "int64",
+        "latin": {
           "type": "string"
         }
       },
       "required": [
-        "enclosure_id"
+        "id"
       ],
       "type": "object"
     }
@@ -490,13 +767,43 @@
         ]
       }
     },
-    "/bjorneparkappen_api/v1.0/animals/create": {
-      "post": {
-        "operationId": "AnimalsApi_createAnimal",
+    "/bjorneparkappen_api/v1.0/animals/all_languages": {
+      "get": {
+        "operationId": "AnimalsApi_listAnimalsAllLanguages",
         "parameters": [],
         "responses": {
           "200": {
-            "description": "A successful response"
+            "description": "A successful response",
+            "schema": {
+              "$ref": "#/definitions/MainAnimalTranslationListResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/bjorneparkappen_api/v1.0/animals/create": {
+      "post": {
+        "operationId": "AnimalsApi_createAnimal",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/ProtorpcMessagesCombinedContainer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response",
+            "schema": {
+              "$ref": "#/definitions/MainAnimalTranslationListResponse"
+            }
           }
         },
         "security": [
@@ -527,7 +834,10 @@
         ],
         "responses": {
           "200": {
-            "description": "A successful response"
+            "description": "A successful response",
+            "schema": {
+              "$ref": "#/definitions/MainAnimalTranslationListResponse"
+            }
           }
         },
         "security": [
@@ -540,10 +850,21 @@
     "/bjorneparkappen_api/v1.0/animals/update": {
       "post": {
         "operationId": "AnimalsApi_updateAnimal",
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/ProtorpcMessagesCombinedContainer"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "A successful response"
+            "description": "A successful response",
+            "schema": {
+              "$ref": "#/definitions/MainAnimalTranslationListResponse"
+            }
           }
         },
         "security": [
@@ -569,6 +890,25 @@
             "description": "A successful response",
             "schema": {
               "$ref": "#/definitions/MainAreaListResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/bjorneparkappen_api/v1.0/areas/all_languages": {
+      "get": {
+        "operationId": "AreasApi_listAreasAllLanguages",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "A successful response",
+            "schema": {
+              "$ref": "#/definitions/MainAreaTranslationListResponse"
             }
           }
         },
@@ -640,10 +980,21 @@
     "/bjorneparkappen_api/v1.0/areas/amenities/create": {
       "post": {
         "operationId": "AreasApi_createAmenity",
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/MainAmenityRequest"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "A successful response"
+            "description": "A successful response",
+            "schema": {
+              "$ref": "#/definitions/MainAreaTranslationListResponse"
+            }
           }
         },
         "security": [
@@ -656,10 +1007,21 @@
     "/bjorneparkappen_api/v1.0/areas/amenities/update": {
       "post": {
         "operationId": "AreasApi_updateAmenity",
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/ProtorpcMessagesCombinedContainer"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "A successful response"
+            "description": "A successful response",
+            "schema": {
+              "$ref": "#/definitions/MainAreaTranslationListResponse"
+            }
           }
         },
         "security": [
@@ -683,7 +1045,10 @@
         ],
         "responses": {
           "200": {
-            "description": "A successful response"
+            "description": "A successful response",
+            "schema": {
+              "$ref": "#/definitions/MainAreaTranslationListResponse"
+            }
           }
         },
         "security": [
@@ -722,7 +1087,15 @@
     "/bjorneparkappen_api/v1.0/areas/enclosures/animals/add": {
       "post": {
         "operationId": "AreasApi_addAnimalToEnclosure",
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/ProtorpcMessagesCombinedContainer"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "A successful response"
@@ -738,10 +1111,21 @@
     "/bjorneparkappen_api/v1.0/areas/enclosures/create": {
       "post": {
         "operationId": "AreasApi_createEnclosure",
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/MainEnclosureRequest"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "A successful response"
+            "description": "A successful response",
+            "schema": {
+              "$ref": "#/definitions/MainAreaTranslationListResponse"
+            }
           }
         },
         "security": [
@@ -754,10 +1138,21 @@
     "/bjorneparkappen_api/v1.0/areas/enclosures/update": {
       "post": {
         "operationId": "AreasApi_updateEnclosure",
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/ProtorpcMessagesCombinedContainer"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "A successful response"
+            "description": "A successful response",
+            "schema": {
+              "$ref": "#/definitions/MainAreaTranslationListResponse"
+            }
           }
         },
         "security": [
@@ -783,6 +1178,25 @@
             "description": "A successful response",
             "schema": {
               "$ref": "#/definitions/MainEventListResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/bjorneparkappen_api/v1.0/events/all_languages": {
+      "get": {
+        "operationId": "EventsApi_listAllEventsAllLanguages",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "A successful response",
+            "schema": {
+              "$ref": "#/definitions/MainEventTranslationListResponse"
             }
           }
         },
@@ -829,10 +1243,21 @@
     "/bjorneparkappen_api/v1.0/events/create": {
       "post": {
         "operationId": "EventsApi_createEvent",
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/MainEventRequest"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "A successful response"
+            "description": "A successful response",
+            "schema": {
+              "$ref": "#/definitions/MainEventTranslationListResponse"
+            }
           }
         },
         "security": [
@@ -863,7 +1288,10 @@
         ],
         "responses": {
           "200": {
-            "description": "A successful response"
+            "description": "A successful response",
+            "schema": {
+              "$ref": "#/definitions/MainEventTranslationListResponse"
+            }
           }
         },
         "security": [
@@ -928,10 +1356,21 @@
     "/bjorneparkappen_api/v1.0/events/feedings/create": {
       "post": {
         "operationId": "EventsApi_createFeeding",
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/MainFeedingRequest"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "A successful response"
+            "description": "A successful response",
+            "schema": {
+              "$ref": "#/definitions/MainEventTranslationListResponse"
+            }
           }
         },
         "security": [
@@ -977,10 +1416,21 @@
     "/bjorneparkappen_api/v1.0/events/feedings/update": {
       "post": {
         "operationId": "EventsApi_updateFeeding",
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/ProtorpcMessagesCombinedContainer"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "A successful response"
+            "description": "A successful response",
+            "schema": {
+              "$ref": "#/definitions/MainEventTranslationListResponse"
+            }
           }
         },
         "security": [
@@ -993,10 +1443,21 @@
     "/bjorneparkappen_api/v1.0/events/update": {
       "post": {
         "operationId": "EventsApi_updateEvent",
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/ProtorpcMessagesCombinedContainer"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "A successful response"
+            "description": "A successful response",
+            "schema": {
+              "$ref": "#/definitions/MainEventTranslationListResponse"
+            }
           }
         },
         "security": [
@@ -1032,13 +1493,43 @@
         ]
       }
     },
-    "/bjorneparkappen_api/v1.0/keepers/create": {
-      "post": {
-        "operationId": "KeepersApi_createKeeper",
+    "/bjorneparkappen_api/v1.0/keepers/all_languages": {
+      "get": {
+        "operationId": "KeepersApi_listKeepersAllLanguages",
         "parameters": [],
         "responses": {
           "200": {
-            "description": "A successful response"
+            "description": "A successful response",
+            "schema": {
+              "$ref": "#/definitions/MainKeeperTranslationListResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/bjorneparkappen_api/v1.0/keepers/create": {
+      "post": {
+        "operationId": "KeepersApi_createKeeper",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/MainKeeperRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response",
+            "schema": {
+              "$ref": "#/definitions/MainKeeperTranslationListResponse"
+            }
           }
         },
         "security": [
@@ -1062,7 +1553,10 @@
         ],
         "responses": {
           "200": {
-            "description": "A successful response"
+            "description": "A successful response",
+            "schema": {
+              "$ref": "#/definitions/MainKeeperTranslationListResponse"
+            }
           }
         },
         "security": [
@@ -1075,10 +1569,21 @@
     "/bjorneparkappen_api/v1.0/keepers/update": {
       "post": {
         "operationId": "KeepersApi_updateKeeper",
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/ProtorpcMessagesCombinedContainer"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "A successful response"
+            "description": "A successful response",
+            "schema": {
+              "$ref": "#/definitions/MainKeeperTranslationListResponse"
+            }
           }
         },
         "security": [
@@ -1114,13 +1619,43 @@
         ]
       }
     },
-    "/bjorneparkappen_api/v1.0/species/create": {
-      "post": {
-        "operationId": "SpeciesApi_createSpecies",
+    "/bjorneparkappen_api/v1.0/species/all_languages": {
+      "get": {
+        "operationId": "SpeciesApi_listSpeciesAllLanguages",
         "parameters": [],
         "responses": {
           "200": {
-            "description": "A successful response"
+            "description": "A successful response",
+            "schema": {
+              "$ref": "#/definitions/MainSpeciesTranslationListResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/bjorneparkappen_api/v1.0/species/create": {
+      "post": {
+        "operationId": "SpeciesApi_createSpecies",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/MainSpeciesRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response",
+            "schema": {
+              "$ref": "#/definitions/MainSpeciesTranslationListResponse"
+            }
           }
         },
         "security": [
@@ -1144,7 +1679,10 @@
         ],
         "responses": {
           "200": {
-            "description": "A successful response"
+            "description": "A successful response",
+            "schema": {
+              "$ref": "#/definitions/MainSpeciesTranslationListResponse"
+            }
           }
         },
         "security": [
@@ -1157,10 +1695,21 @@
     "/bjorneparkappen_api/v1.0/species/update": {
       "post": {
         "operationId": "SpeciesApi_updateSpecies",
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/ProtorpcMessagesCombinedContainer"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "A successful response"
+            "description": "A successful response",
+            "schema": {
+              "$ref": "#/definitions/MainSpeciesTranslationListResponse"
+            }
           }
         },
         "security": [
@@ -1192,7 +1741,15 @@
     "/bjorneparkappen_api/v1.0/visitors/create": {
       "post": {
         "operationId": "VisitorsApi_createVisitor",
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/MainVisitorRequest"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "A successful response",
@@ -1244,7 +1801,15 @@
     "/bjorneparkappen_api/v1.0/visitors/itinerary/add": {
       "post": {
         "operationId": "VisitorsApi_addEventToItinerary",
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/ProtorpcMessagesCombinedContainer"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "A successful response",
@@ -1263,7 +1828,42 @@
     "/bjorneparkappen_api/v1.0/visitors/itinerary/remove": {
       "post": {
         "operationId": "VisitorsApi_removeEventFromItinerary",
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/ProtorpcMessagesCombinedContainer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response",
+            "schema": {
+              "$ref": "#/definitions/MainEventListResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/bjorneparkappen_api/v1.0/visitors/itinerary/sync": {
+      "post": {
+        "operationId": "VisitorsApi_syncItinerary",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/ProtorpcMessagesCombinedContainer"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "A successful response",
@@ -1315,7 +1915,15 @@
     "/bjorneparkappen_api/v1.0/visitors/starred_species/add": {
       "post": {
         "operationId": "VisitorsApi_addStarredSpecies",
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/ProtorpcMessagesCombinedContainer"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "A successful response",
@@ -1334,7 +1942,42 @@
     "/bjorneparkappen_api/v1.0/visitors/starred_species/remove": {
       "post": {
         "operationId": "VisitorsApi_removeStarredSpecies",
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/ProtorpcMessagesCombinedContainer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response",
+            "schema": {
+              "$ref": "#/definitions/MainSpeciesListResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/bjorneparkappen_api/v1.0/visitors/starred_species/sync": {
+      "post": {
+        "operationId": "VisitorsApi_syncStarredSpecies",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/ProtorpcMessagesCombinedContainer"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "A successful response",
@@ -1353,7 +1996,15 @@
     "/bjorneparkappen_api/v1.0/visitors/update": {
       "post": {
         "operationId": "VisitorsApi_updateVisitor",
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/ProtorpcMessagesCombinedContainer"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "A successful response"
