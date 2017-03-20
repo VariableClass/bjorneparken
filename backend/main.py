@@ -670,7 +670,7 @@ class ApiHelper():
                 event.description)
 
         # Retrieve location
-        location = cls.get_amenity_response(event.key.parent().get(), language_code)
+        location = ApiHelper.get_amenity_response(event.key.parent().get(), language_code)
 
         return EventResponse(
             id=event.key.id(),
@@ -1888,7 +1888,7 @@ class EventsApi(remote.Service):
     def create_event(self, request):
 
         # Validate all required values have been provided
-        if not request.label and request.description and request.location_id and request.start_time and request.end_time and is_active is not None:
+        if not request.label and request.description and request.location_id and request.start_time and request.end_time and request.is_active is not None:
             raise endpoints.BadRequestException("Please provided values for 'label', 'description', 'location_id', 'start_time', 'end_time' and 'is_active'.")
 
         # Retrieve location from provided ID
@@ -2015,7 +2015,7 @@ class EventsApi(remote.Service):
     def create_feeding(self, request):
 
         # Validate all required values have been provided
-        if not request.label and request.description and request.location_id and request.start_time and request.end_time and is_active is not None:
+        if not request.label and request.description and request.location_id and request.start_time and request.end_time and request.is_active is not None:
             raise endpoints.BadRequestException("Please provided values for 'label', 'description', 'location_id', 'start_time', 'end_time' and 'is_active'.")
 
         # Retrieve location from provided ID
@@ -2163,7 +2163,7 @@ class EventsApi(remote.Service):
                 raise endpoints.BadRequestException("Keeper '" + str(request.keeper_id) + "' busy during requested times.")
 
             # Update keeper_id value
-            feeding.keeper_id = keeper_id
+            feeding.keeper_id = keeper.id
 
         # Write changes
         feeding.put()
