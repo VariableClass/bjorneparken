@@ -87,7 +87,7 @@ div.content .page {
     font-size: 16px;
     font-weight: bold;
     -webkit-transition-duration: 0.3s; /* Safari */
-    transition-duration: 0.3;
+    transition-duration: 0.3s;
     cursor: pointer;
 }
 
@@ -103,14 +103,14 @@ form {
 
 .button.create {
     position: absolute;
-    top: 0px;
-    right: 0px;
+    top: 0;
+    right: 0;
 }
 
 .button.submit {
     position: absolute;
-    bottom: 0px;
-    right: 0px;
+    bottom: 0;
+    right: 0;
 }
 
 .button.cancel {
@@ -119,7 +119,7 @@ form {
     color: gray;
     border: none;
     position: absolute;
-    bottom: 0px;
+    bottom: 0;
     right: 100px;
 }
 
