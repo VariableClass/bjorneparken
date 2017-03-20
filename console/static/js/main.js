@@ -15,7 +15,7 @@ const API_KEY = "AIzaSyCuD2dk_XFcn512V5JxAZbFlAK9dgNlQ9c";
 const LANGUAGE_CODE = "en";
 
 // Namespaces for Bjørneparken and the Administrative Console
-var bjørneparkappen = bjørneparkappen || {};
+var bjørneparkappen = {};
 bjørneparkappen.adminconsole = bjørneparkappen.adminconsole || {};
 bjørneparkappen.adminconsole.api = bjørneparkappen.adminconsole.api || {};
 bjørneparkappen.adminconsole.navigation = bjørneparkappen.adminconsole.navigation || {};
@@ -138,14 +138,14 @@ bjørneparkappen.adminconsole.lookup = function(search, table){
     var tr = table.getElementsByTagName("tr");
 
     // For each table row
-    for (i = 1; i < tr.length; i++) {
+    for (var i = 1; i < tr.length; i++) {
 
-        td = tr[i].getElementsByTagName("td");
+        var td = tr[i].getElementsByTagName("td");
 
         var fruitlessColumns = 0;
 
         // For each column
-        for (j = 0; j < td.length; j++) {
+        for (var j = 0; j < td.length; j++) {
 
             if (td[j]) {
 
@@ -163,7 +163,7 @@ bjørneparkappen.adminconsole.lookup = function(search, table){
         }
 
         // If no matching text found
-        if (fruitlessColumns == td.length){
+        if (fruitlessColumns === td.length){
 
             // Hide row
             tr[i].style.display = HIDDEN;
@@ -174,11 +174,11 @@ bjørneparkappen.adminconsole.lookup = function(search, table){
             tr[i].style.display = "";
         }
     }
-}
+};
 
 bjørneparkappen.adminconsole.addTranslation = function(item, itemProperty, textInput, languageInput, translationsSpan, addButton){
 
-    if (textInput.value != "" && languageInput.value != ""){
+    if (textInput.value !== "" && languageInput.value !== ""){
 
         // Create visual representation of translation
         var translationParagraph = document.createElement('p');
@@ -201,40 +201,40 @@ bjørneparkappen.adminconsole.addTranslation = function(item, itemProperty, text
         translation.text = translationText;
         translation.language_code = translationLanguage;
 
-        if (item[itemProperty] == null){
+        if (item[itemProperty] === null){
 
             item[itemProperty] = [];
         }
         item[itemProperty].push(translation);
 
         // Disable input box if no more translations available to add
-        if (languageInput.length == 0) {
+        if (languageInput.length === 0) {
 
             textInput.disabled = true;
             languageInput.disabled = true;
             addButton.disabled = true;
         }
     }
-}
+};
 
 bjørneparkappen.adminconsole.getTranslation = function(item, itemProperty, languageCode) {
 
-    for (i = 0; i < item[itemProperty].length; i++){
+    for (var i = 0; i < item[itemProperty].length; i++){
 
-        if (item[itemProperty][i].language_code == languageCode){
+        if (item[itemProperty][i].language_code === languageCode){
 
             return item[itemProperty][i].text;
         }
     }
-}
+};
 
 bjørneparkappen.adminconsole.updateTranslation = function(item, itemProperty, newValue, languageCode){
 
-    if (newValue != "" && languageCode != ""){
+    if (newValue !== "" && languageCode !== ""){
 
-        for (i = 0; i < item[itemProperty].length; i++){
+        for (var i = 0; i < item[itemProperty].length; i++){
 
-            if (item[itemProperty][i].language_code == languageCode) {
+            if (item[itemProperty][i].language_code === languageCode) {
 
                 item[itemProperty][i].text = newValue;
                 alert("Updated!");
@@ -242,7 +242,7 @@ bjørneparkappen.adminconsole.updateTranslation = function(item, itemProperty, n
             }
         }
     }
-}
+};
 
 bjørneparkappen.adminconsole.clearTranslations = function(textInput, languageInput, translationsSpan, addButton){
 
@@ -261,7 +261,7 @@ bjørneparkappen.adminconsole.clearTranslations = function(textInput, languageIn
     languageInput.disabled = false;
 
     addButton.disabled = false;
-}
+};
 
 
 
@@ -281,13 +281,13 @@ bjørneparkappen.adminconsole.api.getSpecies = function(){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        if (xhr.readyState === XMLHttpRequest.DONE){
 
             // If request status is 200
-            if (xhr.status == 200){
+            if (xhr.status === 200){
 
                 // Parse response JSON
-                resp = JSON.parse(xhr.responseText);
+                var resp = JSON.parse(xhr.responseText);
                 speciesList = resp.species || [];
             }
 
@@ -314,10 +314,12 @@ bjørneparkappen.adminconsole.api.createSpecies = function(species){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+
+            var resp;
 
             // If request status is 200
-            if (xhr.status == 200) {
+            if (xhr.status === 200) {
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -346,7 +348,7 @@ bjørneparkappen.adminconsole.api.createSpecies = function(species){
 
     // Send request
     xhr.send(JSON.stringify(species));
-}
+};
 bjørneparkappen.adminconsole.api.updateSpecies = function(species){
 
     // Put UI into wait state
@@ -362,10 +364,12 @@ bjørneparkappen.adminconsole.api.updateSpecies = function(species){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        if (xhr.readyState === XMLHttpRequest.DONE){
+
+            var resp;
 
             // If request status is 200
-            if (xhr.status == 200) {
+            if (xhr.status === 200) {
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -394,7 +398,7 @@ bjørneparkappen.adminconsole.api.updateSpecies = function(species){
 
     // Send request
     xhr.send(JSON.stringify(species));
-}
+};
 bjørneparkappen.adminconsole.api.deleteSpecies = function(species){
 
     // Put UI into wait state
@@ -410,10 +414,12 @@ bjørneparkappen.adminconsole.api.deleteSpecies = function(species){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        if (xhr.readyState === XMLHttpRequest.DONE){
+
+            var resp;
 
             // If request status is 200
-            if (xhr.status == 200){
+            if (xhr.status === 200){
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -455,10 +461,12 @@ bjørneparkappen.adminconsole.api.getAreas = function(){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        if (xhr.readyState === XMLHttpRequest.DONE){
+
+            var resp;
 
             // If request status is 200
-            if (xhr.status == 200){
+            if (xhr.status === 200){
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -489,10 +497,12 @@ bjørneparkappen.adminconsole.api.createAmenity = function(amenity){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        if (xhr.readyState === XMLHttpRequest.DONE){
+
+            var resp;
 
             // If request status is 200
-            if (xhr.status == 200) {
+            if (xhr.status === 200) {
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -521,7 +531,7 @@ bjørneparkappen.adminconsole.api.createAmenity = function(amenity){
 
     // Send request
     xhr.send(JSON.stringify(amenity));
-}
+};
 bjørneparkappen.adminconsole.api.updateAmenity = function(amenity){
 
     // Put UI into wait state
@@ -537,10 +547,12 @@ bjørneparkappen.adminconsole.api.updateAmenity = function(amenity){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        if (xhr.readyState === XMLHttpRequest.DONE){
+
+            var resp;
 
             // If request status is 200
-            if (xhr.status == 200) {
+            if (xhr.status === 200) {
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -569,7 +581,7 @@ bjørneparkappen.adminconsole.api.updateAmenity = function(amenity){
 
     // Send request
     xhr.send(JSON.stringify(amenity));
-}
+};
 bjørneparkappen.adminconsole.api.createEnclosure = function(enclosure){
 
     // Put UI into wait state
@@ -585,10 +597,12 @@ bjørneparkappen.adminconsole.api.createEnclosure = function(enclosure){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        if (xhr.readyState === XMLHttpRequest.DONE){
+
+            var resp;
 
             // If request status is 200
-            if (xhr.status == 200) {
+            if (xhr.status === 200) {
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -617,7 +631,7 @@ bjørneparkappen.adminconsole.api.createEnclosure = function(enclosure){
 
     // Send request
     xhr.send(JSON.stringify(enclosure));
-}
+};
 bjørneparkappen.adminconsole.api.updateEnclosure = function(enclosure){
 
     // Put UI into wait state
@@ -633,10 +647,12 @@ bjørneparkappen.adminconsole.api.updateEnclosure = function(enclosure){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        if (xhr.readyState === XMLHttpRequest.DONE){
+
+            var resp;
 
             // If request status is 200
-            if (xhr.status == 200) {
+            if (xhr.status === 200) {
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -665,7 +681,7 @@ bjørneparkappen.adminconsole.api.updateEnclosure = function(enclosure){
 
     // Send request
     xhr.send(JSON.stringify(enclosure));
-}
+};
 bjørneparkappen.adminconsole.api.deleteArea = function(area){
 
     // Put UI into wait state
@@ -681,10 +697,12 @@ bjørneparkappen.adminconsole.api.deleteArea = function(area){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        if (xhr.readyState === XMLHttpRequest.DONE){
+
+            var resp;
 
             // If request status is 200
-            if (xhr.status == 200){
+            if (xhr.status === 200){
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -727,10 +745,12 @@ bjørneparkappen.adminconsole.api.getEvents = function(){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        if (xhr.readyState === XMLHttpRequest.DONE){
+
+            var resp;
 
             // If request status is 200
-            if (xhr.status == 200){
+            if (xhr.status === 200){
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -761,10 +781,12 @@ bjørneparkappen.adminconsole.api.createEvent = function(event){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        if (xhr.readyState === XMLHttpRequest.DONE){
+
+            var resp;
 
             // If request status is 200
-            if (xhr.status == 200) {
+            if (xhr.status === 200) {
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -793,7 +815,7 @@ bjørneparkappen.adminconsole.api.createEvent = function(event){
 
     // Send request
     xhr.send(JSON.stringify(event));
-}
+};
 bjørneparkappen.adminconsole.api.updateEvent = function(event){
 
     // Put UI into wait state
@@ -809,10 +831,12 @@ bjørneparkappen.adminconsole.api.updateEvent = function(event){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        if (xhr.readyState === XMLHttpRequest.DONE){
+
+            var resp;
 
             // If request status is 200
-            if (xhr.status == 200) {
+            if (xhr.status === 200) {
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -841,7 +865,7 @@ bjørneparkappen.adminconsole.api.updateEvent = function(event){
 
     // Send request
     xhr.send(JSON.stringify(event));
-}
+};
 bjørneparkappen.adminconsole.api.createFeeding = function(feeding){
 
     // Put UI into wait state
@@ -857,10 +881,12 @@ bjørneparkappen.adminconsole.api.createFeeding = function(feeding){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        if (xhr.readyState === XMLHttpRequest.DONE){
+
+            var resp;
 
             // If request status is 200
-            if (xhr.status == 200) {
+            if (xhr.status === 200) {
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -889,7 +915,7 @@ bjørneparkappen.adminconsole.api.createFeeding = function(feeding){
 
     // Send request
     xhr.send(JSON.stringify(feeding));
-}
+};
 bjørneparkappen.adminconsole.api.updateFeeding = function(feeding){
 
     // Put UI into wait state
@@ -905,10 +931,12 @@ bjørneparkappen.adminconsole.api.updateFeeding = function(feeding){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        if (xhr.readyState === XMLHttpRequest.DONE){
+
+            var resp;
 
             // If request status is 200
-            if (xhr.status == 200) {
+            if (xhr.status === 200) {
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -937,7 +965,7 @@ bjørneparkappen.adminconsole.api.updateFeeding = function(feeding){
 
     // Send request
     xhr.send(JSON.stringify(feeding));
-}
+};
 bjørneparkappen.adminconsole.api.deleteEvent = function(event){
 
     // Put UI into wait state
@@ -953,10 +981,12 @@ bjørneparkappen.adminconsole.api.deleteEvent = function(event){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        if (xhr.readyState === XMLHttpRequest.DONE){
+
+            var resp;
 
             // If request status is 200
-            if (xhr.status == 200){
+            if (xhr.status === 200){
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -1000,10 +1030,12 @@ bjørneparkappen.adminconsole.api.getAnimals = function(){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        if (xhr.readyState === XMLHttpRequest.DONE){
+
+            var resp;
 
             // If request status is 200
-            if (xhr.status == 200){
+            if (xhr.status === 200){
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -1033,10 +1065,12 @@ bjørneparkappen.adminconsole.api.createAnimal = function(animal){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        if (xhr.readyState === XMLHttpRequest.DONE){
+
+            var resp;
 
             // If request status is 200
-            if (xhr.status == 200) {
+            if (xhr.status === 200) {
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -1065,7 +1099,7 @@ bjørneparkappen.adminconsole.api.createAnimal = function(animal){
 
     // Send request
     xhr.send(JSON.stringify(animal));
-}
+};
 bjørneparkappen.adminconsole.api.updateAnimal = function(animal){
 
     // Put UI into wait state
@@ -1081,10 +1115,12 @@ bjørneparkappen.adminconsole.api.updateAnimal = function(animal){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        if (xhr.readyState === XMLHttpRequest.DONE){
+
+            var resp;
 
             // If request status is 200
-            if (xhr.status == 200) {
+            if (xhr.status === 200) {
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -1113,7 +1149,7 @@ bjørneparkappen.adminconsole.api.updateAnimal = function(animal){
 
     // Send request
     xhr.send(JSON.stringify(animal));
-}
+};
 bjørneparkappen.adminconsole.api.deleteAnimal = function(animal){
 
     // Put UI into wait state
@@ -1129,10 +1165,12 @@ bjørneparkappen.adminconsole.api.deleteAnimal = function(animal){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        if (xhr.readyState === XMLHttpRequest.DONE){
+
+            var resp;
 
             // If request status is 200
-            if (xhr.status == 200){
+            if (xhr.status === 200){
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -1175,10 +1213,12 @@ bjørneparkappen.adminconsole.api.getKeepers = function(){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        if (xhr.readyState === XMLHttpRequest.DONE){
+
+            var resp;
 
             // If request status is 200
-            if (xhr.status == 200){
+            if (xhr.status === 200){
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -1208,10 +1248,12 @@ bjørneparkappen.adminconsole.api.createKeeper = function(keeper){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        if (xhr.readyState === XMLHttpRequest.DONE){
+
+            var resp;
 
             // If request status is 200
-            if (xhr.status == 200) {
+            if (xhr.status === 200) {
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -1240,7 +1282,7 @@ bjørneparkappen.adminconsole.api.createKeeper = function(keeper){
 
     // Send request
     xhr.send(JSON.stringify(keeper));
-}
+};
 bjørneparkappen.adminconsole.api.updateKeeper = function(keeper){
 
     // Put UI into wait state
@@ -1256,10 +1298,12 @@ bjørneparkappen.adminconsole.api.updateKeeper = function(keeper){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        if (xhr.readyState === XMLHttpRequest.DONE){
+
+            var resp;
 
             // If request status is 200
-            if (xhr.status == 200) {
+            if (xhr.status === 200) {
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -1288,7 +1332,7 @@ bjørneparkappen.adminconsole.api.updateKeeper = function(keeper){
 
     // Send request
     xhr.send(JSON.stringify(keeper));
-}
+};
 bjørneparkappen.adminconsole.api.deleteKeeper = function(keeper){
 
     // Put UI into wait state
@@ -1304,10 +1348,12 @@ bjørneparkappen.adminconsole.api.deleteKeeper = function(keeper){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        if (xhr.readyState === XMLHttpRequest.DONE){
+
+            var resp;
 
             // If request status is 200
-            if (xhr.status == 200){
+            if (xhr.status === 200){
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -1350,7 +1396,7 @@ speciesNav.onclick = function(){
 
     // Load List Species page
     bjørneparkappen.adminconsole.species.list.loadPage();
-}
+};
 
 
 // List Species Page and elements
@@ -1363,7 +1409,7 @@ createSpeciesButton.onclick = function(){
 
     // Display Create Species page
     bjørneparkappen.adminconsole.navigation.displayPage(speciesDetailPage);
-}
+};
 
 // Clears the List Species page
 bjørneparkappen.adminconsole.species.list.clearPageData = function(){
@@ -1388,7 +1434,7 @@ bjørneparkappen.adminconsole.species.list.loadPage = function(){
     bjørneparkappen.adminconsole.species.list.clearPageData();
 
     // If no species were found
-    if (speciesList.length == 0){
+    if (speciesList.length === 0){
 
         // Retrieve the list of species
         bjørneparkappen.adminconsole.api.getSpecies();
@@ -1424,16 +1470,16 @@ bjørneparkappen.adminconsole.species.addToTable = function(species){
     // Create link to delete item
     var deleteLink = document.createElement('a');
     deleteLink.href = '#';
-    deleteLink.innerHTML = "Delete"
+    deleteLink.innerHTML = "Delete";
     deleteLink.onclick = function(){
 
         bjørneparkappen.adminconsole.species.delete(species);
-    }
+    };
 
     deleteCell.appendChild(deleteLink);
 
     // Set all cells except the delete cell to load the update page onclick
-    for (i = 0; i < row.cells.length - 1; i++){
+    for (var i = 0; i < row.cells.length - 1; i++){
 
         row.cells[i].onclick = function(){
 
@@ -1450,7 +1496,7 @@ bjørneparkappen.adminconsole.species.search = function(){
     var table = document.getElementById("list_species_table");
 
     bjørneparkappen.adminconsole.lookup(search, table);
-}
+};
 
 // Deletes a Species
 bjørneparkappen.adminconsole.species.delete = function(species){
@@ -1459,7 +1505,7 @@ bjørneparkappen.adminconsole.species.delete = function(species){
 
         bjørneparkappen.adminconsole.api.deleteSpecies(species);
     }
-}
+};
 
 
 // Species Detail Page and elements
@@ -1472,24 +1518,24 @@ speciesDetailCancel.onclick = function(){
 
     // Display List Species page
     bjørneparkappen.adminconsole.navigation.displayPage(listSpeciesPage);
-}
+};
 var speciesDetailForm = document.getElementById('species_detail_form');
 var speciesCommonNameInput = document.getElementById('species_name');
 var speciesCommonNameLanguageInput = document.getElementById('species_common_name_language');
 speciesCommonNameLanguageInput.onchange = function(){
 
-    if (speciesDetailSpecies.id != null){
+    if (speciesDetailSpecies.id){
 
         // Update textbox value
         speciesCommonNameInput.value = bjørneparkappen.adminconsole.getTranslation(speciesDetailSpecies, 'common_name', speciesCommonNameLanguageInput.value);
     }
-}
+};
 var speciesCommonNameTranslations = document.getElementById('species_common_name_translations');
 var speciesCommonNameAddTranslation = document.getElementById('species_add_common_name_translation');
 speciesCommonNameAddTranslation.onclick = function(){
 
     // If creating
-    if (speciesDetailSpecies.id == null){
+    if (!speciesDetailSpecies.id){
 
         // Add translation to list of displayed translations
         bjørneparkappen.adminconsole.addTranslation(speciesDetailSpecies, 'common_name', speciesCommonNameInput, speciesCommonNameLanguageInput, speciesCommonNameTranslations, speciesCommonNameAddTranslation);
@@ -1499,23 +1545,24 @@ speciesCommonNameAddTranslation.onclick = function(){
         // Update existing translation
         bjørneparkappen.adminconsole.updateTranslation(speciesDetailSpecies, 'common_name', speciesCommonNameInput.value, speciesCommonNameLanguageInput.value);
     }
-}
+};
+var speciesLatinInput = document.getElementById('species_latin');
 var speciesDescriptionInput = document.getElementById('species_description');
 var speciesDescriptionLanguageInput = document.getElementById('species_description_language');
 speciesDescriptionLanguageInput.onchange = function(){
 
-    if (speciesDetailSpecies.id != null){
+    if (speciesDetailSpecies.id){
 
         // Update textbox value
         speciesDescriptionInput.value = bjørneparkappen.adminconsole.getTranslation(speciesDetailSpecies, 'description', speciesDescriptionLanguageInput.value);
     }
-}
+};
 var speciesDescriptionTranslations = document.getElementById('species_description_translations');
 var speciesDescriptionAddTranslation = document.getElementById('species_add_description_translation');
 speciesDescriptionAddTranslation.onclick = function(){
 
     // If creating
-    if (speciesDetailSpecies.id == null){
+    if (!speciesDetailSpecies.id){
 
         // Add translation to list of displayed translations
         bjørneparkappen.adminconsole.addTranslation(speciesDetailSpecies, 'description', speciesDescriptionInput, speciesDescriptionLanguageInput, speciesDescriptionTranslations, speciesDescriptionAddTranslation);
@@ -1525,9 +1572,7 @@ speciesDescriptionAddTranslation.onclick = function(){
         // Update existing translation
         bjørneparkappen.adminconsole.updateTranslation(speciesDetailSpecies, 'description', speciesDescriptionInput.value, speciesDescriptionLanguageInput.value);
     }
-}
-var speciesLatinInput = document.getElementById('species_latin');
-var speciesDescriptionInput = document.getElementById('species_description');
+};
 
 // Clears the Species Detail page
 bjørneparkappen.adminconsole.species.detail.clearPageData = function(){
@@ -1565,11 +1610,11 @@ bjørneparkappen.adminconsole.species.detail.loadCreatePage = function(){
 
             bjørneparkappen.adminconsole.api.createSpecies(speciesDetailSpecies);
         }
-    }
+    };
 
     // Display the detail page
     bjørneparkappen.adminconsole.navigation.displayPage(speciesDetailPage);
-}
+};
 
 // Loads the Update Species page
 bjørneparkappen.adminconsole.species.detail.loadUpdatePage = function(species){
@@ -1594,7 +1639,7 @@ bjørneparkappen.adminconsole.species.detail.loadUpdatePage = function(species){
 
             bjørneparkappen.adminconsole.api.updateSpecies(speciesDetailSpecies);
         }
-    }
+    };
 
     // Populate form with new data
     speciesCommonNameInput.value = bjørneparkappen.adminconsole.getTranslation(speciesDetailSpecies, 'common_name', speciesCommonNameLanguageInput.value);
@@ -1603,7 +1648,7 @@ bjørneparkappen.adminconsole.species.detail.loadUpdatePage = function(species){
 
     // Display the detail page
     bjørneparkappen.adminconsole.navigation.displayPage(speciesDetailPage);
-}
+};
 
 // Validates detail input
 bjørneparkappen.adminconsole.species.detail.validate = function(){
@@ -1614,7 +1659,7 @@ bjørneparkappen.adminconsole.species.detail.validate = function(){
 
         alert("Please enter all translations for the species' common name.")
 
-    } else if (speciesDetailSpecies.latin == ""){
+    } else if (speciesDetailSpecies.latin === ""){
 
         alert("Please enter a latin name.");
 
@@ -1628,7 +1673,7 @@ bjørneparkappen.adminconsole.species.detail.validate = function(){
     }
 
     return valid;
-}
+};
 
 
 
@@ -1658,7 +1703,7 @@ createAreaButton.onclick = function(){
 
     // Display Create Area page
     bjørneparkappen.adminconsole.navigation.displayPage(areaDetailPage);
-}
+};
 
 // Clears the Areas page
 bjørneparkappen.adminconsole.areas.list.clearPageData = function(){
@@ -1734,7 +1779,7 @@ bjørneparkappen.adminconsole.areas.addToTable = function(area){
     // Provide values to the new row
     labelCell.innerHTML = bjørneparkappen.adminconsole.getTranslation(area, 'label', LANGUAGE_CODE);
 
-    if (area.amenity_type != null){
+    if (area.amenity_type !== null){
 
         typeCell.innerHTML = area.amenity_type;
 
@@ -1746,19 +1791,19 @@ bjørneparkappen.adminconsole.areas.addToTable = function(area){
     // Create link to delete item
     var deleteLink = document.createElement('a');
     deleteLink.href = '#';
-    deleteLink.innerHTML = "Delete"
+    deleteLink.innerHTML = "Delete";
     deleteLink.onclick = function(){
 
         if (confirm("Are you sure?")){
 
             bjørneparkappen.adminconsole.areas.delete(area);
         }
-    }
+    };
 
     deleteCell.appendChild(deleteLink);
 
     // Set all cells except the delete cell to load the update page onclick
-    for (i = 0; i < row.cells.length - 1; i++){
+    for (var i = 0; i < row.cells.length - 1; i++){
 
         row.cells[i].onclick = function(){
 
@@ -1775,7 +1820,7 @@ bjørneparkappen.adminconsole.areas.search = function(){
     var table = document.getElementById("list_areas_table");
 
     bjørneparkappen.adminconsole.lookup(search, table);
-}
+};
 
 // Deletes an Area
 bjørneparkappen.adminconsole.areas.delete = function(area){
@@ -1784,7 +1829,7 @@ bjørneparkappen.adminconsole.areas.delete = function(area){
 
         bjørneparkappen.adminconsole.api.deleteArea(area);
     }
-}
+};
 
 
 // Area Detail Page and elements
@@ -1797,38 +1842,37 @@ areaDetailCancel.onclick = function(){
 
     // Display List Areas page
     bjørneparkappen.adminconsole.navigation.displayPage(listAreasPage);
-}
+};
 var areaTypeSelector = document.getElementById('area_type_selector');
+var amenityFields = document.getElementById('amenity_fields');
 areaTypeSelector.onchange = function(){
 
-    var amenity_fields = document.getElementById('amenity_fields');
+    if (areaTypeSelector.value === "enclosure"){
 
-    if (areaTypeSelector.value == "enclosure"){
-
-        amenity_fields.style.display = HIDDEN;
+        amenityFields.style.display = HIDDEN;
 
     } else {
 
-        amenity_fields.style.display = DISPLAYED;
+        amenityFields.style.display = DISPLAYED;
     }
-}
+};
 var areaDetailForm = document.getElementById('area_detail_form');
 var areaLabelInput = document.getElementById('area_label');
 var areaLabelLanguageInput = document.getElementById('area_label_language');
 areaLabelLanguageInput.onchange = function(){
 
-    if (areaDetailArea.id != null){
+    if (areaDetailArea.id){
 
         // Update textbox value
         areaLabelInput.value = bjørneparkappen.adminconsole.getTranslation(areaDetailArea, 'label', areaLabelLanguageInput.value);
     }
-}
+};
 var areaLabelTranslations = document.getElementById('area_label_translations');
 var areaLabelAddTranslation = document.getElementById('area_add_label_translation');
 areaLabelAddTranslation.onclick = function(){
 
     // If creating
-    if (areaDetailArea.id == null){
+    if (!areaDetailArea.id){
 
         // Add translation to list of displayed translations
         bjørneparkappen.adminconsole.addTranslation(areaDetailArea, 'label', areaLabelInput, areaLabelLanguageInput, areaLabelTranslations, areaLabelAddTranslation);
@@ -1838,25 +1882,25 @@ areaLabelAddTranslation.onclick = function(){
         // Update existing translation
         bjørneparkappen.adminconsole.updateTranslation(areaDetailArea, 'label', areaLabelInput.value, areaLabelLanguageInput.value);
     }
-}
+};
 var areaVisitorDestinationInput = document.getElementById('area_visitor_destination');
 var amenityTypeInput = document.getElementById('amenity_type');
 var amenityDescriptionInput = document.getElementById('amenity_description');
 var amenityDescriptionLanguageInput = document.getElementById('amenity_description_language');
 amenityDescriptionLanguageInput.onchange = function(){
 
-    if (areaDetailArea.id != null){
+    if (areaDetailArea.id){
 
         // Update textbox value
         amenityDescriptionInput.value = bjørneparkappen.adminconsole.getTranslation(areaDetailArea, 'description', amenityDescriptionLanguageInput.value);
     }
-}
+};
 var amenityDescriptionTranslations = document.getElementById('amenity_description_translations');
 var amenityDescriptionAddTranslation = document.getElementById('amenity_add_description_translation');
 amenityDescriptionAddTranslation.onclick = function(){
 
     // If creating
-    if (areaDetailArea.id == null){
+    if (!areaDetailArea.id){
 
         // Add translation to list of displayed translations
         bjørneparkappen.adminconsole.addTranslation(areaDetailArea, 'description', amenityDescriptionInput, amenityDescriptionLanguageInput, amenityDescriptionTranslations, amenityDescriptionAddTranslation);
@@ -1866,7 +1910,7 @@ amenityDescriptionAddTranslation.onclick = function(){
         // Update existing translation
         bjørneparkappen.adminconsole.updateTranslation(areaDetailArea, 'description', amenityDescriptionInput.value, amenityDescriptionLanguageInput.value);
     }
-}
+};
 var amenityImage = document.getElementById('amenity_image');
 
 // Clears the Area Detail page
@@ -1905,7 +1949,7 @@ bjørneparkappen.adminconsole.areas.detail.loadCreatePage = function(){
 
         if (bjørneparkappen.adminconsole.areas.detail.validate()){
 
-            if (areaTypeSelector.value == "amenity") {
+            if (areaTypeSelector.value === "amenity") {
 
                 areaDetailArea.amenity_type = amenityTypeInput.value;
                 bjørneparkappen.adminconsole.api.createAmenity(areaDetailArea);
@@ -1915,11 +1959,11 @@ bjørneparkappen.adminconsole.areas.detail.loadCreatePage = function(){
                 bjørneparkappen.adminconsole.api.createEnclosure(areaDetailArea);
             }
         }
-    }
+    };
 
     // Display the detail page
     bjørneparkappen.adminconsole.navigation.displayPage(areaDetailPage);
-}
+};
 
 // Loads the Update Area page
 bjørneparkappen.adminconsole.areas.detail.loadUpdatePage = function(area){
@@ -1937,10 +1981,10 @@ bjørneparkappen.adminconsole.areas.detail.loadUpdatePage = function(area){
     // Set area object
     areaDetailArea = area;
 
-    if (area.amenity_type != null){
+    if (area.amenity_type !== null){
 
         areaTypeSelector.value = "amenity";
-        amenity_fields.style.display = DISPLAYED;
+        amenityFields.style.display = DISPLAYED;
 
         amenityTypeInput.value = area.amenity_type;
         amenityDescriptionInput.value = bjørneparkappen.adminconsole.getTranslation(area, 'description', LANGUAGE_CODE);
@@ -1948,7 +1992,7 @@ bjørneparkappen.adminconsole.areas.detail.loadUpdatePage = function(area){
     } else {
 
         areaTypeSelector.value = "enclosure";
-        amenity_fields.style.display = HIDDEN;
+        amenityFields.style.display = HIDDEN;
     }
 
     areaDetailConfirm.onclick = function(){
@@ -1957,7 +2001,7 @@ bjørneparkappen.adminconsole.areas.detail.loadUpdatePage = function(area){
 
         if (bjørneparkappen.adminconsole.areas.detail.validate()){
 
-            if (areaTypeSelector.value == "amenity") {
+            if (areaTypeSelector.value === "amenity") {
 
                 areaDetailArea.amenity_type = amenityTypeInput.value;
                 bjørneparkappen.adminconsole.api.updateAmenity(areaDetailArea);
@@ -1967,7 +2011,7 @@ bjørneparkappen.adminconsole.areas.detail.loadUpdatePage = function(area){
                 bjørneparkappen.adminconsole.api.updateEnclosure(areaDetailArea);
             }
         }
-    }
+    };
 
     // Populate form with new data
     areaLabelInput.value = bjørneparkappen.adminconsole.getTranslation(area, 'label', areaLabelLanguageInput.value);
@@ -1975,7 +2019,7 @@ bjørneparkappen.adminconsole.areas.detail.loadUpdatePage = function(area){
 
     // Display the detail page
     bjørneparkappen.adminconsole.navigation.displayPage(areaDetailPage);
-}
+};
 
 // Validates detail input
 bjørneparkappen.adminconsole.areas.detail.validate = function(){
@@ -1986,13 +2030,13 @@ bjørneparkappen.adminconsole.areas.detail.validate = function(){
 
         alert("Please enter all translations for the area label.")
 
-    } else if (areaDetailArea.visitor_destination == ""){
+    } else if (areaDetailArea.visitor_destination === ""){
 
         alert("Please enter a set of visitor destination co-ordinates.");
 
-    } else if (areaTypeSelector.value == "amenity"){
+    } else if (areaTypeSelector.value === "amenity"){
 
-        if (areaDetailArea.amenity_type == ""){
+        if (areaDetailArea.amenity_type === ""){
 
             alert("Please select an amenity type.");
 
@@ -2011,7 +2055,7 @@ bjørneparkappen.adminconsole.areas.detail.validate = function(){
     }
 
     return valid;
-}
+};
 
 
 
@@ -2040,7 +2084,7 @@ createAnimalButton.onclick = function(){
 
     // Display Create Animal page
     bjørneparkappen.adminconsole.navigation.displayPage(animalDetailPage);
-}
+};
 
 // Clears the List Animals page
 bjørneparkappen.adminconsole.animals.list.clearPageData = function(){
@@ -2065,7 +2109,7 @@ bjørneparkappen.adminconsole.animals.list.loadPage = function(){
     bjørneparkappen.adminconsole.animals.list.clearPageData();
 
     // If no animals returned
-    if (animalsList.length == 0) {
+    if (animalsList.length === 0) {
 
         // Retrieve the list of animals
         bjørneparkappen.adminconsole.api.getAnimals();
@@ -2107,22 +2151,22 @@ bjørneparkappen.adminconsole.animals.addToTable = function(animal){
 
         animal.is_available = !animal.is_available;
         bjørneparkappen.adminconsole.api.updateAnimal(animal);
-    }
+    };
     availableCell.appendChild(checkbox);
 
     // Create link to delete item
     var deleteLink = document.createElement('a');
     deleteLink.href = '#';
-    deleteLink.innerHTML = "Delete"
+    deleteLink.innerHTML = "Delete";
     deleteLink.onclick = function(){
 
             bjørneparkappen.adminconsole.animals.delete(animal);
-    }
+    };
 
     deleteCell.appendChild(deleteLink);
 
     // Set all cells except the delete and available cells to load the update page onclick
-    for (i = 0; i < row.cells.length - 2; i++){
+    for (var i = 0; i < row.cells.length - 2; i++){
 
         row.cells[i].onclick = function(){
 
@@ -2139,7 +2183,7 @@ bjørneparkappen.adminconsole.animals.search = function(){
     var table = document.getElementById("list_animals_table");
 
     bjørneparkappen.adminconsole.lookup(search, table);
-}
+};
 
 // Deletes an Animal
 bjørneparkappen.adminconsole.animals.delete = function(animal){
@@ -2148,7 +2192,7 @@ bjørneparkappen.adminconsole.animals.delete = function(animal){
 
         bjørneparkappen.adminconsole.api.deleteAnimal(animal);
     }
-}
+};
 
 
 // Animal Detail Page and elements
@@ -2161,25 +2205,25 @@ animalDetailCancel.onclick = function(){
 
      // Display List Animals page
      bjørneparkappen.adminconsole.navigation.displayPage(listAnimalsPage);
-}
+};
 var animalDetailForm = document.getElementById('animal_detail_form');
 var animalNameInput = document.getElementById('animal_name');
 var animalDescriptionInput = document.getElementById('animal_description');
 var animalDescriptionLanguageInput = document.getElementById('animal_description_language');
 animalDescriptionLanguageInput.onchange = function(){
 
-    if (animalDetailAnimal.id != null){
+    if (animalDetailAnimal.id){
 
         // Update textbox value
         animalDescriptionInput.value = bjørneparkappen.adminconsole.getTranslation(animalDetailAnimal, 'description', animalDescriptionLanguageInput.value);
     }
-}
+};
 var animalDescriptionTranslations = document.getElementById('animal_description_translations');
 var animalDescriptionAddTranslation = document.getElementById('animal_add_description_translation');
 animalDescriptionAddTranslation.onclick = function(){
 
     // If creating
-    if (animalDetailAnimal.id == null){
+    if (!animalDetailAnimal.id){
 
         // Add translation to list of displayed translations
         bjørneparkappen.adminconsole.addTranslation(animalDetailAnimal, 'description', animalDescriptionInput, animalDescriptionLanguageInput, animalDescriptionTranslations, animalDescriptionAddTranslation);
@@ -2189,7 +2233,7 @@ animalDescriptionAddTranslation.onclick = function(){
         // Update existing translation
         bjørneparkappen.adminconsole.updateTranslation(animalDetailAnimal, 'description', animalDescriptionInput.value, animalDescriptionLanguageInput.value);
     }
-}
+};
 var animalSpeciesInput = document.getElementById('animal_species');
 var animalEnclosureInput = document.getElementById('animal_enclosure');
 var animalAvailableInput = document.getElementById('animal_available');
@@ -2210,7 +2254,7 @@ bjørneparkappen.adminconsole.animals.detail.clearPageData = function(){
     animalSpeciesInput.length = 0;
 
     // Add species options to dropdown
-    for (speciesCount = 0; speciesCount < speciesList.length; speciesCount++){
+    for (var speciesCount = 0; speciesCount < speciesList.length; speciesCount++){
 
         var option = document.createElement("option");
         option.value = speciesList[speciesCount].id;
@@ -2225,7 +2269,7 @@ bjørneparkappen.adminconsole.animals.detail.clearPageData = function(){
     animalEnclosureInput.length = 0;
 
     // Add enclosure options to dropdown
-    for (enclosureCount = 0; enclosureCount < enclosuresList.length; enclosureCount++){
+    for (var enclosureCount = 0; enclosureCount < enclosuresList.length; enclosureCount++){
 
         var option = document.createElement("option");
         option.value = enclosuresList[enclosureCount].id;
@@ -2256,11 +2300,11 @@ bjørneparkappen.adminconsole.animals.detail.loadCreatePage = function(){
 
             bjørneparkappen.adminconsole.api.createAnimal(animalDetailAnimal);
         }
-    }
+    };
 
     // Display the detail page
     bjørneparkappen.adminconsole.navigation.displayPage(animalDetailPage);
-}
+};
 
 // Loads the Update Animal page
 bjørneparkappen.adminconsole.animals.detail.loadUpdatePage = function(animal){
@@ -2287,7 +2331,7 @@ bjørneparkappen.adminconsole.animals.detail.loadUpdatePage = function(animal){
 
             bjørneparkappen.adminconsole.api.updateAnimal(animalDetailAnimal);
         }
-    }
+    };
 
     // Populate page with new data
     animalNameInput.value = animalDetailAnimal.name;
@@ -2298,18 +2342,18 @@ bjørneparkappen.adminconsole.animals.detail.loadUpdatePage = function(animal){
 
     // Display the detail page
     bjørneparkappen.adminconsole.navigation.displayPage(animalDetailPage);
-}
+};
 
 // Validates detail input
 bjørneparkappen.adminconsole.animals.detail.validate = function(){
 
     var valid = false;
 
-    if (animalDetailAnimal.name == ""){
+    if (animalDetailAnimal.name === ""){
 
         alert("Please enter a name.")
 
-    } else if (animalDetailAnimal.species_id == ""){
+    } else if (animalDetailAnimal.species_id === ""){
 
         alert("Please enter a species.");
 
@@ -2317,7 +2361,7 @@ bjørneparkappen.adminconsole.animals.detail.validate = function(){
 
         alert("Please enter all translations for the animal description.");
 
-    } else if (animalDetailAnimal.enclosure_id == ""){
+    } else if (animalDetailAnimal.enclosure_id === ""){
 
         alert("Please enter an enclosure.");
 
@@ -2327,7 +2371,7 @@ bjørneparkappen.adminconsole.animals.detail.validate = function(){
     }
 
     return valid;
-}
+};
 
 
 
@@ -2357,7 +2401,7 @@ createEventButton.onclick = function(){
 
     // Display Create Event page
     bjørneparkappen.adminconsole.navigation.displayPage(eventDetailPage);
-}
+};
 
 // Clears the List Events page
 bjørneparkappen.adminconsole.events.list.clearPageData = function(){
@@ -2438,7 +2482,7 @@ bjørneparkappen.adminconsole.events.addToTable = function(event){
     startTimeCell.innerHTML = event.start_time;
     endTimeCell.innerHTML = event.end_time;
 
-    if (event.keeper != null){
+    if (event.keeper){
 
         keeperCell.innerHTML = event.keeper.name;
 
@@ -2454,22 +2498,22 @@ bjørneparkappen.adminconsole.events.addToTable = function(event){
 
         event.is_available = !event.is_available;
         bjørneparkappen.adminconsole.api.updateEvent(event);
-    }
+    };
     activeCell.appendChild(checkbox);
 
     // Create link to delete item
     var deleteLink = document.createElement('a');
     deleteLink.href = '#';
-    deleteLink.innerHTML = "Delete"
+    deleteLink.innerHTML = "Delete";
     deleteLink.onclick = function(){
 
         bjørneparkappen.adminconsole.events.delete(event);
-    }
+    };
 
     deleteCell.appendChild(deleteLink);
 
     // Set all cells except the delete and available cells to load the update page onclick
-    for (i = 0; i < row.cells.length - 2; i++){
+    for (var i = 0; i < row.cells.length - 2; i++){
 
         row.cells[i].onclick = function(){
 
@@ -2486,7 +2530,7 @@ bjørneparkappen.adminconsole.events.search = function(){
     var table = document.getElementById("list_events_table");
 
     bjørneparkappen.adminconsole.lookup(search, table);
-}
+};
 
 // Deletes an Event
 bjørneparkappen.adminconsole.events.delete = function(event){
@@ -2495,7 +2539,7 @@ bjørneparkappen.adminconsole.events.delete = function(event){
 
         bjørneparkappen.adminconsole.api.deleteEvent(event);
     }
-}
+};
 
 
 // Event Detail Page and elements
@@ -2507,21 +2551,20 @@ var eventDetailCancel = document.getElementById('event_detail_cancel');
 eventDetailCancel.onclick = function(){
     // Display List Events page
     bjørneparkappen.adminconsole.navigation.displayPage(listEventsPage);
-}
+};
 var eventTypeSelector = document.getElementById('event_type_selector');
+var feedingFields = document.getElementById('feeding_fields');
 eventTypeSelector.onchange = function(){
-
-    var feeding_fields = document.getElementById('feeding_fields');
 
     // Clear areas dropdown
     eventAreaInput.length = 0;
 
-    if (eventTypeSelector.value == "event"){
+    if (eventTypeSelector.value === "event"){
 
-        feeding_fields.style.display = HIDDEN;
+        feedingFields.style.display = HIDDEN;
 
         // Add amenity options to dropdown
-        for (amenityCount = 0; amenityCount < amenitiesList.length; amenityCount++){
+        for (var amenityCount = 0; amenityCount < amenitiesList.length; amenityCount++){
 
             var option = document.createElement("option");
             option.value = amenitiesList[amenityCount].id;
@@ -2532,10 +2575,10 @@ eventTypeSelector.onchange = function(){
 
     } else {
 
-        feeding_fields.style.display = DISPLAYED;
+        feedingFields.style.display = DISPLAYED;
 
         // Add enclosure options to dropdown
-        for (enclosureCount = 0; enclosureCount < enclosuresList.length; enclosureCount++){
+        for (var enclosureCount = 0; enclosureCount < enclosuresList.length; enclosureCount++){
 
             var option = document.createElement("option");
             option.value = enclosuresList[enclosureCount].id;
@@ -2544,24 +2587,24 @@ eventTypeSelector.onchange = function(){
             eventAreaInput.add(option);
         }
     }
-}
+};
 var eventDetailForm = document.getElementById('event_detail_form');
 var eventLabelInput = document.getElementById('event_label');
 var eventLabelLanguageInput = document.getElementById('event_label_language');
 eventLabelLanguageInput.onchange = function(){
 
-    if (eventDetailEvent.id != null){
+    if (eventDetailEvent.id){
 
         // Update textbox value
         eventLabelInput.value = bjørneparkappen.adminconsole.getTranslation(eventDetailEvent, 'label', eventLabelLanguageInput.value);
     }
-}
+};
 var eventLabelTranslations = document.getElementById('event_label_translations');
 var eventLabelAddTranslation = document.getElementById('event_add_label_translation');
 eventLabelAddTranslation.onclick = function(){
 
     // If creating
-    if (eventDetailEvent.id == null){
+    if (!eventDetailEvent.id){
 
         // Add translation to list of displayed translations
         bjørneparkappen.adminconsole.addTranslation(eventDetailEvent, 'label', eventLabelInput, eventLabelLanguageInput, eventLabelTranslations, eventLabelAddTranslation);
@@ -2571,7 +2614,7 @@ eventLabelAddTranslation.onclick = function(){
         // Update existing translation
         bjørneparkappen.adminconsole.updateTranslation(eventDetailEvent, 'label', eventLabelInput.value, eventLabelLanguageInput.value);
     }
-}
+};
 var eventStartTimeInput = document.getElementById('event_start_time');
 var eventEndTimeInput = document.getElementById('event_end_time');
 var eventAreaInput = document.getElementById('event_area');
@@ -2579,18 +2622,18 @@ var eventDescriptionInput = document.getElementById('event_description');
 var eventDescriptionLanguageInput = document.getElementById('event_description_language');
 eventDescriptionLanguageInput.onchange = function(){
 
-    if (eventDetailEvent.id != null){
+    if (eventDetailEvent.id){
 
         // Update textbox value
         eventDescriptionInput.value = bjørneparkappen.adminconsole.getTranslation(eventDetailEvent, 'description', eventDescriptionLanguageInput.value);
     }
-}
+};
 var eventDescriptionTranslations = document.getElementById('event_description_translations');
 var eventDescriptionAddTranslation = document.getElementById('event_add_description_translation');
 eventDescriptionAddTranslation.onclick = function(){
 
     // If creating
-    if (eventDetailEvent.id == null){
+    if (!eventDetailEvent.id){
 
         // Add translation to list of displayed translations
         bjørneparkappen.adminconsole.addTranslation(eventDetailEvent, 'description', eventDescriptionInput, eventDescriptionLanguageInput, eventDescriptionTranslations, eventDescriptionAddTranslation);
@@ -2600,7 +2643,7 @@ eventDescriptionAddTranslation.onclick = function(){
         // Update existing translation
         bjørneparkappen.adminconsole.updateTranslation(eventDetailEvent, 'description', eventDescriptionInput.value, eventDescriptionLanguageInput.value);
     }
-}
+};
 var eventKeeperInput = document.getElementById('event_keeper');
 var eventActiveInput = document.getElementById('event_active');
 
@@ -2630,7 +2673,7 @@ bjørneparkappen.adminconsole.events.detail.clearPageData = function(){
     eventKeeperInput.length = 0;
 
     // Add keeper options to dropdown
-    for (keeperCount = 0; keeperCount < keepersList.length; keeperCount++){
+    for (var keeperCount = 0; keeperCount < keepersList.length; keeperCount++){
 
         var option = document.createElement("option");
         option.value = keepersList[keeperCount].id;
@@ -2646,10 +2689,10 @@ bjørneparkappen.adminconsole.events.detail.loadCreatePage = function(){
     // Clear page data
     bjørneparkappen.adminconsole.events.detail.clearPageData();
 
-    if (eventTypeSelector.value == "event"){
+    if (eventTypeSelector.value === "event"){
 
         // Add amenity options to dropdown
-        for (amenityCount = 0; amenityCount < amenitiesList.length; amenityCount++){
+        for (var amenityCount = 0; amenityCount < amenitiesList.length; amenityCount++){
 
             var option = document.createElement("option");
             option.value = amenitiesList[amenityCount].id;
@@ -2661,7 +2704,7 @@ bjørneparkappen.adminconsole.events.detail.loadCreatePage = function(){
     } else {
 
         // Add enclosure options to dropdown
-        for (enclosureCount = 0; enclosureCount < enclosuresList.length; enclosureCount++){
+        for (var enclosureCount = 0; enclosureCount < enclosuresList.length; enclosureCount++){
 
             var option = document.createElement("option");
             option.value = enclosuresList[enclosureCount].id;
@@ -2684,7 +2727,7 @@ bjørneparkappen.adminconsole.events.detail.loadCreatePage = function(){
         eventDetailEvent.location_id = eventAreaInput.value;
         eventDetailEvent.is_active = eventActiveInput.checked;
 
-        if (eventTypeSelector.value == "event"){
+        if (eventTypeSelector.value === "event"){
 
             bjørneparkappen.adminconsole.api.createEvent(eventDetailEvent);
 
@@ -2694,11 +2737,11 @@ bjørneparkappen.adminconsole.events.detail.loadCreatePage = function(){
 
             bjørneparkappen.adminconsole.api.createFeeding(eventDetailEvent);
         }
-    }
+    };
 
     // Display the detail page
     bjørneparkappen.adminconsole.navigation.displayPage(eventDetailPage);
-}
+};
 
 // Loads the Update Event page
 bjørneparkappen.adminconsole.events.detail.loadUpdatePage = function(event){
@@ -2725,15 +2768,15 @@ bjørneparkappen.adminconsole.events.detail.loadUpdatePage = function(event){
     eventDescriptionInput.value = bjørneparkappen.adminconsole.getTranslation(eventDetailEvent, 'description', eventLabelLanguageInput.value);
 
     // If item is a feeding
-    if (eventDetailEvent.keeper != null){
+    if (eventDetailEvent.keeper){
 
         eventTypeSelector.value = "feeding";
-        feeding_fields.style.display = DISPLAYED;
+        feedingFields.style.display = DISPLAYED;
 
         eventKeeperInput.value = eventDetailEvent.keeper.id;
 
         // Add enclosure options to dropdown
-        for (enclosureCount = 0; enclosureCount < enclosuresList.length; enclosureCount++){
+        for (var enclosureCount = 0; enclosureCount < enclosuresList.length; enclosureCount++){
 
             var option = document.createElement("option");
             option.value = enclosuresList[enclosureCount].id;
@@ -2745,10 +2788,10 @@ bjørneparkappen.adminconsole.events.detail.loadUpdatePage = function(event){
     } else {
 
         eventTypeSelector.value = "event";
-        feeding_fields.style.display = HIDDEN;
+        feedingFields.style.display = HIDDEN;
 
         // Add amenity options to dropdown
-        for (amenityCount = 0; amenityCount < amenitiesList.length; amenityCount++){
+        for (var amenityCount = 0; amenityCount < amenitiesList.length; amenityCount++){
 
             var option = document.createElement("option");
             option.value = amenitiesList[amenityCount].id;
@@ -2768,7 +2811,7 @@ bjørneparkappen.adminconsole.events.detail.loadUpdatePage = function(event){
 
         if (bjørneparkappen.adminconsole.events.detail.validate()) {
 
-            if (eventTypeSelector.value == "event"){
+            if (eventTypeSelector.value === "event"){
 
                 bjørneparkappen.adminconsole.api.updateEvent(eventDetailEvent);
 
@@ -2779,11 +2822,11 @@ bjørneparkappen.adminconsole.events.detail.loadUpdatePage = function(event){
                 bjørneparkappen.adminconsole.api.updateFeeding(eventDetailEvent);
             }
         }
-    }
+    };
 
     // Display the detail page
     bjørneparkappen.adminconsole.navigation.displayPage(eventDetailPage);
-}
+};
 
 // Validates detail input
 bjørneparkappen.adminconsole.events.detail.validate = function(){
@@ -2794,11 +2837,11 @@ bjørneparkappen.adminconsole.events.detail.validate = function(){
 
         alert("Please enter all translations for the event label.")
 
-    } else if (eventDetailEvent.start_time == ""){
+    } else if (eventDetailEvent.start_time === ""){
 
         alert("Please enter the event start time.");
 
-    } else if (eventDetailEvent.end_time == ""){
+    } else if (eventDetailEvent.end_time === ""){
 
         alert("Please enter the event end time.");
 
@@ -2812,7 +2855,7 @@ bjørneparkappen.adminconsole.events.detail.validate = function(){
     }
 
     return valid;
-}
+};
 
 
 /** Keepers */
@@ -2839,7 +2882,7 @@ createKeeperButton.onclick = function(){
 
     // Display Create Keeper page
     bjørneparkappen.adminconsole.navigation.displayPage(keeperDetailPage);
-}
+};
 
 // Clears the List Keepers page
 bjørneparkappen.adminconsole.keepers.list.clearPageData = function(){
@@ -2864,7 +2907,7 @@ bjørneparkappen.adminconsole.keepers.list.loadPage = function(){
     bjørneparkappen.adminconsole.keepers.list.clearPageData();
 
     // If no keepers returned
-    if (keepersList.length == 0) {
+    if (keepersList.length === 0) {
 
         // Retrieve list of keepers
         bjørneparkappen.adminconsole.api.getKeepers();
@@ -2903,16 +2946,16 @@ bjørneparkappen.adminconsole.keepers.addToTable = function(keeper){
     // Create link to delete item
     var deleteLink = document.createElement('a');
     deleteLink.href = '#';
-    deleteLink.innerHTML = "Delete"
+    deleteLink.innerHTML = "Delete";
     deleteLink.onclick = function(){
 
         bjørneparkappen.adminconsole.keepers.delete(keeper);
-    }
+    };
 
     deleteCell.appendChild(deleteLink);
 
     // Set all cells except the delete cell to load the update page onclick
-    for (i = 0; i < row.cells.length - 1; i++){
+    for (var i = 0; i < row.cells.length - 1; i++){
 
         row.cells[i].onclick = function(){
 
@@ -2929,7 +2972,7 @@ bjørneparkappen.adminconsole.keepers.search = function(){
     var table = document.getElementById("list_keepers_table");
 
     bjørneparkappen.adminconsole.lookup(search, table);
-}
+};
 
 // Deletes a Keeper
 bjørneparkappen.adminconsole.keepers.delete = function(keeper){
@@ -2938,7 +2981,7 @@ bjørneparkappen.adminconsole.keepers.delete = function(keeper){
 
         bjørneparkappen.adminconsole.api.deleteKeeper(keeper);
     }
-}
+};
 
 // Keeper Detail Page and elements
 var keeperDetailKeeper = {};
@@ -2950,25 +2993,25 @@ keeperDetailCancel.onclick = function(){
 
     // Display List Keepers page
     bjørneparkappen.adminconsole.navigation.displayPage(listKeepersPage);
-}
+};
 var keeperDetailForm = document.getElementById('keeper_detail_form');
 var keeperNameInput = document.getElementById('keeper_name');
 var keeperBioInput = document.getElementById('keeper_bio');
 var keeperBioLanguageInput = document.getElementById('keeper_bio_language');
 keeperBioLanguageInput.onchange = function(){
 
-    if (keeperDetailKeeper.id != null){
+    if (keeperDetailKeeper.id){
 
         // Update textbox value
         keeperBioInput.value = bjørneparkappen.adminconsole.getTranslation(keeperDetailKeeper, 'bio', keeperBioLanguageInput.value);
     }
-}
+};
 var keeperBioTranslations = document.getElementById('keeper_bio_translations');
 var keeperBioAddTranslation = document.getElementById('keeper_add_bio_translation');
 keeperBioAddTranslation.onclick = function(){
 
     // If creating
-    if (keeperDetailKeeper.id == null){
+    if (!keeperDetailKeeper.id){
 
         // Add translation to list of displayed translations
         bjørneparkappen.adminconsole.addTranslation(keeperDetailKeeper, 'bio', keeperBioInput, keeperBioLanguageInput, keeperBioTranslations, keeperBioAddTranslation);
@@ -2978,7 +3021,7 @@ keeperBioAddTranslation.onclick = function(){
         // Update existing translation
         bjørneparkappen.adminconsole.updateTranslation(keeperDetailKeeper, 'bio', keeperBioInput.value, keeperBioLanguageInput.value);
     }
-}
+};
 
 // Clears the Keeper Detail page
 bjørneparkappen.adminconsole.keepers.detail.clearPageData = function(){
@@ -3012,11 +3055,11 @@ bjørneparkappen.adminconsole.keepers.detail.loadCreatePage = function(){
 
             bjørneparkappen.adminconsole.api.createKeeper(keeperDetailKeeper);
         }
-    }
+    };
 
     // Display the detail page
     bjørneparkappen.adminconsole.navigation.displayPage(keeperDetailPage);
-}
+};
 
 // Loads the Update Keeper page
 bjørneparkappen.adminconsole.keepers.detail.loadUpdatePage = function(keeper){
@@ -3040,21 +3083,21 @@ bjørneparkappen.adminconsole.keepers.detail.loadUpdatePage = function(keeper){
 
             bjørneparkappen.adminconsole.api.updateKeeper(keeperDetailKeeper);
         }
-    }
+    };
 
     keeperNameInput.value = keeper.name;
     keeperBioInput.value = bjørneparkappen.adminconsole.getTranslation(keeperDetailKeeper, 'bio', LANGUAGE_CODE);
 
     // Display the detail page
     bjørneparkappen.adminconsole.navigation.displayPage(keeperDetailPage);
-}
+};
 
 // Validates detail input
 bjørneparkappen.adminconsole.keepers.detail.validate = function(){
 
     var valid = false;
 
-    if (keeperDetailKeeper.name == ""){
+    if (keeperDetailKeeper.name === ""){
 
         alert("Please enter a name.")
 
@@ -3068,4 +3111,4 @@ bjørneparkappen.adminconsole.keepers.detail.validate = function(){
     }
 
     return valid;
-}
+};
