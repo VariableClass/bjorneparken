@@ -156,14 +156,11 @@ public class HomeActivity
         mRequester = new RequestsModule(getString(R.string.app_name), this);
         mRequestsActive = 0;
 
-        // Initialise and register a new receiver to notify the main thread of network changes
-        setupNetworkChangeListener();
-
         // If server was not previously available
         if (!mServerAvailable) {
 
-            // Check whether the server can be reached
-            checkServerAvailability();
+            // Initialise and register a new receiver to notify the main thread of network changes
+            setupNetworkChangeListener();
         }
     }
 
