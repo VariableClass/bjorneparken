@@ -7,7 +7,7 @@ body {
 
 ul.sidenav {
     list-style-type: none;
-    min-width: 12%;
+    min-width: 20%;
     margin: 0;
     padding: 0;
     background-color: #333333;
@@ -54,7 +54,7 @@ ul.sidenav li a:hover:not(.active) {
 }
 
 div.content {
-    margin-left: 12%;
+    margin-left: 20%;
     padding: 1px 16px;
 }
 
