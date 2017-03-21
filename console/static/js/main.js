@@ -1794,10 +1794,7 @@ bjørneparkappen.adminconsole.areas.addToTable = function(area){
     deleteLink.innerHTML = "Delete";
     deleteLink.onclick = function(){
 
-        if (confirm("Are you sure?")){
-
-            bjørneparkappen.adminconsole.areas.delete(area);
-        }
+        bjørneparkappen.adminconsole.areas.delete(area);
     };
 
     deleteCell.appendChild(deleteLink);
@@ -2160,7 +2157,7 @@ bjørneparkappen.adminconsole.animals.addToTable = function(animal){
     deleteLink.innerHTML = "Delete";
     deleteLink.onclick = function(){
 
-            bjørneparkappen.adminconsole.animals.delete(animal);
+        bjørneparkappen.adminconsole.animals.delete(animal);
     };
 
     deleteCell.appendChild(deleteLink);
