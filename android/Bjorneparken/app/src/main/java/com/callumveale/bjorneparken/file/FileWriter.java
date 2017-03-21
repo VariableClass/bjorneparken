@@ -1,17 +1,23 @@
 package com.callumveale.bjorneparken.file;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 import com.callumveale.bjorneparken.config.Configuration;
 import com.callumveale.bjorneparken.models.Amenity;
 import com.callumveale.bjorneparken.models.Event;
 import com.callumveale.bjorneparken.models.Feeding;
+import com.callumveale.bjorneparken.models.IModel;
 import com.callumveale.bjorneparken.models.Species;
 import com.google.api.client.json.GenericJson;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.DateTime;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -399,6 +405,42 @@ public class FileWriter {
     //endregion Amenities
 
     //endregion Areas
+
+    //region Images
+
+    public void getImageFromFile(IModel item){
+
+        try {
+
+            FileInputStream inputStream = new FileInputStream(new File(mContext.getFilesDir() + item.getClass().getSimpleName() + "-" + item.getId()));
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+            // Get image
+            byte[] buffer = new byte[2048];
+            int length;
+
+            while ((length = inputStream.read(buffer)) != -1) {
+                byteArrayOutputStream.write(buffer, 0, length);
+            }
+
+            inputStream.close();
+            byteArrayOutputStream.close();
+
+            // Get image byte array
+            byte[] imageBytes = byteArrayOutputStream.toByteArray();
+
+            // Load image into item
+            Bitmap image = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+            item.setImage(image);
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //endregion Images
 
     private void writeJsonToFile(GenericJson jsonToWrite, String filename){
 

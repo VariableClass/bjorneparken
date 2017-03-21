@@ -102,11 +102,10 @@ public class DetailFragment extends Fragment implements DialogConfirmFragment.On
         // Retrieve item from which to populate the view
         IModel item = (IModel) mItem;
 
-        // Set image
-        byte[] imageBytes = item.getImageBytes();
-        if (imageBytes != null && imageBytes.length >= 0){
+        Bitmap bitmap = item.getImage();
 
-            Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+        // Set image
+        if (bitmap != null){
 
             ImageView imageView = (ImageView) view.findViewById(R.id.detail_image);
             imageView.setImageBitmap(bitmap);

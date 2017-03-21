@@ -2,6 +2,7 @@ package com.callumveale.bjorneparken.requests;
 
 import com.callumveale.bjorneparken.activities.HomeActivity;
 import com.callumveale.bjorneparken.models.Event;
+import com.callumveale.bjorneparken.models.IModel;
 import com.callumveale.bjorneparken.models.Species;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.json.jackson2.JacksonFactory;
@@ -119,6 +120,12 @@ public class RequestsModule {
 
         GetVisitorStarredSpeciesTask getVisitorStarredSpecies = new GetVisitorStarredSpeciesTask(mBuilder, mActivity, mLanguage, visitorId);
         getVisitorStarredSpecies.execute();
+    }
+
+    public void getImage(IModel item){
+
+        GetImageTask getImage = new GetImageTask(mActivity, item);
+        getImage.execute();
     }
 
     //endregion GET Requests

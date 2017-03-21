@@ -1,5 +1,6 @@
 package com.callumveale.bjorneparken.models;
 
+import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -224,7 +225,19 @@ public class Event implements IModel, Parcelable{
     }
 
     @Override
-    public byte[] getImageBytes() { return null; }
+    public String getImageUrl() {
+        return null;
+    }
+
+    @Override
+    public Bitmap getImage() {
+        return null;
+    }
+
+    @Override
+    public void setImage(Bitmap bitmap) {
+        return;
+    }
 
     //endregion IModel Overridden Methods
 

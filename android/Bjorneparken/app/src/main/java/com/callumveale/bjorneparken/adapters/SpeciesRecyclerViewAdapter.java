@@ -55,11 +55,10 @@ public class SpeciesRecyclerViewAdapter extends RecyclerViewAdapter implements D
 
         int maxTextLength = 95;
 
-        // Set image
-        byte[] imageBytes = species.getImageBytes();
-        if (imageBytes.length > 0){
+        Bitmap bitmap = species.getImage();
 
-            Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+        // Set image
+        if (bitmap != null){
 
             holder.mImageView.setImageBitmap(bitmap);
             holder.mImageView.setVisibility(View.VISIBLE);

@@ -33,6 +33,7 @@ import com.callumveale.bjorneparken.models.Animal;
 import com.callumveale.bjorneparken.models.Enclosure;
 import com.callumveale.bjorneparken.models.Event;
 import com.callumveale.bjorneparken.models.Feeding;
+import com.callumveale.bjorneparken.models.IModel;
 import com.callumveale.bjorneparken.models.NavigationDrawerItem;
 import com.callumveale.bjorneparken.models.Species;
 import com.callumveale.bjorneparken.R;
@@ -331,6 +332,12 @@ public class HomeActivity
 
         // Attempt to retrieve species from file
         mSpecies = mFileWriter.getSpeciesFromFile();
+
+        // Retrieve images for any species which have them
+        for (Species speciesInst : mSpecies){
+
+            getImage(speciesInst);
+        }
     }
 
     private void getVisitorDataFromFile(){
@@ -565,8 +572,41 @@ public class HomeActivity
         // Cache response
         mSpecies = ResponseConverter.convertSpeciesListResponse(species);
 
+        // Retrieve images for any species which have them
+        for (Species speciesInst : mSpecies){
+
+            getImage(speciesInst);
+        }
+
         // Write response to file
         mFileWriter.writeSpeciesToFile(species);
+    }
+
+    private void getImage(IModel item){
+
+        // Check if item has an image
+        if (item.getImageUrl() == null) {
+
+            return;
+        }
+
+        // Attempt to read image from file
+        mFileWriter.getImageFromFile(item);
+
+        // Check if image has been retrieved
+        if (item.getImage() != null) {
+
+            return;
+        }
+
+        // Check if server is available
+        if (!mServerAvailable) {
+
+            return;
+        }
+
+        // Retrieve image from server
+        mRequester.getImage(item);
     }
 
     //endregion Park Data Callbacks

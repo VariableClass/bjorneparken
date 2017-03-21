@@ -1,10 +1,14 @@
 package com.callumveale.bjorneparken.models;
 
+import android.graphics.Bitmap;
+
 /**
  * Created by callum on 01/03/2017.
  */
 
 public interface IModel {
+
+    long getId();
 
     String getHeader();
 
@@ -16,5 +20,9 @@ public interface IModel {
 
     String getSubcaption();
 
-    byte[] getImageBytes();
+    String getImageUrl();
+
+    Bitmap getImage();
+
+    void setImage(Bitmap bitmap);
 }

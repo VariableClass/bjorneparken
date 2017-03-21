@@ -31,18 +31,19 @@ public class Species implements IModel, Parcelable{
     private String commonName;
     private String latin;
     private String description;
-    private byte[] imageBytes;
+    private String imageUrl;
+    private Bitmap image;
 
     //endregion Properties
 
     //region Constructors
 
-    public Species(long id, String commonName, String latin, String description, byte[] imageBytes){
+    public Species(long id, String commonName, String latin, String description, String imageUrl){
         this.id = id;
         this.commonName = commonName;
         this.latin = latin;
         this.description = description;
-        this.imageBytes = imageBytes;
+        this.imageUrl = imageUrl;
     }
 
     public Species(long id, String commonName, String latin, String description){
@@ -50,7 +51,6 @@ public class Species implements IModel, Parcelable{
         this.commonName = commonName;
         this.latin = latin;
         this.description = description;
-        this.imageBytes = new byte[]{};
     }
 
     // Parcelling part
@@ -62,11 +62,9 @@ public class Species implements IModel, Parcelable{
         this.commonName = data[1];
         this.latin = data[2];
         this.description = data[3];
+        this.imageUrl = data[4];
 
-        int arrayLength = in.readInt();
-
-        this.imageBytes = new byte[arrayLength];
-        in.readByteArray(this.imageBytes);
+        this.image = in.readParcelable(Bitmap.class.getClassLoader());
     }
 
     //endregion Constructors
@@ -87,7 +85,7 @@ public class Species implements IModel, Parcelable{
         return description;
     }
 
-    public byte[] getImageBytes() { return imageBytes; }
+    public String getImageUrl() { return imageUrl; }
 
     //region IModel Overridden Methods
 
@@ -111,6 +109,12 @@ public class Species implements IModel, Parcelable{
         return null;
     }
 
+    @Override
+    public Bitmap getImage() { return image; }
+
+    @Override
+    public void setImage(Bitmap bitmap) { this.image = bitmap; }
+
     //endregion IModel Overridden Methods
 
     //region Parcelable Overridden Methods
@@ -126,10 +130,15 @@ public class Species implements IModel, Parcelable{
                 String.valueOf(this.id),
                 this.commonName,
                 this.latin,
-                this.description});
+                this.description,
+                this.imageUrl});
 
-        dest.writeInt(imageBytes.length);
-        dest.writeByteArray(imageBytes);
+        if (image == null){
+
+            return;
+        }
+
+        dest.writeValue(image);
     }
 
     //endregion Parcelable Overridden Methods

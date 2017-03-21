@@ -35,17 +35,7 @@ public class ResponseConverter {
         response.setCommonName(species.getCommonName());
         response.setLatin(species.getLatin());
         response.setDescription(species.getDescription());
-
-        // If species has image
-        if (species.getImageBytes() != null) {
-
-            // Encode base64 image
-            byte[] base64 = Base64.encode(species.getImageBytes(), Base64.DEFAULT);
-
-            String base64mime = "data:image/jpeg;base64," + base64.toString();
-
-            response.setImage(base64mime);
-        }
+        response.setImage(species.getImageUrl());
 
         // Return a new species response created from the species object
         return response;
@@ -297,21 +287,9 @@ public class ResponseConverter {
             return null;
         }
 
-        String base64mime = response.getImage();
-
-        if (base64mime != null){
-
-            String base64 = base64mime.split(",")[1];
-
-            // Decode base64 image
-            byte[] imageBytes = Base64.decode(base64, Base64.DEFAULT);
-
-            // Return a new species object created from the species response
-            return new Species(response.getId(), response.getCommonName(), response.getLatin(), response.getDescription(), imageBytes);
-        }
 
         // Return a new species object created from the species response
-        return new Species(response.getId(), response.getCommonName(), response.getLatin(), response.getDescription());
+        return new Species(response.getId(), response.getCommonName(), response.getLatin(), response.getDescription(), response.getImage());
     }
 
     public static ArrayList<Species> convertSpeciesListResponse(MainSpeciesListResponse response){
