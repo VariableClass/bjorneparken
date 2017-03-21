@@ -163,7 +163,7 @@ bjørneparkappen.adminconsole.lookup = function(search, table){
         }
 
         // If no matching text found
-        if (fruitlessColumns === td.length){
+        if (fruitlessColumns == td.length){
 
             // Hide row
             tr[i].style.display = HIDDEN;
@@ -178,7 +178,7 @@ bjørneparkappen.adminconsole.lookup = function(search, table){
 
 bjørneparkappen.adminconsole.addTranslation = function(item, itemProperty, textInput, languageInput, translationsSpan, addButton){
 
-    if (textInput.value !== "" && languageInput.value !== ""){
+    if (textInput.value != "" && languageInput.value != ""){
 
         // Create visual representation of translation
         var translationParagraph = document.createElement('p');
@@ -201,14 +201,14 @@ bjørneparkappen.adminconsole.addTranslation = function(item, itemProperty, text
         translation.text = translationText;
         translation.language_code = translationLanguage;
 
-        if (item[itemProperty] === null){
+        if (item[itemProperty] == null){
 
             item[itemProperty] = [];
         }
         item[itemProperty].push(translation);
 
         // Disable input box if no more translations available to add
-        if (languageInput.length === 0) {
+        if (languageInput.length == 0) {
 
             textInput.disabled = true;
             languageInput.disabled = true;
@@ -221,7 +221,7 @@ bjørneparkappen.adminconsole.getTranslation = function(item, itemProperty, lang
 
     for (var i = 0; i < item[itemProperty].length; i++){
 
-        if (item[itemProperty][i].language_code === languageCode){
+        if (item[itemProperty][i].language_code == languageCode){
 
             return item[itemProperty][i].text;
         }
@@ -230,11 +230,11 @@ bjørneparkappen.adminconsole.getTranslation = function(item, itemProperty, lang
 
 bjørneparkappen.adminconsole.updateTranslation = function(item, itemProperty, newValue, languageCode){
 
-    if (newValue !== "" && languageCode !== ""){
+    if (newValue != "" && languageCode != ""){
 
         for (var i = 0; i < item[itemProperty].length; i++){
 
-            if (item[itemProperty][i].language_code === languageCode) {
+            if (item[itemProperty][i].language_code == languageCode) {
 
                 item[itemProperty][i].text = newValue;
                 alert("Updated!");
@@ -281,10 +281,10 @@ bjørneparkappen.adminconsole.api.getSpecies = function(){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState === XMLHttpRequest.DONE){
+        if (xhr.readyState == XMLHttpRequest.DONE){
 
             // If request status is 200
-            if (xhr.status === 200){
+            if (xhr.status == 200){
 
                 // Parse response JSON
                 var resp = JSON.parse(xhr.responseText);
@@ -314,12 +314,12 @@ bjørneparkappen.adminconsole.api.createSpecies = function(species){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState === XMLHttpRequest.DONE) {
+        if (xhr.readyState == XMLHttpRequest.DONE) {
 
             var resp;
 
             // If request status is 200
-            if (xhr.status === 200) {
+            if (xhr.status == 200) {
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -364,12 +364,12 @@ bjørneparkappen.adminconsole.api.updateSpecies = function(species){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState === XMLHttpRequest.DONE){
+        if (xhr.readyState == XMLHttpRequest.DONE){
 
             var resp;
 
             // If request status is 200
-            if (xhr.status === 200) {
+            if (xhr.status == 200) {
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -414,12 +414,12 @@ bjørneparkappen.adminconsole.api.deleteSpecies = function(species){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState === XMLHttpRequest.DONE){
+        if (xhr.readyState == XMLHttpRequest.DONE){
 
             var resp;
 
             // If request status is 200
-            if (xhr.status === 200){
+            if (xhr.status == 200){
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -461,12 +461,12 @@ bjørneparkappen.adminconsole.api.getAreas = function(){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState === XMLHttpRequest.DONE){
+        if (xhr.readyState == XMLHttpRequest.DONE){
 
             var resp;
 
             // If request status is 200
-            if (xhr.status === 200){
+            if (xhr.status == 200){
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -497,12 +497,12 @@ bjørneparkappen.adminconsole.api.createAmenity = function(amenity){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState === XMLHttpRequest.DONE){
+        if (xhr.readyState == XMLHttpRequest.DONE){
 
             var resp;
 
             // If request status is 200
-            if (xhr.status === 200) {
+            if (xhr.status == 200) {
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -547,12 +547,12 @@ bjørneparkappen.adminconsole.api.updateAmenity = function(amenity){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState === XMLHttpRequest.DONE){
+        if (xhr.readyState == XMLHttpRequest.DONE){
 
             var resp;
 
             // If request status is 200
-            if (xhr.status === 200) {
+            if (xhr.status == 200) {
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -597,12 +597,12 @@ bjørneparkappen.adminconsole.api.createEnclosure = function(enclosure){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState === XMLHttpRequest.DONE){
+        if (xhr.readyState == XMLHttpRequest.DONE){
 
             var resp;
 
             // If request status is 200
-            if (xhr.status === 200) {
+            if (xhr.status == 200) {
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -647,12 +647,12 @@ bjørneparkappen.adminconsole.api.updateEnclosure = function(enclosure){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState === XMLHttpRequest.DONE){
+        if (xhr.readyState == XMLHttpRequest.DONE){
 
             var resp;
 
             // If request status is 200
-            if (xhr.status === 200) {
+            if (xhr.status == 200) {
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -697,12 +697,12 @@ bjørneparkappen.adminconsole.api.deleteArea = function(area){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState === XMLHttpRequest.DONE){
+        if (xhr.readyState == XMLHttpRequest.DONE){
 
             var resp;
 
             // If request status is 200
-            if (xhr.status === 200){
+            if (xhr.status == 200){
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -745,12 +745,12 @@ bjørneparkappen.adminconsole.api.getEvents = function(){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState === XMLHttpRequest.DONE){
+        if (xhr.readyState == XMLHttpRequest.DONE){
 
             var resp;
 
             // If request status is 200
-            if (xhr.status === 200){
+            if (xhr.status == 200){
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -781,12 +781,12 @@ bjørneparkappen.adminconsole.api.createEvent = function(event){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState === XMLHttpRequest.DONE){
+        if (xhr.readyState == XMLHttpRequest.DONE){
 
             var resp;
 
             // If request status is 200
-            if (xhr.status === 200) {
+            if (xhr.status == 200) {
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -831,12 +831,12 @@ bjørneparkappen.adminconsole.api.updateEvent = function(event){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState === XMLHttpRequest.DONE){
+        if (xhr.readyState == XMLHttpRequest.DONE){
 
             var resp;
 
             // If request status is 200
-            if (xhr.status === 200) {
+            if (xhr.status == 200) {
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -881,12 +881,12 @@ bjørneparkappen.adminconsole.api.createFeeding = function(feeding){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState === XMLHttpRequest.DONE){
+        if (xhr.readyState == XMLHttpRequest.DONE){
 
             var resp;
 
             // If request status is 200
-            if (xhr.status === 200) {
+            if (xhr.status == 200) {
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -931,12 +931,12 @@ bjørneparkappen.adminconsole.api.updateFeeding = function(feeding){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState === XMLHttpRequest.DONE){
+        if (xhr.readyState == XMLHttpRequest.DONE){
 
             var resp;
 
             // If request status is 200
-            if (xhr.status === 200) {
+            if (xhr.status == 200) {
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -981,12 +981,12 @@ bjørneparkappen.adminconsole.api.deleteEvent = function(event){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState === XMLHttpRequest.DONE){
+        if (xhr.readyState == XMLHttpRequest.DONE){
 
             var resp;
 
             // If request status is 200
-            if (xhr.status === 200){
+            if (xhr.status == 200){
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -1030,12 +1030,12 @@ bjørneparkappen.adminconsole.api.getAnimals = function(){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState === XMLHttpRequest.DONE){
+        if (xhr.readyState == XMLHttpRequest.DONE){
 
             var resp;
 
             // If request status is 200
-            if (xhr.status === 200){
+            if (xhr.status == 200){
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -1065,12 +1065,12 @@ bjørneparkappen.adminconsole.api.createAnimal = function(animal){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState === XMLHttpRequest.DONE){
+        if (xhr.readyState == XMLHttpRequest.DONE){
 
             var resp;
 
             // If request status is 200
-            if (xhr.status === 200) {
+            if (xhr.status == 200) {
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -1115,12 +1115,12 @@ bjørneparkappen.adminconsole.api.updateAnimal = function(animal){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState === XMLHttpRequest.DONE){
+        if (xhr.readyState == XMLHttpRequest.DONE){
 
             var resp;
 
             // If request status is 200
-            if (xhr.status === 200) {
+            if (xhr.status == 200) {
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -1165,12 +1165,12 @@ bjørneparkappen.adminconsole.api.deleteAnimal = function(animal){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState === XMLHttpRequest.DONE){
+        if (xhr.readyState == XMLHttpRequest.DONE){
 
             var resp;
 
             // If request status is 200
-            if (xhr.status === 200){
+            if (xhr.status == 200){
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -1213,12 +1213,12 @@ bjørneparkappen.adminconsole.api.getKeepers = function(){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState === XMLHttpRequest.DONE){
+        if (xhr.readyState == XMLHttpRequest.DONE){
 
             var resp;
 
             // If request status is 200
-            if (xhr.status === 200){
+            if (xhr.status == 200){
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -1248,12 +1248,12 @@ bjørneparkappen.adminconsole.api.createKeeper = function(keeper){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState === XMLHttpRequest.DONE){
+        if (xhr.readyState == XMLHttpRequest.DONE){
 
             var resp;
 
             // If request status is 200
-            if (xhr.status === 200) {
+            if (xhr.status == 200) {
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -1298,12 +1298,12 @@ bjørneparkappen.adminconsole.api.updateKeeper = function(keeper){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState === XMLHttpRequest.DONE){
+        if (xhr.readyState == XMLHttpRequest.DONE){
 
             var resp;
 
             // If request status is 200
-            if (xhr.status === 200) {
+            if (xhr.status == 200) {
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -1348,12 +1348,12 @@ bjørneparkappen.adminconsole.api.deleteKeeper = function(keeper){
     xhr.onreadystatechange = function() {
 
         // If request has completed
-        if (xhr.readyState === XMLHttpRequest.DONE){
+        if (xhr.readyState == XMLHttpRequest.DONE){
 
             var resp;
 
             // If request status is 200
-            if (xhr.status === 200){
+            if (xhr.status == 200){
 
                 // Parse response JSON
                 resp = JSON.parse(xhr.responseText);
@@ -1434,7 +1434,7 @@ bjørneparkappen.adminconsole.species.list.loadPage = function(){
     bjørneparkappen.adminconsole.species.list.clearPageData();
 
     // If no species were found
-    if (speciesList.length === 0){
+    if (speciesList.length == 0){
 
         // Retrieve the list of species
         bjørneparkappen.adminconsole.api.getSpecies();
@@ -1659,7 +1659,7 @@ bjørneparkappen.adminconsole.species.detail.validate = function(){
 
         alert("Please enter all translations for the species' common name.")
 
-    } else if (speciesDetailSpecies.latin === ""){
+    } else if (speciesDetailSpecies.latin == ""){
 
         alert("Please enter a latin name.");
 
@@ -1779,7 +1779,7 @@ bjørneparkappen.adminconsole.areas.addToTable = function(area){
     // Provide values to the new row
     labelCell.innerHTML = bjørneparkappen.adminconsole.getTranslation(area, 'label', LANGUAGE_CODE);
 
-    if (area.amenity_type !== null){
+    if (area.amenity_type != null){
 
         typeCell.innerHTML = area.amenity_type;
 
@@ -1844,7 +1844,7 @@ var areaTypeSelector = document.getElementById('area_type_selector');
 var amenityFields = document.getElementById('amenity_fields');
 areaTypeSelector.onchange = function(){
 
-    if (areaTypeSelector.value === "enclosure"){
+    if (areaTypeSelector.value == "enclosure"){
 
         amenityFields.style.display = HIDDEN;
 
@@ -1946,7 +1946,7 @@ bjørneparkappen.adminconsole.areas.detail.loadCreatePage = function(){
 
         if (bjørneparkappen.adminconsole.areas.detail.validate()){
 
-            if (areaTypeSelector.value === "amenity") {
+            if (areaTypeSelector.value == "amenity") {
 
                 areaDetailArea.amenity_type = amenityTypeInput.value;
                 bjørneparkappen.adminconsole.api.createAmenity(areaDetailArea);
@@ -1978,7 +1978,7 @@ bjørneparkappen.adminconsole.areas.detail.loadUpdatePage = function(area){
     // Set area object
     areaDetailArea = area;
 
-    if (area.amenity_type !== null){
+    if (area.amenity_type != null){
 
         areaTypeSelector.value = "amenity";
         amenityFields.style.display = DISPLAYED;
@@ -1998,7 +1998,7 @@ bjørneparkappen.adminconsole.areas.detail.loadUpdatePage = function(area){
 
         if (bjørneparkappen.adminconsole.areas.detail.validate()){
 
-            if (areaTypeSelector.value === "amenity") {
+            if (areaTypeSelector.value == "amenity") {
 
                 areaDetailArea.amenity_type = amenityTypeInput.value;
                 bjørneparkappen.adminconsole.api.updateAmenity(areaDetailArea);
@@ -2027,13 +2027,13 @@ bjørneparkappen.adminconsole.areas.detail.validate = function(){
 
         alert("Please enter all translations for the area label.")
 
-    } else if (areaDetailArea.visitor_destination === ""){
+    } else if (areaDetailArea.visitor_destination == ""){
 
         alert("Please enter a set of visitor destination co-ordinates.");
 
-    } else if (areaTypeSelector.value === "amenity"){
+    } else if (areaTypeSelector.value == "amenity"){
 
-        if (areaDetailArea.amenity_type === ""){
+        if (areaDetailArea.amenity_type == ""){
 
             alert("Please select an amenity type.");
 
@@ -2106,7 +2106,7 @@ bjørneparkappen.adminconsole.animals.list.loadPage = function(){
     bjørneparkappen.adminconsole.animals.list.clearPageData();
 
     // If no animals returned
-    if (animalsList.length === 0) {
+    if (animalsList.length == 0) {
 
         // Retrieve the list of animals
         bjørneparkappen.adminconsole.api.getAnimals();
@@ -2346,11 +2346,11 @@ bjørneparkappen.adminconsole.animals.detail.validate = function(){
 
     var valid = false;
 
-    if (animalDetailAnimal.name === ""){
+    if (animalDetailAnimal.name == ""){
 
         alert("Please enter a name.")
 
-    } else if (animalDetailAnimal.species_id === ""){
+    } else if (animalDetailAnimal.species_id == ""){
 
         alert("Please enter a species.");
 
@@ -2358,7 +2358,7 @@ bjørneparkappen.adminconsole.animals.detail.validate = function(){
 
         alert("Please enter all translations for the animal description.");
 
-    } else if (animalDetailAnimal.enclosure_id === ""){
+    } else if (animalDetailAnimal.enclosure_id == ""){
 
         alert("Please enter an enclosure.");
 
@@ -2556,7 +2556,7 @@ eventTypeSelector.onchange = function(){
     // Clear areas dropdown
     eventAreaInput.length = 0;
 
-    if (eventTypeSelector.value === "event"){
+    if (eventTypeSelector.value == "event"){
 
         feedingFields.style.display = HIDDEN;
 
@@ -2686,7 +2686,7 @@ bjørneparkappen.adminconsole.events.detail.loadCreatePage = function(){
     // Clear page data
     bjørneparkappen.adminconsole.events.detail.clearPageData();
 
-    if (eventTypeSelector.value === "event"){
+    if (eventTypeSelector.value == "event"){
 
         // Add amenity options to dropdown
         for (var amenityCount = 0; amenityCount < amenitiesList.length; amenityCount++){
@@ -2724,7 +2724,7 @@ bjørneparkappen.adminconsole.events.detail.loadCreatePage = function(){
         eventDetailEvent.location_id = eventAreaInput.value;
         eventDetailEvent.is_active = eventActiveInput.checked;
 
-        if (eventTypeSelector.value === "event"){
+        if (eventTypeSelector.value == "event"){
 
             bjørneparkappen.adminconsole.api.createEvent(eventDetailEvent);
 
@@ -2808,7 +2808,7 @@ bjørneparkappen.adminconsole.events.detail.loadUpdatePage = function(event){
 
         if (bjørneparkappen.adminconsole.events.detail.validate()) {
 
-            if (eventTypeSelector.value === "event"){
+            if (eventTypeSelector.value == "event"){
 
                 bjørneparkappen.adminconsole.api.updateEvent(eventDetailEvent);
 
@@ -2834,11 +2834,11 @@ bjørneparkappen.adminconsole.events.detail.validate = function(){
 
         alert("Please enter all translations for the event label.")
 
-    } else if (eventDetailEvent.start_time === ""){
+    } else if (eventDetailEvent.start_time == ""){
 
         alert("Please enter the event start time.");
 
-    } else if (eventDetailEvent.end_time === ""){
+    } else if (eventDetailEvent.end_time == ""){
 
         alert("Please enter the event end time.");
 
@@ -2904,7 +2904,7 @@ bjørneparkappen.adminconsole.keepers.list.loadPage = function(){
     bjørneparkappen.adminconsole.keepers.list.clearPageData();
 
     // If no keepers returned
-    if (keepersList.length === 0) {
+    if (keepersList.length == 0) {
 
         // Retrieve list of keepers
         bjørneparkappen.adminconsole.api.getKeepers();
@@ -3094,7 +3094,7 @@ bjørneparkappen.adminconsole.keepers.detail.validate = function(){
 
     var valid = false;
 
-    if (keeperDetailKeeper.name === ""){
+    if (keeperDetailKeeper.name == ""){
 
         alert("Please enter a name.")
 
