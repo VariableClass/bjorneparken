@@ -88,7 +88,7 @@ public class SocialFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (savedInstanceState != null){
+        if (getArguments() != null){
             mInternetAvailable = getArguments().getBoolean(ARG_INTERNET);
         }
 
