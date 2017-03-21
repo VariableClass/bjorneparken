@@ -61,9 +61,6 @@ public class Enclosure extends Area implements IModel, Parcelable {
 
         animals = new ArrayList<>();
         in.readTypedList(animals, Animal.CREATOR);
-
-        Bitmap bitmap = in.readParcelable(Bitmap.class.getClassLoader());
-        setImage(bitmap);
     }
 
     //endregion Constructors
@@ -137,8 +134,6 @@ public class Enclosure extends Area implements IModel, Parcelable {
         dest.writeStringList(getCoordinates());
 
         dest.writeTypedList(animals);
-
-        dest.writeValue(getImage());
     }
 
     //endregion Parcelable Overridden Methods

@@ -63,9 +63,6 @@ public class Amenity extends Area implements IModel, Parcelable{
         ArrayList<String> coordinates = new ArrayList<>();
         in.readStringList(coordinates);
         setCoordinates(coordinates);
-
-        Bitmap bitmap = in.readParcelable(Bitmap.class.getClassLoader());
-        setImage(bitmap);
     }
 
     //endregion Constructors
@@ -138,13 +135,6 @@ public class Amenity extends Area implements IModel, Parcelable{
                 amenityType});
 
         dest.writeStringList(getCoordinates());
-
-        if (getImage() == null){
-
-            return;
-        }
-
-        dest.writeValue(getImage());
     }
 
     //endregion Parcelable Overridden Methods

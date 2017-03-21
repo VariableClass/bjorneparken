@@ -1,6 +1,7 @@
 package com.callumveale.bjorneparken.adapters;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.os.Parcelable;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -49,6 +50,23 @@ public class EventRecyclerViewAdapter extends RecyclerViewAdapter {
             return;
         }
 
+        int maxTextLength = 95;
+
+        Bitmap bitmap = event.getImage();
+
+        // Set image
+        if (bitmap != null){
+
+            holder.mImageView.setImageBitmap(bitmap);
+            holder.mImageView.setVisibility(View.VISIBLE);
+            maxTextLength = 65;
+
+        } else {
+
+            holder.mImageView.setImageBitmap(null);
+            holder.mImageView.setVisibility(View.GONE);
+        }
+
         // Set list view item
         holder.mItem = event;
 
@@ -82,7 +100,7 @@ public class EventRecyclerViewAdapter extends RecyclerViewAdapter {
         // Set body
         String description = event.getDescription();
         if (description.length() > 100){
-            description = description.substring(0, 95) + "...";
+            description = description.substring(0, maxTextLength) + "...";
         }
         holder.mBodyView.setText(description);
 

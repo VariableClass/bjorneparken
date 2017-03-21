@@ -198,6 +198,7 @@ public class ResponseConverter {
         response.setStartTime(event.getStartTime());
         response.setEndTime(event.getEndTime());
         response.setIsActive(event.isActive());
+        response.setImage(event.getImageUrl());
 
         // Return a new event response created from the event object
         return response;
@@ -223,6 +224,7 @@ public class ResponseConverter {
         response.setEndTime(feeding.getEndTime());
         response.setIsActive(feeding.isActive());
         response.setKeeper(keeper);
+        response.setImage(feeding.getImageUrl());
 
         // Return a new feeding response created from the feeding object
         return response;
@@ -543,7 +545,7 @@ public class ResponseConverter {
         Amenity location = convertAmenityResponse(response.getLocation());
 
         // Return a new event object created from the event response
-        return new Event(response.getId(), response.getLabel(), response.getDescription(), location, response.getStartTime(), response.getEndTime(), response.getIsActive());
+        return new Event(response.getId(), response.getLabel(), response.getDescription(), location, response.getStartTime(), response.getEndTime(), response.getIsActive(), response.getImage());
 
     }
 
@@ -590,7 +592,7 @@ public class ResponseConverter {
         Keeper keeper = convertKeeperResponse(response.getKeeper());
 
         // Return a new feeding object created from the feeding response
-        return new Feeding(response.getId(), response.getLabel(), response.getDescription(), location, response.getStartTime(), response.getEndTime(), response.getIsActive(), keeper);
+        return new Feeding(response.getId(), response.getLabel(), response.getDescription(), location, response.getStartTime(), response.getEndTime(), response.getIsActive(), keeper, response.getImage());
     }
 
     public static ArrayList<Feeding> convertFeedingListResponse(MainEventListResponse response){

@@ -37,10 +37,23 @@ public class Event implements IModel, Parcelable{
     private String startTime;
     private String endTime;
     private boolean isActive;
+    private String imageUrl;
+    private Bitmap image;
 
     //endregion Properties
 
     //region Constructors
+
+    public Event(long id, String label, String description, Area location, String startTime, String endTime, boolean isActive, String imageUrl){
+        this.id = id;
+        this.label = label;
+        this.description = description;
+        this.location = location;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.isActive = isActive;
+        this.imageUrl = imageUrl;
+    }
 
     public Event(long id, String label, String description, Area location, String startTime, String endTime, boolean isActive){
         this.id = id;
@@ -57,12 +70,13 @@ public class Event implements IModel, Parcelable{
 
         this.id = in.readLong();
 
-        String[] data = new String[4];
+        String[] data = new String[5];
         in.readStringArray(data);
         this.label = data[0];
         this.description = data[1];
         this.startTime = data[2];
         this.endTime = data[3];
+        this.imageUrl = data[4];
 
         this.location = in.readParcelable(Amenity.class.getClassLoader());
 
@@ -202,6 +216,11 @@ public class Event implements IModel, Parcelable{
         isActive = active;
     }
 
+    public void setImageUrl(String imageUrl) {
+
+        this.imageUrl = imageUrl;
+    }
+
     //region IModel Overridden Methods
 
     @Override
@@ -226,17 +245,18 @@ public class Event implements IModel, Parcelable{
 
     @Override
     public String getImageUrl() {
-        return null;
+        return this.imageUrl;
     }
 
     @Override
     public Bitmap getImage() {
-        return null;
+        return this.image;
     }
 
     @Override
     public void setImage(Bitmap bitmap) {
-        return;
+
+        this.image = bitmap;
     }
 
     //endregion IModel Overridden Methods
@@ -251,7 +271,7 @@ public class Event implements IModel, Parcelable{
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(this.id);
-        dest.writeStringArray(new String[]{this.label, this.description, this.startTime, this.endTime});
+        dest.writeStringArray(new String[]{this.label, this.description, this.startTime, this.endTime, this.imageUrl});
 
         if (this.location.getClass() == Amenity.class) {
             dest.writeParcelable((Amenity) this.location, 0);
@@ -260,7 +280,6 @@ public class Event implements IModel, Parcelable{
 
             dest.writeParcelable((Enclosure) this.location, 0);
         }
-
 
         dest.writeBooleanArray(new boolean[]{this.isActive});
     }

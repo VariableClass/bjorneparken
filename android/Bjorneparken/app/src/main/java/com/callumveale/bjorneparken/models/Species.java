@@ -55,7 +55,7 @@ public class Species implements IModel, Parcelable{
 
     // Parcelling part
     public Species(Parcel in){
-        String[] data = new String[4];
+        String[] data = new String[5];
 
         in.readStringArray(data);
         this.id = Long.parseLong(data[0]);
@@ -63,8 +63,6 @@ public class Species implements IModel, Parcelable{
         this.latin = data[2];
         this.description = data[3];
         this.imageUrl = data[4];
-
-        this.image = in.readParcelable(Bitmap.class.getClassLoader());
     }
 
     //endregion Constructors
@@ -132,13 +130,6 @@ public class Species implements IModel, Parcelable{
                 this.latin,
                 this.description,
                 this.imageUrl});
-
-        if (image == null){
-
-            return;
-        }
-
-        dest.writeValue(image);
     }
 
     //endregion Parcelable Overridden Methods

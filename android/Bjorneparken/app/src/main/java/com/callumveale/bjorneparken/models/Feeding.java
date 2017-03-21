@@ -1,5 +1,6 @@
 package com.callumveale.bjorneparken.models;
 
+import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -32,22 +33,30 @@ public class Feeding extends Event implements IModel, Parcelable{
 
     //region Constructors
 
+    public Feeding(long id, String label, String description, Enclosure location, String startTime, String endTime, boolean isActive, Keeper keeper, String imageUrl){
+        super(id, label, description, location, startTime, endTime, isActive, imageUrl);
+        this.keeper = keeper;
+    }
+
     public Feeding(long id, String label, String description, Enclosure location, String startTime, String endTime, boolean isActive, Keeper keeper){
         super(id, label, description, location, startTime, endTime, isActive);
         this.keeper = keeper;
     }
+
+
 
     // Parcelling part
     public Feeding(Parcel in){
 
         setId(in.readLong());
 
-        String[] data = new String[4];
+        String[] data = new String[5];
         in.readStringArray(data);
         setLabel(data[0]);
         setDescription(data[1]);
         setStartTime(data[2]);
         setEndTime(data[3]);
+        setImageUrl(data[4]);
 
         setLocation((Area)in.readParcelable(Enclosure.class.getClassLoader()));
 
@@ -86,7 +95,7 @@ public class Feeding extends Event implements IModel, Parcelable{
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(this.getId());
-        dest.writeStringArray(new String[]{this.getLabel(), this.getDescription(), this.getStartTime(), this.getEndTime()});
+        dest.writeStringArray(new String[]{this.getLabel(), this.getDescription(), this.getStartTime(), this.getEndTime(), this.getImageUrl()});
         dest.writeParcelable((Enclosure)this.getLocation(), 0);
         dest.writeBooleanArray(new boolean[]{this.isActive()});
         dest.writeParcelable(this.keeper, 0);

@@ -321,16 +321,34 @@ public class HomeActivity
         // Attempt to retrieve amenities from file
         mAmenities = mFileWriter.getAmenitiesFromFile();
 
+        // Retrieve images for any amenity which has them
+        for (Amenity amenity : mAmenities){
+
+            getImage(amenity);
+        }
+
         // Attempt to retrieve attractions from file
         mAttractions = mFileWriter.getAttractionsFromFile();
+
+        // Retrieve images for any attraction which has them
+        for (Amenity attraction: mAttractions){
+
+            getImage(attraction);
+        }
 
         // Attempt to retrieve feedings from file
         mFeedings = mFileWriter.getFeedingsFromFile();
 
+        // Retrieve images for any species which have them
+        for (Feeding feeding : mFeedings){
+
+            getImage(feeding);
+        }
+
         // Attempt to retrieve species from file
         mSpecies = mFileWriter.getSpeciesFromFile();
 
-        // Retrieve images for any species which have them
+        // Retrieve images for any species which has them
         for (Species speciesInst : mSpecies){
 
             getImage(speciesInst);
@@ -574,6 +592,12 @@ public class HomeActivity
 
         // Write response to file
         mFileWriter.writeFeedingsToFile(feedings);
+
+        // Retrieve images for any feedings which have them
+        for (Feeding feeding : mFeedings){
+
+            getImage(feeding);
+        }
     }
 
     public void saveSpecies(MainSpeciesListResponse species){
@@ -627,6 +651,12 @@ public class HomeActivity
         // Cache response
         mItinerary = ResponseConverter.convertEventListResponse(itineraryResponse);
 
+        // Retrieve images for items
+        for (Event event : mItinerary){
+
+            getImage(event);
+        }
+
         // Clear synchronisation flag
         mItineraryUpdated = false;
 
@@ -645,6 +675,12 @@ public class HomeActivity
 
         // Cache response
         mStarredSpecies = ResponseConverter.convertSpeciesListResponse(starredSpeciesResponse);
+
+        // Retrieve images for items
+        for (Species species : mStarredSpecies){
+
+            getImage(species);
+        }
 
         // Clear synchronisation flag
         mStarredSpeciesUpdated = false;
