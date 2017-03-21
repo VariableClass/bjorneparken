@@ -21,6 +21,9 @@
           },
           "type": "array"
         },
+        "image": {
+          "type": "string"
+        },
         "label": {
           "items": {
             "$ref": "#/definitions/MainInternationalMessage"
@@ -49,6 +52,9 @@
         },
         "id": {
           "format": "int64",
+          "type": "string"
+        },
+        "image": {
           "type": "string"
         },
         "label": {
@@ -206,6 +212,9 @@
           },
           "type": "array"
         },
+        "image": {
+          "type": "string"
+        },
         "label": {
           "items": {
             "$ref": "#/definitions/MainInternationalMessage"
@@ -234,6 +243,9 @@
         },
         "id": {
           "format": "int64",
+          "type": "string"
+        },
+        "image": {
           "type": "string"
         },
         "label": {
@@ -303,6 +315,9 @@
         "end_time": {
           "type": "string"
         },
+        "image": {
+          "type": "string"
+        },
         "is_active": {
           "type": "boolean"
         },
@@ -332,6 +347,9 @@
         },
         "id": {
           "format": "int64",
+          "type": "string"
+        },
+        "image": {
           "type": "string"
         },
         "is_active": {
@@ -410,6 +428,9 @@
         "end_time": {
           "type": "string"
         },
+        "image": {
+          "type": "string"
+        },
         "is_active": {
           "type": "boolean"
         },
@@ -443,6 +464,9 @@
         },
         "id": {
           "format": "int64",
+          "type": "string"
+        },
+        "image": {
           "type": "string"
         },
         "is_active": {

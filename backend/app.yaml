@@ -16,4 +16,4 @@ libraries:
 
 env_variables:
    ENDPOINTS_SERVICE_NAME: api.bjorneparkappen.appspot.com
-   ENDPOINTS_SERVICE_VERSION: 2017-03-19r0
+   ENDPOINTS_SERVICE_VERSION: 2017-03-21r0

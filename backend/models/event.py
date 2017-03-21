@@ -1,6 +1,7 @@
 from google.appengine.ext import ndb
 from google.appengine.ext.ndb import polymodel
 from i18n import InternationalText
+from image import Image
 
 class Event(polymodel.PolyModel):
 
@@ -10,6 +11,7 @@ class Event(polymodel.PolyModel):
     start_time = ndb.StringProperty()
     end_time = ndb.StringProperty()
     is_active = ndb.BooleanProperty()
+    image = ndb.StructuredProperty(Image)
 
     # Class Methods
     @classmethod

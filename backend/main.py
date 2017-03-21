@@ -191,6 +191,7 @@ class EventRequest(messages.Message):
     start_time = messages.StringField(4)
     end_time = messages.StringField(5)
     is_active = messages.BooleanField(6)
+    image = messages.StringField(7)
 
 class UpdateEventRequest(messages.Message):
     label = messages.MessageField(InternationalMessage, 1, repeated=True)
@@ -198,6 +199,7 @@ class UpdateEventRequest(messages.Message):
     start_time = messages.StringField(3)
     end_time = messages.StringField(4)
     is_active = messages.BooleanField(5)
+    image = messages.StringField(6)
 
 class FeedingRequest(messages.Message):
     label = messages.MessageField(InternationalMessage, 1, repeated=True)
@@ -207,6 +209,7 @@ class FeedingRequest(messages.Message):
     end_time = messages.StringField(5)
     is_active = messages.BooleanField(6)
     keeper_id = messages.IntegerField(7)
+    image = messages.StringField(8)
 
 class UpdateFeedingRequest(messages.Message):
     label = messages.MessageField(InternationalMessage, 1, repeated=True)
@@ -215,6 +218,7 @@ class UpdateFeedingRequest(messages.Message):
     end_time = messages.StringField(4)
     is_active = messages.BooleanField(5)
     keeper_id = messages.IntegerField(6)
+    image = messages.StringField(7)
 
 class EventResponse(messages.Message):
     id = messages.IntegerField(1)
@@ -224,6 +228,7 @@ class EventResponse(messages.Message):
     start_time = messages.StringField(5)
     end_time = messages.StringField(6)
     is_active = messages.BooleanField(7)
+    image = messages.StringField(8)
 
 class FeedingResponse(messages.Message):
     id = messages.IntegerField(1)
@@ -234,6 +239,7 @@ class FeedingResponse(messages.Message):
     end_time = messages.StringField(6)
     is_active = messages.BooleanField(7)
     keeper = messages.MessageField(KeeperResponse, 8)
+    image = messages.StringField(9)
 
 class EventListResponse(messages.Message):
     events = messages.MessageField(EventResponse, 1, repeated=True)
@@ -415,7 +421,7 @@ class ApiHelper():
         image = None
 
         # If species has an image
-        if not species.image is None:
+        if species.image:
             image = species.image.get()
 
         return SpeciesResponse(
@@ -663,6 +669,12 @@ class ApiHelper():
         # Retrieve location
         location = ApiHelper.get_amenity_response(event.key.parent().get(), language_code)
 
+        image = None
+
+        # If event has an image
+        if event.image:
+            image = event.image.get()
+
         return EventResponse(
             id=event.key.id(),
             label=event_label_translation,
@@ -670,7 +682,8 @@ class ApiHelper():
             location=location,
             start_time=event.start_time,
             end_time=event.end_time,
-            is_active=event.is_active)
+            is_active=event.is_active,
+            image=image)
 
     @staticmethod
     def get_event_response_with_translations(event):
@@ -735,6 +748,12 @@ class ApiHelper():
             name=keeper.name,
             bio=keeper_bio_translation)
 
+        image = None
+
+        # If feeding has an image
+        if feeding.image:
+            image = feeding.image.get()
+
         return FeedingResponse(
             id=feeding.key.id(),
             label=feeding_label_translation,
@@ -743,7 +762,8 @@ class ApiHelper():
             start_time=feeding.start_time,
             end_time=feeding.end_time,
             is_active=feeding.is_active,
-            keeper=keeper_response)
+            keeper=keeper_response,
+            image=image)
 
     @staticmethod
     def get_feeding_response_with_translations(feeding):
@@ -1931,12 +1951,20 @@ class EventsApi(remote.Service):
         description = ApiHelper.convert_i18n_messages_to_i18n_texts(international_messages=request.description)
 
         # Create new event
-        Event(parent=location.key,
+        event = Event(parent=location.key,
             label=label,
             description=description,
             start_time=request.start_time,
             end_time=request.end_time,
-            is_active=request.is_active).put()
+            is_active=request.is_active)
+
+        # Write to datastore
+        event_key = event.put()
+
+        # If image attached, create one
+        if request.image:
+            event.image = Image.upload(event_key.id(), request.image)
+            event.put()
 
         # Update version
         ApiHelper.update_version()
@@ -2005,6 +2033,10 @@ class EventsApi(remote.Service):
                 raise endpoints.BadRequestException("Time must be in the format 'HH.MM' and end time must not exceed start time.")
 
             event.end_time = request.end_time
+
+        # If value for image provided:
+        if request.image:
+            event.image = Image.upload(event.key.id(), request.image)
 
         # Check if value for is_active provided
         try:
@@ -2090,7 +2122,12 @@ class EventsApi(remote.Service):
                 is_active=request.is_active)
 
         # Write changes
-        feeding.put()
+        feeding_key = feeding.put()
+
+        # If image attached, create one
+        if request.image:
+            feeding.image = Image.upload(feeding_key.id(), request.image)
+            feeding.put()
 
         # Update version
         ApiHelper.update_version()
@@ -2155,6 +2192,10 @@ class EventsApi(remote.Service):
         # If value for end_time provided
         if request.end_time:
             feeding.end_time = request.end_time
+
+        # If value for image provided:
+        if request.image:
+            feeding.image = Image.upload(feeding.key.id(), request.image)
 
         # Check if value for is_active provided
         try:
@@ -2235,7 +2276,12 @@ class EventsApi(remote.Service):
             # Write changes
             visitor.put()
 
-        # Delete area
+        # If event has an image
+        if event.image:
+            # Delete image
+            event.image.delete()
+
+        # Delete event
         event.key.delete()
 
         # Update version
