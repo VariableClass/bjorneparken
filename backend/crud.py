@@ -1,6 +1,8 @@
 import os
 import lib.cloudstorage as gcs
 from google.appengine.api import app_identity
+from google.appengine.api import images
+from google.appengine.ext import blobstore
 
 
 # Upload image to cloud storage bucket
@@ -62,6 +64,22 @@ def delete_file(filename):
 
     except gcs.NotFoundError:
         print (filename + 'not found')
+
+
+# Retrieves a public URL for an image
+def get_serving_url(filename):
+
+    # Retrieve default bucket
+    bucket_name = retrieve_default_bucket()
+
+    # Create a blobstore style filename
+    blobstore_filename = '/gs/' + bucket_name + '/' + str(filename)
+
+    # Create a blob key from which to build a serving URL
+    blob_key = blobstore.create_gs_key(blobstore_filename)
+
+    # Return a public serving URL
+    return images.get_serving_url(blob_key=blob_key)
 
 
 # Retrieve default bucket

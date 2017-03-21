@@ -1,4 +1,3 @@
-import base64
 import crud
 import endpoints
 import re
@@ -12,18 +11,13 @@ class Image(ndb.Model):
 
     # Methods
     def get(self):
-        # Retrieve image
-        image = crud.retrieve_image_file(self.name)
-
-        # Encode image
-        base64_prefix = "data:" + self.mime_type + ";base64,"
-
-        return base64_prefix + base64.b64encode(image)
+        # Return public image serving url
+        return crud.get_serving_url(self.name)
 
 
     def delete(self):
         # Delete image
-        crud.delete_file(self.name);
+        crud.delete_file(self.name)
 
 
     # Class Methods
@@ -54,4 +48,4 @@ class Image(ndb.Model):
 
         else:
             raise endpoints.BadRequestException(
-                "'" + mime_type + "' is not an accepted type. Please upload an image of one of the following formats:" + ", ".join(accepted_mime_types))
+                "'" + mime_type + "' is not an accepted type. Please upload an image of one of the following formats:" + ", ".join(Image.accepted_mime_types))

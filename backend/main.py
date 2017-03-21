@@ -1,6 +1,5 @@
 # coding=utf-8
 # [START imports]
-import crud
 import datetime
 import endpoints
 from google.appengine.ext import ndb
