@@ -126,6 +126,7 @@ class EnclosureRequest(messages.Message):
     label = messages.MessageField(InternationalMessage, 1, repeated=True)
     visitor_destination = messages.StringField(2)
     coordinates = messages.StringField(3, repeated=True)
+    image = messages.StringField(4)
 
 class AmenityRequest(messages.Message):
     label = messages.MessageField(InternationalMessage, 1, repeated=True)
@@ -133,6 +134,7 @@ class AmenityRequest(messages.Message):
     coordinates = messages.StringField(3, repeated=True)
     description = messages.MessageField(InternationalMessage, 4, repeated=True)
     amenity_type = messages.StringField(5)
+    image = messages.StringField(6)
 
 class EnclosureResponse(messages.Message):
     id = messages.IntegerField(1)
@@ -140,6 +142,7 @@ class EnclosureResponse(messages.Message):
     visitor_destination = messages.StringField(3)
     coordinates = messages.StringField(4, repeated=True)
     animals = messages.MessageField(AnimalResponse, 5, repeated=True)
+    image = messages.StringField(6)
 
 class AmenityResponse(messages.Message):
     id = messages.IntegerField(1)
@@ -148,6 +151,7 @@ class AmenityResponse(messages.Message):
     coordinates = messages.StringField(4, repeated=True)
     description = messages.StringField(5)
     amenity_type = messages.StringField(6)
+    image = messages.StringField(7)
 
 class AreaListResponse(messages.Message):
     enclosures = messages.MessageField(EnclosureResponse, 1, repeated=True)
@@ -511,38 +515,19 @@ class ApiHelper():
             # Add animal to return list
             animals.append(animal_response)
 
+        image = None
+
+        # If area has an image
+        if area.image:
+            image = area.image.get()
+
         return EnclosureResponse(
             id=area.key.id(),
             label=area_label_translation,
             visitor_destination=str(area.visitor_destination.lon) + ", " + str(area.visitor_destination.lat),
             coordinates=coordinates,
-            animals=animals)
-
-    @staticmethod
-    def get_amenity_response(area, language_code):
-
-        # Translate translatable area resources
-        area_label_translation = InternationalText.get_translation(
-                language_code,
-                area.label)
-
-        amenity_description_translation = InternationalText.get_translation(
-                language_code,
-                area.description)
-
-        coordinates = []
-
-        # Convert co-ordinate pairs to strings
-        for coordinate in area.coordinates:
-            coordinates.append(str(coordinate.lon) + ", " + str(coordinate.lat))
-
-        return AmenityResponse(
-            id=area.key.id(),
-            label=area_label_translation,
-            visitor_destination=str(area.visitor_destination.lon) + ", " + str(area.visitor_destination.lat),
-            coordinates=coordinates,
-            description=amenity_description_translation,
-            amenity_type=area.amenity_type)
+            animals=animals,
+            image=image)
 
     @staticmethod
     def get_enclosure_response_with_translations(area):
@@ -590,6 +575,12 @@ class ApiHelper():
 
         coordinates = []
 
+        image = None
+
+        # If area has an image
+        if area.image:
+            image = area.image.get()
+
         # Convert co-ordinate pairs to strings
         for coordinate in area.coordinates:
             coordinates.append(str(coordinate.lon) + ", " + str(coordinate.lat))
@@ -600,7 +591,8 @@ class ApiHelper():
             visitor_destination=str(area.visitor_destination.lon) + ", " + str(area.visitor_destination.lat),
             coordinates=coordinates,
             description=amenity_description_translation,
-            amenity_type=area.amenity_type)
+            amenity_type=area.amenity_type,
+            image=image)
 
     @staticmethod
     def get_amenity_response_with_translations(area):
@@ -946,7 +938,7 @@ class SpeciesApi(remote.Service):
             visitor.put()
 
         # If species has an image
-        if not species.image is None:
+        if species.image:
             # Delete image
             species.image.delete()
 
@@ -1371,9 +1363,17 @@ class AreasApi(remote.Service):
             coordinates.append(ndb.GeoPt(coordinate_array[0], coordinate_array[1]))
 
         # Create new enclosure
-        Enclosure(label=label,
+        enclosure = Enclosure(label=label,
                 visitor_destination=visitor_destination,
-                coordinates=coordinates).put()
+                coordinates=coordinates)
+
+        # Write to datastore
+        enclosure_key = enclosure.put()
+
+        # If image attached, create one
+        if request.image:
+            enclosure.image = Image.upload(enclosure_key.id(), request.image)
+            enclosure.put()
 
         # Update version
         ApiHelper.update_version()
@@ -1430,11 +1430,19 @@ class AreasApi(remote.Service):
         amenity_type = Amenity.AmenityType[request.amenity_type]
 
         # Create new amenity
-        Amenity(label=label,
+        amenity = Amenity(label=label,
                 visitor_destination=visitor_destination,
                 coordinates=coordinates,
                 description=description,
-                amenity_type=amenity_type.name).put()
+                amenity_type=amenity_type.name)
+
+        # Write to datastore
+        amenity_key = amenity.put()
+
+        # If image attached, create one
+        if request.image:
+            amenity.image = Image.upload(amenity_key.id(), request.image)
+            amenity.put()
 
         # Update version
         ApiHelper.update_version()
@@ -1488,6 +1496,10 @@ class AreasApi(remote.Service):
             for coordinate_string in request.coordinates:
                 coordinate_array = coordinate_string.split(", ")
                 coordinates.append(ndb.GeoPt(coordinate_array[0], coordinate_array[1]))
+
+        # If value for image provided:
+        if request.image:
+            enclosure.image = Image.upload(enclosure.key.id(), request.image)
 
         # Write changes
         enclosure.put()
@@ -1623,6 +1635,10 @@ class AreasApi(remote.Service):
                 raise endpoints.BadRequestException("No AmenityType found by the name '" + request.amenity_type +
                                                     "'. Amenities may be any of the following: " + string_amenity_types)
 
+        # If value for image provided:
+        if request.image:
+            amenity.image = Image.upload(amenity.key.id(), request.image)
+
         # Write changes
         amenity.put()
 
@@ -1652,6 +1668,11 @@ class AreasApi(remote.Service):
         # Delete each
         for event in events:
             event.key.delete()
+
+        # If area has an image
+        if area.image:
+            # Delete image
+            area.image.delete()
 
         # Delete area
         area.key.delete()

@@ -2,6 +2,7 @@ from event import Event
 from google.appengine.ext import ndb
 from google.appengine.ext.ndb import polymodel
 from i18n import InternationalText
+from image import Image
 from time import Time
 
 class Area(polymodel.PolyModel):
@@ -15,6 +16,7 @@ class Area(polymodel.PolyModel):
     label = ndb.StructuredProperty(InternationalText, repeated=True)
     visitor_destination = ndb.GeoPtProperty()
     coordinates = ndb.GeoPtProperty(repeated=True)
+    image = ndb.StructuredProperty(Image)
 
     # Methods
     def get_events(self):
@@ -43,12 +45,12 @@ class Area(polymodel.PolyModel):
 
         return True
 
-    def get_area():
+    def get_area(self):
         area = 0
-        previous_point = len(coordinates) - 1
+        previous_point = len(self.coordinates) - 1
 
-        for current_point in range(0, len(coordinates) - 1):
-            area = area + (coordinates[previous_point].lat + coordinates[current_point].lat) * (coordinates[previous_point].lon - coordinates[current_point].lon)
+        for current_point in range(0, len(self.coordinates) - 1):
+            area = area + (self.coordinates[previous_point].lat + self.coordinates[current_point].lat) * (self.coordinates[previous_point].lon - self.coordinates[current_point].lon)
             previous_point = current_point
 
         return area/2
