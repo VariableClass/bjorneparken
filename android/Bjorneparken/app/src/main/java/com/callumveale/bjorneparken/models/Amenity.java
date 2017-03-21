@@ -36,6 +36,12 @@ public class Amenity extends Area implements IModel, Parcelable{
 
     //region Constructors
 
+    public Amenity(long id, String label, String visitorDestination, ArrayList<String> coordinates, String imageUrl, String description, String amenityType){
+        super(id, label, visitorDestination, coordinates, imageUrl);
+        this.description = description;
+        this.amenityType = amenityType;
+    }
+
     public Amenity(long id, String label, String visitorDestination, ArrayList<String> coordinates, String description, String amenityType){
         super(id, label, visitorDestination, coordinates);
         this.description = description;
@@ -57,6 +63,9 @@ public class Amenity extends Area implements IModel, Parcelable{
         ArrayList<String> coordinates = new ArrayList<>();
         in.readStringList(coordinates);
         setCoordinates(coordinates);
+
+        Bitmap bitmap = in.readParcelable(Bitmap.class.getClassLoader());
+        setImage(bitmap);
     }
 
     //endregion Constructors
@@ -95,17 +104,17 @@ public class Amenity extends Area implements IModel, Parcelable{
 
     @Override
     public String getImageUrl() {
-        return null;
+        return super.getImageUrl();
     }
 
     @Override
     public Bitmap getImage() {
-        return null;
+        return super.getImage();
     }
 
     @Override
     public void setImage(Bitmap bitmap) {
-        return;
+        super.setImage(bitmap);
     }
 
     //endregion IModel Overridden Methods
@@ -129,6 +138,13 @@ public class Amenity extends Area implements IModel, Parcelable{
                 amenityType});
 
         dest.writeStringList(getCoordinates());
+
+        if (getImage() == null){
+
+            return;
+        }
+
+        dest.writeValue(getImage());
     }
 
     //endregion Parcelable Overridden Methods

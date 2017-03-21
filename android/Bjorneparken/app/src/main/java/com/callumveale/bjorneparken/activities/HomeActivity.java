@@ -544,6 +544,12 @@ public class HomeActivity
 
         // Write response to file
         mFileWriter.writeAmenitiesToFile(amenities);
+
+        // Retrieve images for any amenities which have them
+        for (Amenity amenity : mAmenities){
+
+            getImage(amenity);
+        }
     }
 
     public void saveAttractions(MainAreaListResponse attractions){
@@ -553,6 +559,12 @@ public class HomeActivity
 
         // Write response to file
         mFileWriter.writeAttractionsToFile(attractions);
+
+        // Retrieve images for any attractions which have them
+        for (Amenity attraction : mAttractions){
+
+            getImage(attraction);
+        }
     }
 
     public void saveFeedings(MainEventListResponse feedings){

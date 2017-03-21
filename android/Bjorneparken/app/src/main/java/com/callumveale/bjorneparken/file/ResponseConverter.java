@@ -1,7 +1,5 @@
 package com.callumveale.bjorneparken.file;
 
-import android.util.Base64;
-
 import com.callumveale.bjorneparken.models.*;
 
 import java.util.ArrayList;
@@ -116,6 +114,7 @@ public class ResponseConverter {
         response.setVisitorDestination(amenity.getVisitorDestination());
         response.setCoordinates(amenity.getCoordinates());
         response.setAmenityType(amenity.getAmenityType());
+        response.setImage(amenity.getImageUrl());
 
         // Return a new amenity response created from the amenity object
         return response;
@@ -148,6 +147,7 @@ public class ResponseConverter {
         response.setVisitorDestination(enclosure.getVisitorDestination());
         response.setCoordinates(enclosure.getCoordinates());
         response.setAnimals(animals);
+        response.setImage(enclosure.getImageUrl());
 
         // Return a new amenity response created from the amenity object
         return response;
@@ -407,7 +407,7 @@ public class ResponseConverter {
         ArrayList<String> coordinates = new ArrayList<>(response.getCoordinates());
 
         // Return a new amenity object created from the amenity response
-        return new Amenity(response.getId(), response.getLabel(), response.getVisitorDestination(), coordinates, response.getDescription(), response.getAmenityType());
+        return new Amenity(response.getId(), response.getLabel(), response.getVisitorDestination(), coordinates, response.getImage(), response.getDescription(), response.getAmenityType());
     }
 
     public static ArrayList<Amenity> convertAmenityListResponse(MainAreaListResponse response){
@@ -455,7 +455,7 @@ public class ResponseConverter {
         ArrayList<Animal> animals = convertAnimalListResponse(response.getAnimals());
 
         // Return a new enclosure object created from the enclosure response
-        return new Enclosure(response.getId(), response.getLabel(), response.getVisitorDestination(), coordinates, animals);
+        return new Enclosure(response.getId(), response.getLabel(), response.getVisitorDestination(), coordinates, response.getImage(), animals);
     }
 
     private static ArrayList<Enclosure> convertEnclosureListResponse(MainAreaListResponse response){

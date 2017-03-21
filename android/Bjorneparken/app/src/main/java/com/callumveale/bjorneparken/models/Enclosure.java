@@ -35,6 +35,11 @@ public class Enclosure extends Area implements IModel, Parcelable {
 
     //region Constructors
 
+    public Enclosure(long id, String label, String visitorDestination, ArrayList<String> coordinates, String imageUrl, ArrayList<Animal> animals){
+        super(id, label, visitorDestination, coordinates, imageUrl);
+        this.animals = animals;
+    }
+
     public Enclosure(long id, String label, String visitorDestination, ArrayList<String> coordinates, ArrayList<Animal> animals){
         super(id, label, visitorDestination, coordinates);
         this.animals = animals;
@@ -56,6 +61,9 @@ public class Enclosure extends Area implements IModel, Parcelable {
 
         animals = new ArrayList<>();
         in.readTypedList(animals, Animal.CREATOR);
+
+        Bitmap bitmap = in.readParcelable(Bitmap.class.getClassLoader());
+        setImage(bitmap);
     }
 
     //endregion Constructors
@@ -95,17 +103,17 @@ public class Enclosure extends Area implements IModel, Parcelable {
 
     @Override
     public String getImageUrl() {
-        return null;
+        return super.getImageUrl();
     }
 
     @Override
     public Bitmap getImage() {
-        return null;
+        return super.getImage();
     }
 
     @Override
     public void setImage(Bitmap bitmap) {
-        return;
+        super.setImage(bitmap);
     }
 
     //endregion IModel Overridden Methods
@@ -129,6 +137,8 @@ public class Enclosure extends Area implements IModel, Parcelable {
         dest.writeStringList(getCoordinates());
 
         dest.writeTypedList(animals);
+
+        dest.writeValue(getImage());
     }
 
     //endregion Parcelable Overridden Methods

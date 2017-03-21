@@ -1,6 +1,7 @@
 package com.callumveale.bjorneparken.adapters;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.os.Parcelable;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -43,6 +44,20 @@ public class AmenityRecyclerViewAdapter extends RecyclerViewAdapter {
         holder.mItem = amenity;
         holder.mHeaderView.setText(amenity.getLabel());
         holder.mBodyView.setText(amenity.getDescription());
+
+        Bitmap bitmap = amenity.getImage();
+
+        // Set image
+        if (bitmap != null){
+
+            holder.mImageView.setImageBitmap(bitmap);
+            holder.mImageView.setVisibility(View.VISIBLE);
+
+        } else {
+
+            holder.mImageView.setImageBitmap(null);
+            holder.mImageView.setVisibility(View.GONE);
+        }
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
