@@ -7,6 +7,8 @@ import com.callumveale.bjorneparken.models.Species;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.URL;
+import java.net.URLConnection;
 
 import none.bjorneparkappen_api.BjorneparkappenApi;
 import none.bjorneparkappen_api.model.MainSpeciesListResponse;
@@ -47,18 +49,18 @@ public class CheckConnectionTask extends AsyncTask<Void, Void, Boolean> {
     @Override
     protected Boolean doInBackground(Void... params) {
 
-        boolean available = false;
+        try{
 
-        try {
+            URL root = new URL(mRootUrl);
+            URLConnection connection = root.openConnection();
+            connection.setConnectTimeout(30000);
+            connection.connect();
+            return true;
 
-            available = InetAddress.getByName(mRootUrl).isReachable(5000);
+        } catch (Exception e) {
 
-        } catch (IOException e) {
-
-            e.printStackTrace();
+            return false;
         }
-
-        return available;
     }
 
     @Override
