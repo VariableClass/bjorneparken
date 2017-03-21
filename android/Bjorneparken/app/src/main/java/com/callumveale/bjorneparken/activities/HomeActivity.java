@@ -364,6 +364,12 @@ public class HomeActivity
         // Attempt to retrieve visitor itinerary from file
         mItinerary = mFileWriter.getItineraryFromFile();
 
+        // Retrieve images for any species which has them
+        for (Event event : mItinerary){
+
+            getImage(event);
+        }
+
         // Attempt to retrieve visitor starred species from file
         mStarredSpecies = mFileWriter.getStarredSpeciesFromFile();
     }

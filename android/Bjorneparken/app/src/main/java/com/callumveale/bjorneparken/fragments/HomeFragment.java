@@ -1,12 +1,14 @@
 package com.callumveale.bjorneparken.fragments;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -157,6 +159,16 @@ public class HomeFragment extends Fragment {
             // Retrieve and hide the no events text view
             TextView noEvents = (TextView) view.findViewById(R.id.home_empty);
             noEvents.setVisibility(View.GONE);
+
+            Bitmap bitmap = event.getImage();
+
+            // Set image
+            if (bitmap != null){
+
+                ImageView mImageView = (ImageView) view.findViewById(R.id.event_image);
+                mImageView.setImageBitmap(bitmap);
+                mImageView.setVisibility(View.VISIBLE);
+            }
 
             // Retrieve and set the label text view
             TextView mLabelView = (TextView) view.findViewById(R.id.event_label);

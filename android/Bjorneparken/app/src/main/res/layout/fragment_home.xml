@@ -59,6 +59,12 @@
             android:orientation="vertical"
             android:background="@drawable/list_item">
 
+            <ImageView
+                android:id="@+id/event_image"
+                android:layout_width="250dp"
+                android:layout_height="250dp"
+                android:visibility="gone"/>
+
             <TextView
                 android:id="@+id/event_label"
                 android:layout_width="wrap_content"
