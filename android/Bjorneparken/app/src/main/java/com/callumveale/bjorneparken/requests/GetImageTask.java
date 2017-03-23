@@ -72,7 +72,7 @@ public class GetImageTask extends AsyncTask<Void, Void, Void> {
             byte[] imageBytes = byteArrayOutputStream.toByteArray();
 
             // Write byte array to file
-            OutputStream os = new FileOutputStream(new File(mActivity.getFilesDir() + mItem.getClass().getSimpleName() + "-" + mItem.getId()), false);
+            OutputStream os = new FileOutputStream(new File(mActivity.getFilesDir() + "/" + mItem.getClass().getSimpleName() + "-" + mItem.getId()), false);
             os.write(imageBytes);
             os.flush();
             os.close();

@@ -412,7 +412,7 @@ public class FileWriter {
 
         try {
 
-            FileInputStream inputStream = new FileInputStream(new File(mContext.getFilesDir() + item.getClass().getSimpleName() + "-" + item.getId()));
+            FileInputStream inputStream = new FileInputStream(new File(mContext.getFilesDir() + "/" + item.getClass().getSimpleName() + "-" + item.getId()));
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
             // Get image
