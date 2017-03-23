@@ -4,6 +4,13 @@
     <string name="facebook_place_id">201367389875716</string>
     <string name="hashtag">#bjørneparken</string>
 
+    <!-- Welcome Screen -->
+    <string name="welcome_start">When are you visiting us?</string>
+    <string name="welcome_end">&#8230;and when are you here until?</string>
+    <string name="welcome_back">Back</string>
+    <string name="welcome_next">Next</string>
+    <string name="welcome_save">OK</string>
+
     <!-- Navigation Drawer -->
     <string name="drawer_open">Navigation drawer open</string>
     <string name="drawer_close">Navigation drawer closed</string>

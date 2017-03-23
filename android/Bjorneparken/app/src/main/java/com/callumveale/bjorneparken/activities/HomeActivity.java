@@ -1,5 +1,7 @@
 package com.callumveale.bjorneparken.activities;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.content.IntentFilter;
 
 import android.net.ConnectivityManager;
@@ -61,6 +63,9 @@ public class HomeActivity
     //region Constants
 
     private static final String ARG_SERVER_AVAILABLE = "server-available";
+    public static final String ARG_VISIT_START = "visit-start";
+    public static final String ARG_VISIT_END = "visit-end";
+    private static final int INITIALISE_DATES = 0;
 
     //endregion Constants
 
@@ -279,24 +284,15 @@ public class HomeActivity
 
         } else {
 
-            // TODO Retrieve visit of dates from user
+            // Create new date objects at the current day
             mVisitStart = new DateTime(new Date());
             mVisitEnd = new DateTime(new Date());
 
-            // Initialise version file
-            mVersion = new DateTime(new Date(0));
-            mFileWriter.writeVersionToFile(mVersion);
-
-            // If server is available
-            if (mServerAvailable) {
-
-                // Obtain new ID
-                getNewId();
-
-            } else {
-
-                // TODO Show connect to internet message
-            }
+            // Create activity to allow the user to select their visit dates
+            Intent getDateIntent = new Intent(this, WelcomeActivity.class);
+            getDateIntent.putExtra(ARG_VISIT_START, mVisitStart);
+            getDateIntent.putExtra(ARG_VISIT_END, mVisitEnd);
+            startActivityForResult(getDateIntent, INITIALISE_DATES);
         }
     }
 
@@ -357,9 +353,9 @@ public class HomeActivity
 
     private void getVisitorDataFromFile(){
 
-        // TODO Retrieve visit of dates from user
-        mVisitStart = new DateTime(new Date());
-        mVisitEnd = new DateTime(new Date());
+        // Retrieve visitor dates from file
+        mVisitStart = mFileWriter.getVisitStartDateFromFile();
+        mVisitEnd = mFileWriter.getVisitEndDateFromFile();
 
         // Attempt to retrieve visitor itinerary from file
         mItinerary = mFileWriter.getItineraryFromFile();
@@ -1056,6 +1052,35 @@ public class HomeActivity
     //endregion UI
 
     //region Activity Overridden Methods
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (requestCode == INITIALISE_DATES && resultCode == Activity.RESULT_OK){
+
+            // Update dates
+            mVisitStart = (DateTime) data.getSerializableExtra(ARG_VISIT_START);
+            mVisitEnd = (DateTime) data.getSerializableExtra(ARG_VISIT_END);
+
+            // Write dates to file
+            mFileWriter.writeVisitStartDateToFile(mVisitStart);
+            mFileWriter.writeVisitEndDateToFile(mVisitEnd);
+
+            // Initialise version file
+            mVersion = new DateTime(new Date(0));
+            mFileWriter.writeVersionToFile(mVersion);
+
+            // If server is not available
+            if (!mServerAvailable) {
+
+                return;
+            }
+
+            // Obtain new ID
+            getNewId();
+
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

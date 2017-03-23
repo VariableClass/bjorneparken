@@ -46,6 +46,8 @@ public class FileWriter {
     private static final String STARRED_SPECIES_FILE = "starred_species";
     private static final String VERSION_FILE = "version";
     private static final String VISITOR_ID_FILE = "visitor_id";
+    private static final String VISIT_START_FILE = "visit_start";
+    private static final String VISIT_END_FILE = "visit_start";
 
     //endregion Constants
 
@@ -154,6 +156,96 @@ public class FileWriter {
     }
 
     //endregion Visitor ID
+
+    //region Visit Dates
+
+    //region Visit Start
+
+    public void writeVisitStartDateToFile(DateTime visitStartDate){
+
+        FileOutputStream outputStream;
+
+        try {
+            outputStream = mContext.openFileOutput(VISIT_START_FILE, Context.MODE_PRIVATE);
+            outputStream.write(String.valueOf(visitStartDate.getValue()).getBytes());
+            outputStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public DateTime getVisitStartDateFromFile(){
+
+        long visitStartDate = 0;
+
+        try {
+            InputStream inputStream = mContext.openFileInput(VISIT_START_FILE);
+
+            if (inputStream != null) {
+
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+                visitStartDate = Long.parseLong(bufferedReader.readLine());
+
+                inputStream.close();
+            }
+        }
+        catch (FileNotFoundException fileNotFoundException) {
+            fileNotFoundException.printStackTrace();
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
+
+        return new DateTime(visitStartDate);
+    }
+
+    //endregion Visit Start
+
+    //region Visit End
+
+    public void writeVisitEndDateToFile(DateTime visitEndDate){
+
+        FileOutputStream outputStream;
+
+        try {
+            outputStream = mContext.openFileOutput(VISIT_END_FILE, Context.MODE_PRIVATE);
+            outputStream.write(String.valueOf(visitEndDate.getValue()).getBytes());
+            outputStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public DateTime getVisitEndDateFromFile(){
+
+        long visitEndDate = 0;
+
+        try {
+            InputStream inputStream = mContext.openFileInput(VISIT_END_FILE);
+
+            if (inputStream != null) {
+
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+                visitEndDate = Long.parseLong(bufferedReader.readLine());
+
+                inputStream.close();
+            }
+        }
+        catch (FileNotFoundException fileNotFoundException) {
+            fileNotFoundException.printStackTrace();
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
+
+        return new DateTime(visitEndDate);
+    }
+
+    //endregion Visit End
+
+    //endregion Visit Dates
 
     //region Itinerary
 
