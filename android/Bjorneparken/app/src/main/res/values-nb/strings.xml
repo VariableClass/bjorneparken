@@ -1,6 +1,13 @@
 <resources>
     <string name="app_name">Bjørneparken</string>
 
+    <!-- Welcome Screen -->
+    <string name="welcome_start">Når besøker du oss?</string>
+    <string name="welcome_end">&#8230;og hvor lenge skal du være her?</string>
+    <string name="welcome_back">Tilbake</string>
+    <string name="welcome_next">Neste</string>
+    <string name="welcome_save">OK</string>
+
     <!-- Navigation Drawer -->
     <string name="drawer_open">Navigasjonsmenyen åpen</string>
     <string name="drawer_close">Navigasjonsmenyen lukket</string>
