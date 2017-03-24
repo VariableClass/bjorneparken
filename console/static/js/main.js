@@ -19,6 +19,7 @@ var bjørneparkappen = {};
 bjørneparkappen.adminconsole = bjørneparkappen.adminconsole || {};
 bjørneparkappen.adminconsole.api = bjørneparkappen.adminconsole.api || {};
 bjørneparkappen.adminconsole.navigation = bjørneparkappen.adminconsole.navigation || {};
+bjørneparkappen.adminconsole.signin = bjørneparkappen.adminconsole.signin || {};
 bjørneparkappen.adminconsole.species = bjørneparkappen.adminconsole.species || {};
 bjørneparkappen.adminconsole.species.list = bjørneparkappen.adminconsole.species.list || {};
 bjørneparkappen.adminconsole.species.detail = bjørneparkappen.adminconsole.species.detail || {};
@@ -71,12 +72,7 @@ bjørneparkappen.adminconsole.endWait = function(){
 // Initialises the application
 bjørneparkappen.adminconsole.init = function() {
 
-    // Retrieve all data asynchronously
-    bjørneparkappen.adminconsole.api.getSpecies();
-    bjørneparkappen.adminconsole.api.getAreas();
-    bjørneparkappen.adminconsole.api.getAnimals();
-    bjørneparkappen.adminconsole.api.getEvents();
-    bjørneparkappen.adminconsole.api.getKeepers();
+    bjørneparkappen.adminconsole.signin.checkUser(firebase.auth().currentUser);
 };
 
 
@@ -103,6 +99,7 @@ bjørneparkappen.adminconsole.navigation.selectNavItem = function(navItem){
 // Hides all pages
 bjørneparkappen.adminconsole.navigation.hideAllPages = function(){
 
+    signInPage.style.display = HIDDEN;
     speciesDetailPage.style.display = HIDDEN;
     listSpeciesPage.style.display = HIDDEN;
     areaDetailPage.style.display = HIDDEN;
@@ -271,1116 +268,1371 @@ bjørneparkappen.adminconsole.api.getSpecies = function(){
     // Put UI into wait state
     bjørneparkappen.adminconsole.startWait();
 
-    // Create new request
-    var xhr = new XMLHttpRequest();
+    // Retrieve current user token
+    firebase.auth().currentUser.getToken().then(function(idToken){
 
-    // Open new GET request
-    xhr.open('GET', BASE_URL + "species/all_languages?key=" + API_KEY);
+        // Create new request
+        var xhr = new XMLHttpRequest();
 
-    // GET request state change callback event
-    xhr.onreadystatechange = function() {
+        // Open new GET request
+        xhr.open('GET', BASE_URL + "species/all_languages?key=" + API_KEY);
 
-        // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        // Set authorisation header using Firebase token
+        xhr.setRequestHeader('Authorization', 'Bearer ' + idToken);
 
-            // If request status is 200
-            if (xhr.status == 200){
+        // GET request state change callback event
+        xhr.onreadystatechange = function() {
 
-                // Parse response JSON
-                var resp = JSON.parse(xhr.responseText);
-                speciesList = resp.species || [];
+            // If request has completed
+            if (xhr.readyState == XMLHttpRequest.DONE){
+
+                // If request status is 200
+                if (xhr.status == 200){
+
+                    // Parse response JSON
+                    var resp = JSON.parse(xhr.responseText);
+                    speciesList = resp.species || [];
+                }
+
+                // Terminate UI wait state
+                bjørneparkappen.adminconsole.endWait();
             }
+        };
 
-            // Terminate UI wait state
-            bjørneparkappen.adminconsole.endWait();
-        }
-    };
+        // Send request
+        xhr.send();
 
-    // Send request
-    xhr.send();
+    });
 };
 bjørneparkappen.adminconsole.api.createSpecies = function(species){
 
     // Put UI into wait state
     bjørneparkappen.adminconsole.startWait();
 
-    // Create new request
-    var xhr = new XMLHttpRequest();
+    // Retrieve current user token
+    firebase.auth().currentUser.getToken().then(function(idToken){
 
-    // Open new POST request
-    xhr.open('POST', BASE_URL + "species/create?key=" + API_KEY);
+        // Create new request
+        var xhr = new XMLHttpRequest();
 
-    // POST request state change callback event
-    xhr.onreadystatechange = function() {
+        // Open new POST request
+        xhr.open('POST', BASE_URL + "species/create?key=" + API_KEY);
 
-        // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE) {
+        // Set authorisation header using Firebase token
+        xhr.setRequestHeader('Authorization', 'Bearer ' + idToken);
 
-            var resp;
+        // POST request state change callback event
+        xhr.onreadystatechange = function() {
 
-            // If request status is 200
-            if (xhr.status == 200) {
+            // If request has completed
+            if (xhr.readyState == XMLHttpRequest.DONE) {
 
-                // Parse response JSON
-                resp = JSON.parse(xhr.responseText);
-                speciesList = resp.species || [];
+                var resp;
 
-                // Load the List Species page with new data
-                bjørneparkappen.adminconsole.species.list.loadPage();
+                // If request status is 200
+                if (xhr.status == 200) {
 
-                // Display the List Species page
-                bjørneparkappen.adminconsole.navigation.displayPage(listSpeciesPage);
+                    // Parse response JSON
+                    resp = JSON.parse(xhr.responseText);
+                    speciesList = resp.species || [];
 
-            } else {
+                    // Load the List Species page with new data
+                    bjørneparkappen.adminconsole.species.list.loadPage();
 
-                // Display error message
-                resp = JSON.parse(xhr.responseText);
-                alert(resp.error.message);
+                    // Display the List Species page
+                    bjørneparkappen.adminconsole.navigation.displayPage(listSpeciesPage);
+
+                } else {
+
+                    // Display error message
+                    resp = JSON.parse(xhr.responseText);
+                    alert(resp.error.message);
+                }
+
+                // Terminate UI wait state
+                bjørneparkappen.adminconsole.endWait();
             }
+        };
 
-            // Terminate UI wait state
-            bjørneparkappen.adminconsole.endWait();
-        }
-    };
+        // Set content type
+        xhr.setRequestHeader("Content-type", "application/json");
 
-    // Set content type
-    xhr.setRequestHeader("Content-type", "application/json");
-
-    // Send request
-    xhr.send(JSON.stringify(species));
+        // Send request
+        xhr.send(JSON.stringify(species));
+    });
 };
 bjørneparkappen.adminconsole.api.updateSpecies = function(species){
 
     // Put UI into wait state
     bjørneparkappen.adminconsole.startWait();
 
-    // Create new request
-    var xhr = new XMLHttpRequest();
+    // Retrieve current user token
+    firebase.auth().currentUser.getToken().then(function(idToken){
 
-    // Open new POST request
-    xhr.open('POST', BASE_URL + "species/update?id=" + species.id + "&key=" + API_KEY);
+        // Create new request
+        var xhr = new XMLHttpRequest();
 
-    // POST request state change callback event
-    xhr.onreadystatechange = function() {
+        // Open new POST request
+        xhr.open('POST', BASE_URL + "species/update?id=" + species.id + "&key=" + API_KEY);
 
-        // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        // Set authorisation header using Firebase token
+        xhr.setRequestHeader('Authorization', 'Bearer ' + idToken);
 
-            var resp;
+        // POST request state change callback event
+        xhr.onreadystatechange = function() {
 
-            // If request status is 200
-            if (xhr.status == 200) {
+            // If request has completed
+            if (xhr.readyState == XMLHttpRequest.DONE){
 
-                // Parse response JSON
-                resp = JSON.parse(xhr.responseText);
-                speciesList = resp.species || [];
+                var resp;
 
-                // Load the List Species page with new data
-                bjørneparkappen.adminconsole.species.list.loadPage();
+                // If request status is 200
+                if (xhr.status == 200) {
 
-                // Display the List Species page
-                bjørneparkappen.adminconsole.navigation.displayPage(listSpeciesPage);
+                    // Parse response JSON
+                    resp = JSON.parse(xhr.responseText);
+                    speciesList = resp.species || [];
 
-            } else {
+                    // Load the List Species page with new data
+                    bjørneparkappen.adminconsole.species.list.loadPage();
 
-                // Display error message
-                resp = JSON.parse(xhr.responseText);
-                alert(resp.error.message);
+                    // Display the List Species page
+                    bjørneparkappen.adminconsole.navigation.displayPage(listSpeciesPage);
+
+                } else {
+
+                    // Display error message
+                    resp = JSON.parse(xhr.responseText);
+                    alert(resp.error.message);
+                }
+
+                // Terminate UI wait state
+                bjørneparkappen.adminconsole.endWait();
             }
+        };
 
-            // Terminate UI wait state
-            bjørneparkappen.adminconsole.endWait();
-        }
-    };
+        // Set content type
+        xhr.setRequestHeader("Content-type", "application/json");
 
-    // Set content type
-    xhr.setRequestHeader("Content-type", "application/json");
-
-    // Send request
-    xhr.send(JSON.stringify(species));
+        // Send request
+        xhr.send(JSON.stringify(species));
+    });
 };
 bjørneparkappen.adminconsole.api.deleteSpecies = function(species){
 
     // Put UI into wait state
     bjørneparkappen.adminconsole.startWait();
 
-    // Create new request
-    var xhr = new XMLHttpRequest();
+    // Retrieve current user token
+    firebase.auth().currentUser.getToken().then(function(idToken) {
 
-    // Open new DELETE request
-    xhr.open('DELETE', BASE_URL + "species/delete?id=" + species.id + "&key=" + API_KEY);
+        // Create new request
+        var xhr = new XMLHttpRequest();
 
-    // DELETE request state change callback event
-    xhr.onreadystatechange = function() {
+        // Open new DELETE request
+        xhr.open('DELETE', BASE_URL + "species/delete?id=" + species.id + "&key=" + API_KEY);
 
-        // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        // Set authorisation header using Firebase token
+        xhr.setRequestHeader('Authorization', 'Bearer ' + idToken);
 
-            var resp;
+        // DELETE request state change callback event
+        xhr.onreadystatechange = function () {
 
-            // If request status is 200
-            if (xhr.status == 200){
+            // If request has completed
+            if (xhr.readyState == XMLHttpRequest.DONE) {
 
-                // Parse response JSON
-                resp = JSON.parse(xhr.responseText);
-                speciesList = resp.species || [];
+                var resp;
 
-                // Load the List Species page with new data
-                bjørneparkappen.adminconsole.species.list.loadPage();
+                // If request status is 200
+                if (xhr.status == 200) {
 
-                // Display the List Species page
-                bjørneparkappen.adminconsole.navigation.displayPage(listSpeciesPage);
+                    // Parse response JSON
+                    resp = JSON.parse(xhr.responseText);
+                    speciesList = resp.species || [];
 
-            } else {
+                    // Load the List Species page with new data
+                    bjørneparkappen.adminconsole.species.list.loadPage();
 
-                // Display error message
-                resp = JSON.parse(xhr.responseText);
-                alert(resp.error.message);
+                    // Display the List Species page
+                    bjørneparkappen.adminconsole.navigation.displayPage(listSpeciesPage);
+
+                } else {
+
+                    // Display error message
+                    resp = JSON.parse(xhr.responseText);
+                    alert(resp.error.message);
+                }
+
+                // Terminate UI wait state
+                bjørneparkappen.adminconsole.endWait();
+
             }
+        };
 
-            // Terminate UI wait state
-            bjørneparkappen.adminconsole.endWait();
-
-        }
-    };
-
-    // Send request
-    xhr.send();
+        // Send request
+        xhr.send();
+    });
 };
 bjørneparkappen.adminconsole.api.getAreas = function(){
     // Put UI into wait state
     bjørneparkappen.adminconsole.startWait();
 
-    // Create new request
-    var xhr = new XMLHttpRequest();
+    // Retrieve current user token
+    firebase.auth().currentUser.getToken().then(function(idToken) {
 
-    // Open new GET request
-    xhr.open('GET', BASE_URL + "areas/all_languages?key=" + API_KEY);
+        // Create new request
+        var xhr = new XMLHttpRequest();
 
-    // GET request state change callback event
-    xhr.onreadystatechange = function() {
+        // Open new GET request
+        xhr.open('GET', BASE_URL + "areas/all_languages?key=" + API_KEY);
 
-        // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        // Set authorisation header using Firebase token
+        xhr.setRequestHeader('Authorization', 'Bearer ' + idToken);
 
-            var resp;
+        // GET request state change callback event
+        xhr.onreadystatechange = function () {
 
-            // If request status is 200
-            if (xhr.status == 200){
+            // If request has completed
+            if (xhr.readyState == XMLHttpRequest.DONE) {
 
-                // Parse response JSON
-                resp = JSON.parse(xhr.responseText);
-                amenitiesList = resp.amenities || [];
-                enclosuresList = resp.enclosures || [];
+                var resp;
+
+                // If request status is 200
+                if (xhr.status == 200) {
+
+                    // Parse response JSON
+                    resp = JSON.parse(xhr.responseText);
+                    amenitiesList = resp.amenities || [];
+                    enclosuresList = resp.enclosures || [];
+                }
+
+                // Terminate UI wait state
+                bjørneparkappen.adminconsole.endWait();
             }
+        };
 
-            // Terminate UI wait state
-            bjørneparkappen.adminconsole.endWait();
-        }
-    };
-
-    // Send request
-    xhr.send();
+        // Send request
+        xhr.send();
+    });
 };
 bjørneparkappen.adminconsole.api.createAmenity = function(amenity){
 
     // Put UI into wait state
     bjørneparkappen.adminconsole.startWait();
 
-    // Create new request
-    var xhr = new XMLHttpRequest();
+    // Retrieve current user token
+    firebase.auth().currentUser.getToken().then(function(idToken) {
 
-    // Open new POST request
-    xhr.open('POST', BASE_URL + "areas/amenities/create?key=" + API_KEY);
+        // Create new request
+        var xhr = new XMLHttpRequest();
 
-    // POST request state change callback event
-    xhr.onreadystatechange = function() {
+        // Open new POST request
+        xhr.open('POST', BASE_URL + "areas/amenities/create?key=" + API_KEY);
 
-        // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        // Set authorisation header using Firebase token
+        xhr.setRequestHeader('Authorization', 'Bearer ' + idToken);
 
-            var resp;
+        // POST request state change callback event
+        xhr.onreadystatechange = function () {
 
-            // If request status is 200
-            if (xhr.status == 200) {
+            // If request has completed
+            if (xhr.readyState == XMLHttpRequest.DONE) {
 
-                // Parse response JSON
-                resp = JSON.parse(xhr.responseText);
-                amenitiesList = resp.amenities || [];
+                var resp;
 
-                // Load the List Areas page with new data
-                bjørneparkappen.adminconsole.areas.list.loadPage();
+                // If request status is 200
+                if (xhr.status == 200) {
 
-                // Display the List Areas page
-                bjørneparkappen.adminconsole.navigation.displayPage(listAreasPage);
+                    // Parse response JSON
+                    resp = JSON.parse(xhr.responseText);
+                    amenitiesList = resp.amenities || [];
 
-            } else {
+                    // Load the List Areas page with new data
+                    bjørneparkappen.adminconsole.areas.list.loadPage();
 
-                // Display error message
-                resp = JSON.parse(xhr.responseText);
-                alert(resp.error.message);
+                    // Display the List Areas page
+                    bjørneparkappen.adminconsole.navigation.displayPage(listAreasPage);
+
+                } else {
+
+                    // Display error message
+                    resp = JSON.parse(xhr.responseText);
+                    alert(resp.error.message);
+                }
+
+                // Terminate UI wait state
+                bjørneparkappen.adminconsole.endWait();
             }
+        };
 
-            // Terminate UI wait state
-            bjørneparkappen.adminconsole.endWait();
-        }
-    };
+        // Set content type
+        xhr.setRequestHeader("Content-type", "application/json");
 
-    // Set content type
-    xhr.setRequestHeader("Content-type", "application/json");
-
-    // Send request
-    xhr.send(JSON.stringify(amenity));
+        // Send request
+        xhr.send(JSON.stringify(amenity));
+    });
 };
 bjørneparkappen.adminconsole.api.updateAmenity = function(amenity){
 
     // Put UI into wait state
     bjørneparkappen.adminconsole.startWait();
 
-    // Create new request
-    var xhr = new XMLHttpRequest();
+    // Retrieve current user token
+    firebase.auth().currentUser.getToken().then(function(idToken) {
 
-    // Open new POST request
-    xhr.open('POST', BASE_URL + "areas/amenities/update?id=" + amenity.id + "&key=" + API_KEY);
+        // Create new request
+        var xhr = new XMLHttpRequest();
 
-    // POST request state change callback event
-    xhr.onreadystatechange = function() {
+        // Open new POST request
+        xhr.open('POST', BASE_URL + "areas/amenities/update?id=" + amenity.id + "&key=" + API_KEY);
 
-        // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        // Set authorisation header using Firebase token
+        xhr.setRequestHeader('Authorization', 'Bearer ' + idToken);
 
-            var resp;
+        // POST request state change callback event
+        xhr.onreadystatechange = function () {
 
-            // If request status is 200
-            if (xhr.status == 200) {
+            // If request has completed
+            if (xhr.readyState == XMLHttpRequest.DONE) {
 
-                // Parse response JSON
-                resp = JSON.parse(xhr.responseText);
-                amenitiesList = resp.amenities || [];
+                var resp;
 
-                // Load the List Areas page with new data
-                bjørneparkappen.adminconsole.areas.list.loadPage();
+                // If request status is 200
+                if (xhr.status == 200) {
 
-                // Display the List Areas page
-                bjørneparkappen.adminconsole.navigation.displayPage(listAreasPage);
+                    // Parse response JSON
+                    resp = JSON.parse(xhr.responseText);
+                    amenitiesList = resp.amenities || [];
 
-            } else {
+                    // Load the List Areas page with new data
+                    bjørneparkappen.adminconsole.areas.list.loadPage();
 
-                // Display error message
-                resp = JSON.parse(xhr.responseText);
-                alert(resp.error.message);
+                    // Display the List Areas page
+                    bjørneparkappen.adminconsole.navigation.displayPage(listAreasPage);
+
+                } else {
+
+                    // Display error message
+                    resp = JSON.parse(xhr.responseText);
+                    alert(resp.error.message);
+                }
+
+                // Terminate UI wait state
+                bjørneparkappen.adminconsole.endWait();
             }
+        };
 
-            // Terminate UI wait state
-            bjørneparkappen.adminconsole.endWait();
-        }
-    };
+        // Set content type
+        xhr.setRequestHeader("Content-type", "application/json");
 
-    // Set content type
-    xhr.setRequestHeader("Content-type", "application/json");
+        // Send request
+        xhr.send(JSON.stringify(amenity));
 
-    // Send request
-    xhr.send(JSON.stringify(amenity));
+    });
 };
 bjørneparkappen.adminconsole.api.createEnclosure = function(enclosure){
 
     // Put UI into wait state
     bjørneparkappen.adminconsole.startWait();
 
-    // Create new request
-    var xhr = new XMLHttpRequest();
+    // Retrieve current user token
+    firebase.auth().currentUser.getToken().then(function(idToken) {
 
-    // Open new POST request
-    xhr.open('POST', BASE_URL + "areas/enclosures/create?key=" + API_KEY);
+        // Create new request
+        var xhr = new XMLHttpRequest();
 
-    // POST request state change callback event
-    xhr.onreadystatechange = function() {
+        // Open new POST request
+        xhr.open('POST', BASE_URL + "areas/enclosures/create?key=" + API_KEY);
 
-        // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        // Set authorisation header using Firebase token
+        xhr.setRequestHeader('Authorization', 'Bearer ' + idToken);
 
-            var resp;
+        // POST request state change callback event
+        xhr.onreadystatechange = function () {
 
-            // If request status is 200
-            if (xhr.status == 200) {
+            // If request has completed
+            if (xhr.readyState == XMLHttpRequest.DONE) {
 
-                // Parse response JSON
-                resp = JSON.parse(xhr.responseText);
-                enclosuresList = resp.enclosures || [];
+                var resp;
 
-                // Load the List Areas page with new data
-                bjørneparkappen.adminconsole.areas.list.loadPage();
+                // If request status is 200
+                if (xhr.status == 200) {
 
-                // Display the List Areas page
-                bjørneparkappen.adminconsole.navigation.displayPage(listAreasPage);
+                    // Parse response JSON
+                    resp = JSON.parse(xhr.responseText);
+                    enclosuresList = resp.enclosures || [];
 
-            } else {
+                    // Load the List Areas page with new data
+                    bjørneparkappen.adminconsole.areas.list.loadPage();
 
-                // Display error message
-                resp = JSON.parse(xhr.responseText);
-                alert(resp.error.message);
+                    // Display the List Areas page
+                    bjørneparkappen.adminconsole.navigation.displayPage(listAreasPage);
+
+                } else {
+
+                    // Display error message
+                    resp = JSON.parse(xhr.responseText);
+                    alert(resp.error.message);
+                }
+
+                // Terminate UI wait state
+                bjørneparkappen.adminconsole.endWait();
             }
+        };
 
-            // Terminate UI wait state
-            bjørneparkappen.adminconsole.endWait();
-        }
-    };
+        // Set content type
+        xhr.setRequestHeader("Content-type", "application/json");
 
-    // Set content type
-    xhr.setRequestHeader("Content-type", "application/json");
-
-    // Send request
-    xhr.send(JSON.stringify(enclosure));
+        // Send request
+        xhr.send(JSON.stringify(enclosure));
+    });
 };
 bjørneparkappen.adminconsole.api.updateEnclosure = function(enclosure){
 
     // Put UI into wait state
     bjørneparkappen.adminconsole.startWait();
 
-    // Create new request
-    var xhr = new XMLHttpRequest();
+    // Retrieve current user token
+    firebase.auth().currentUser.getToken().then(function(idToken) {
 
-    // Open new POST request
-    xhr.open('POST', BASE_URL + "areas/enclosures/update?id=" + enclosure.id + "&key=" + API_KEY);
+        // Create new request
+        var xhr = new XMLHttpRequest();
 
-    // POST request state change callback event
-    xhr.onreadystatechange = function() {
+        // Open new POST request
+        xhr.open('POST', BASE_URL + "areas/enclosures/update?id=" + enclosure.id + "&key=" + API_KEY);
 
-        // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        // Set authorisation header using Firebase token
+        xhr.setRequestHeader('Authorization', 'Bearer ' + idToken);
 
-            var resp;
+        // POST request state change callback event
+        xhr.onreadystatechange = function () {
 
-            // If request status is 200
-            if (xhr.status == 200) {
+            // If request has completed
+            if (xhr.readyState == XMLHttpRequest.DONE) {
 
-                // Parse response JSON
-                resp = JSON.parse(xhr.responseText);
-                enclosuresList = resp.enclosures || [];
+                var resp;
 
-                // Load the List Areas page with new data
-                bjørneparkappen.adminconsole.areas.list.loadPage();
+                // If request status is 200
+                if (xhr.status == 200) {
 
-                // Display the List Areas page
-                bjørneparkappen.adminconsole.navigation.displayPage(listAreasPage);
+                    // Parse response JSON
+                    resp = JSON.parse(xhr.responseText);
+                    enclosuresList = resp.enclosures || [];
 
-            } else {
+                    // Load the List Areas page with new data
+                    bjørneparkappen.adminconsole.areas.list.loadPage();
 
-                // Display error message
-                resp = JSON.parse(xhr.responseText);
-                alert(resp.error.message);
+                    // Display the List Areas page
+                    bjørneparkappen.adminconsole.navigation.displayPage(listAreasPage);
+
+                } else {
+
+                    // Display error message
+                    resp = JSON.parse(xhr.responseText);
+                    alert(resp.error.message);
+                }
+
+                // Terminate UI wait state
+                bjørneparkappen.adminconsole.endWait();
             }
+        };
 
-            // Terminate UI wait state
-            bjørneparkappen.adminconsole.endWait();
-        }
-    };
+        // Set content type
+        xhr.setRequestHeader("Content-type", "application/json");
 
-    // Set content type
-    xhr.setRequestHeader("Content-type", "application/json");
-
-    // Send request
-    xhr.send(JSON.stringify(enclosure));
+        // Send request
+        xhr.send(JSON.stringify(enclosure));
+    });
 };
 bjørneparkappen.adminconsole.api.deleteArea = function(area){
 
     // Put UI into wait state
     bjørneparkappen.adminconsole.startWait();
 
-    // Create new request
-    var xhr = new XMLHttpRequest();
+    // Retrieve current user token
+    firebase.auth().currentUser.getToken().then(function(idToken) {
 
-    // Open new DELETE request
-    xhr.open('DELETE', BASE_URL + "areas/delete?id=" + area.id + "&key=" + API_KEY);
+        // Create new request
+        var xhr = new XMLHttpRequest();
 
-    // DELETE request state change callback event
-    xhr.onreadystatechange = function() {
+        // Open new DELETE request
+        xhr.open('DELETE', BASE_URL + "areas/delete?id=" + area.id + "&key=" + API_KEY);
 
-        // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        // Set authorisation header using Firebase token
+        xhr.setRequestHeader('Authorization', 'Bearer ' + idToken);
 
-            var resp;
+        // DELETE request state change callback event
+        xhr.onreadystatechange = function () {
 
-            // If request status is 200
-            if (xhr.status == 200){
+            // If request has completed
+            if (xhr.readyState == XMLHttpRequest.DONE) {
 
-                // Parse response JSON
-                resp = JSON.parse(xhr.responseText);
-                amenitiesList = resp.amenities || [];
-                enclosuresList = resp.enclosures || [];
+                var resp;
 
-                // Load the List Areas page with new data
-                bjørneparkappen.adminconsole.areas.list.loadPage();
+                // If request status is 200
+                if (xhr.status == 200) {
 
-                // Display the List Areas page
-                bjørneparkappen.adminconsole.navigation.displayPage(listAreasPage);
+                    // Parse response JSON
+                    resp = JSON.parse(xhr.responseText);
+                    amenitiesList = resp.amenities || [];
+                    enclosuresList = resp.enclosures || [];
 
-            } else {
+                    // Load the List Areas page with new data
+                    bjørneparkappen.adminconsole.areas.list.loadPage();
 
-                // Display error message
-                resp = JSON.parse(xhr.responseText);
-                alert(resp.error.message);
+                    // Display the List Areas page
+                    bjørneparkappen.adminconsole.navigation.displayPage(listAreasPage);
+
+                } else {
+
+                    // Display error message
+                    resp = JSON.parse(xhr.responseText);
+                    alert(resp.error.message);
+                }
+
+                // Terminate UI wait state
+                bjørneparkappen.adminconsole.endWait();
+
             }
+        };
 
-            // Terminate UI wait state
-            bjørneparkappen.adminconsole.endWait();
-
-        }
-    };
-
-    // Send request
-    xhr.send();
+        // Send request
+        xhr.send();
+    });
 };
 bjørneparkappen.adminconsole.api.getEvents = function(){
     // Put UI into wait state
     bjørneparkappen.adminconsole.startWait();
 
-    // Create new request
-    var xhr = new XMLHttpRequest();
+    // Retrieve current user token
+    firebase.auth().currentUser.getToken().then(function(idToken) {
 
-    // Open new GET request
-    xhr.open('GET', BASE_URL + "events/all_languages?key=" + API_KEY);
+        // Create new request
+        var xhr = new XMLHttpRequest();
 
-    // GET request state change callback event
-    xhr.onreadystatechange = function() {
+        // Open new GET request
+        xhr.open('GET', BASE_URL + "events/all_languages?key=" + API_KEY);
 
-        // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        // Set authorisation header using Firebase token
+        xhr.setRequestHeader('Authorization', 'Bearer ' + idToken);
 
-            var resp;
+        // GET request state change callback event
+        xhr.onreadystatechange = function () {
 
-            // If request status is 200
-            if (xhr.status == 200){
+            // If request has completed
+            if (xhr.readyState == XMLHttpRequest.DONE) {
 
-                // Parse response JSON
-                resp = JSON.parse(xhr.responseText);
-                eventsList = resp.events || [];
-                feedingsList = resp.feedings || [];
+                var resp;
+
+                // If request status is 200
+                if (xhr.status == 200) {
+
+                    // Parse response JSON
+                    resp = JSON.parse(xhr.responseText);
+                    eventsList = resp.events || [];
+                    feedingsList = resp.feedings || [];
+                }
+
+                // Terminate UI wait state
+                bjørneparkappen.adminconsole.endWait();
             }
+        };
 
-            // Terminate UI wait state
-            bjørneparkappen.adminconsole.endWait();
-        }
-    };
-
-    // Send request
-    xhr.send();
+        // Send request
+        xhr.send();
+    });
 };
 bjørneparkappen.adminconsole.api.createEvent = function(event){
 
     // Put UI into wait state
     bjørneparkappen.adminconsole.startWait();
 
-    // Create new request
-    var xhr = new XMLHttpRequest();
+    // Retrieve current user token
+    firebase.auth().currentUser.getToken().then(function(idToken) {
 
-    // Open new POST request
-    xhr.open('POST', BASE_URL + "events/create?key=" + API_KEY);
+        // Create new request
+        var xhr = new XMLHttpRequest();
 
-    // POST request state change callback event
-    xhr.onreadystatechange = function() {
+        // Open new POST request
+        xhr.open('POST', BASE_URL + "events/create?key=" + API_KEY);
 
-        // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        // Set authorisation header using Firebase token
+        xhr.setRequestHeader('Authorization', 'Bearer ' + idToken);
 
-            var resp;
+        // POST request state change callback event
+        xhr.onreadystatechange = function () {
 
-            // If request status is 200
-            if (xhr.status == 200) {
+            // If request has completed
+            if (xhr.readyState == XMLHttpRequest.DONE) {
 
-                // Parse response JSON
-                resp = JSON.parse(xhr.responseText);
-                eventsList = resp.events || [];
+                var resp;
 
-                // Load the List Events page with new data
-                bjørneparkappen.adminconsole.events.list.loadPage();
+                // If request status is 200
+                if (xhr.status == 200) {
 
-                // Display the List Events page
-                bjørneparkappen.adminconsole.navigation.displayPage(listEventsPage);
+                    // Parse response JSON
+                    resp = JSON.parse(xhr.responseText);
+                    eventsList = resp.events || [];
 
-            } else {
+                    // Load the List Events page with new data
+                    bjørneparkappen.adminconsole.events.list.loadPage();
 
-                // Display error message
-                resp = JSON.parse(xhr.responseText);
-                alert(resp.error.message);
+                    // Display the List Events page
+                    bjørneparkappen.adminconsole.navigation.displayPage(listEventsPage);
+
+                } else {
+
+                    // Display error message
+                    resp = JSON.parse(xhr.responseText);
+                    alert(resp.error.message);
+                }
+
+                // Terminate UI wait state
+                bjørneparkappen.adminconsole.endWait();
             }
+        };
 
-            // Terminate UI wait state
-            bjørneparkappen.adminconsole.endWait();
-        }
-    };
+        // Set content type
+        xhr.setRequestHeader("Content-type", "application/json");
 
-    // Set content type
-    xhr.setRequestHeader("Content-type", "application/json");
-
-    // Send request
-    xhr.send(JSON.stringify(event));
+        // Send request
+        xhr.send(JSON.stringify(event));
+    });
 };
 bjørneparkappen.adminconsole.api.updateEvent = function(event){
 
     // Put UI into wait state
     bjørneparkappen.adminconsole.startWait();
 
-    // Create new request
-    var xhr = new XMLHttpRequest();
+    // Retrieve current user token
+    firebase.auth().currentUser.getToken().then(function(idToken) {
 
-    // Open new POST request
-    xhr.open('POST', BASE_URL + "events/update?event_id=" + event.id + "&location_id=" + event.location.id + "&key=" + API_KEY);
+        // Create new request
+        var xhr = new XMLHttpRequest();
 
-    // POST request state change callback event
-    xhr.onreadystatechange = function() {
+        // Open new POST request
+        xhr.open('POST', BASE_URL + "events/update?event_id=" + event.id + "&location_id=" + event.location.id + "&key=" + API_KEY);
 
-        // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        // Set authorisation header using Firebase token
+        xhr.setRequestHeader('Authorization', 'Bearer ' + idToken);
 
-            var resp;
+        // POST request state change callback event
+        xhr.onreadystatechange = function () {
 
-            // If request status is 200
-            if (xhr.status == 200) {
+            // If request has completed
+            if (xhr.readyState == XMLHttpRequest.DONE) {
 
-                // Parse response JSON
-                resp = JSON.parse(xhr.responseText);
-                eventsList = resp.events || [];
+                var resp;
 
-                // Load the List Events page with new data
-                bjørneparkappen.adminconsole.events.list.loadPage();
+                // If request status is 200
+                if (xhr.status == 200) {
 
-                // Display the List Events page
-                bjørneparkappen.adminconsole.navigation.displayPage(listEventsPage);
+                    // Parse response JSON
+                    resp = JSON.parse(xhr.responseText);
+                    eventsList = resp.events || [];
 
-            } else {
+                    // Load the List Events page with new data
+                    bjørneparkappen.adminconsole.events.list.loadPage();
 
-                // Display error message
-                resp = JSON.parse(xhr.responseText);
-                alert(resp.error.message);
+                    // Display the List Events page
+                    bjørneparkappen.adminconsole.navigation.displayPage(listEventsPage);
+
+                } else {
+
+                    // Display error message
+                    resp = JSON.parse(xhr.responseText);
+                    alert(resp.error.message);
+                }
+
+                // Terminate UI wait state
+                bjørneparkappen.adminconsole.endWait();
             }
+        };
 
-            // Terminate UI wait state
-            bjørneparkappen.adminconsole.endWait();
-        }
-    };
+        // Set content type
+        xhr.setRequestHeader("Content-type", "application/json");
 
-    // Set content type
-    xhr.setRequestHeader("Content-type", "application/json");
-
-    // Send request
-    xhr.send(JSON.stringify(event));
+        // Send request
+        xhr.send(JSON.stringify(event));
+    });
 };
 bjørneparkappen.adminconsole.api.createFeeding = function(feeding){
 
     // Put UI into wait state
     bjørneparkappen.adminconsole.startWait();
 
-    // Create new request
-    var xhr = new XMLHttpRequest();
+    // Retrieve current user token
+    firebase.auth().currentUser.getToken().then(function(idToken) {
 
-    // Open new POST request
-    xhr.open('POST', BASE_URL + "events/feedings/create?key=" + API_KEY);
+        // Create new request
+        var xhr = new XMLHttpRequest();
 
-    // POST request state change callback event
-    xhr.onreadystatechange = function() {
+        // Open new POST request
+        xhr.open('POST', BASE_URL + "events/feedings/create?key=" + API_KEY);
 
-        // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        // Set authorisation header using Firebase token
+        xhr.setRequestHeader('Authorization', 'Bearer ' + idToken);
 
-            var resp;
+        // POST request state change callback event
+        xhr.onreadystatechange = function () {
 
-            // If request status is 200
-            if (xhr.status == 200) {
+            // If request has completed
+            if (xhr.readyState == XMLHttpRequest.DONE) {
 
-                // Parse response JSON
-                resp = JSON.parse(xhr.responseText);
-                feedingsList = resp.feedings || [];
+                var resp;
 
-                // Load the List Events page with new data
-                bjørneparkappen.adminconsole.events.list.loadPage();
+                // If request status is 200
+                if (xhr.status == 200) {
 
-                // Display the List Events page
-                bjørneparkappen.adminconsole.navigation.displayPage(listEventsPage);
+                    // Parse response JSON
+                    resp = JSON.parse(xhr.responseText);
+                    feedingsList = resp.feedings || [];
 
-            } else {
+                    // Load the List Events page with new data
+                    bjørneparkappen.adminconsole.events.list.loadPage();
 
-                // Display error message
-                resp = JSON.parse(xhr.responseText);
-                alert(resp.error.message);
+                    // Display the List Events page
+                    bjørneparkappen.adminconsole.navigation.displayPage(listEventsPage);
+
+                } else {
+
+                    // Display error message
+                    resp = JSON.parse(xhr.responseText);
+                    alert(resp.error.message);
+                }
+
+                // Terminate UI wait state
+                bjørneparkappen.adminconsole.endWait();
             }
+        };
 
-            // Terminate UI wait state
-            bjørneparkappen.adminconsole.endWait();
-        }
-    };
+        // Set content type
+        xhr.setRequestHeader("Content-type", "application/json");
 
-    // Set content type
-    xhr.setRequestHeader("Content-type", "application/json");
-
-    // Send request
-    xhr.send(JSON.stringify(feeding));
+        // Send request
+        xhr.send(JSON.stringify(feeding));
+    });
 };
 bjørneparkappen.adminconsole.api.updateFeeding = function(feeding){
 
     // Put UI into wait state
     bjørneparkappen.adminconsole.startWait();
 
-    // Create new request
-    var xhr = new XMLHttpRequest();
+    // Retrieve current user token
+    firebase.auth().currentUser.getToken().then(function(idToken) {
 
-    // Open new POST request
-    xhr.open('POST', BASE_URL + "events/feedings/update?feeding_id=" + feeding.id + "&location_id=" + feeding.location.id + "&key=" + API_KEY);
+        // Create new request
+        var xhr = new XMLHttpRequest();
 
-    // POST request state change callback event
-    xhr.onreadystatechange = function() {
+        // Open new POST request
+        xhr.open('POST', BASE_URL + "events/feedings/update?feeding_id=" + feeding.id + "&location_id=" + feeding.location.id + "&key=" + API_KEY);
 
-        // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        // Set authorisation header using Firebase token
+        xhr.setRequestHeader('Authorization', 'Bearer ' + idToken);
 
-            var resp;
+        // POST request state change callback event
+        xhr.onreadystatechange = function () {
 
-            // If request status is 200
-            if (xhr.status == 200) {
+            // If request has completed
+            if (xhr.readyState == XMLHttpRequest.DONE) {
 
-                // Parse response JSON
-                resp = JSON.parse(xhr.responseText);
-                feedingsList = resp.feedings || [];
+                var resp;
 
-                // Load the List Events page with new data
-                bjørneparkappen.adminconsole.events.list.loadPage();
+                // If request status is 200
+                if (xhr.status == 200) {
 
-                // Display the List Events page
-                bjørneparkappen.adminconsole.navigation.displayPage(listEventsPage);
+                    // Parse response JSON
+                    resp = JSON.parse(xhr.responseText);
+                    feedingsList = resp.feedings || [];
 
-            } else {
+                    // Load the List Events page with new data
+                    bjørneparkappen.adminconsole.events.list.loadPage();
 
-                // Display error message
-                resp = JSON.parse(xhr.responseText);
-                alert(resp.error.message);
+                    // Display the List Events page
+                    bjørneparkappen.adminconsole.navigation.displayPage(listEventsPage);
+
+                } else {
+
+                    // Display error message
+                    resp = JSON.parse(xhr.responseText);
+                    alert(resp.error.message);
+                }
+
+                // Terminate UI wait state
+                bjørneparkappen.adminconsole.endWait();
             }
+        };
 
-            // Terminate UI wait state
-            bjørneparkappen.adminconsole.endWait();
-        }
-    };
+        // Set content type
+        xhr.setRequestHeader("Content-type", "application/json");
 
-    // Set content type
-    xhr.setRequestHeader("Content-type", "application/json");
-
-    // Send request
-    xhr.send(JSON.stringify(feeding));
+        // Send request
+        xhr.send(JSON.stringify(feeding));
+    });
 };
 bjørneparkappen.adminconsole.api.deleteEvent = function(event){
 
     // Put UI into wait state
     bjørneparkappen.adminconsole.startWait();
 
-    // Create new request
-    var xhr = new XMLHttpRequest();
+    // Retrieve current user token
+    firebase.auth().currentUser.getToken().then(function(idToken) {
 
-    // Open new DELETE request
-    xhr.open('DELETE', BASE_URL + "events/delete?event_id=" + event.id + "&location_id=" + event.location.id + "&key=" + API_KEY);
+        // Create new request
+        var xhr = new XMLHttpRequest();
 
-    // DELETE request state change callback event
-    xhr.onreadystatechange = function() {
+        // Open new DELETE request
+        xhr.open('DELETE', BASE_URL + "events/delete?event_id=" + event.id + "&location_id=" + event.location.id + "&key=" + API_KEY);
 
-        // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        // Set authorisation header using Firebase token
+        xhr.setRequestHeader('Authorization', 'Bearer ' + idToken);
 
-            var resp;
+        // DELETE request state change callback event
+        xhr.onreadystatechange = function () {
 
-            // If request status is 200
-            if (xhr.status == 200){
+            // If request has completed
+            if (xhr.readyState == XMLHttpRequest.DONE) {
 
-                // Parse response JSON
-                resp = JSON.parse(xhr.responseText);
-                eventsList = resp.events || [];
-                feedingsList = resp.feedings || [];
+                var resp;
 
-                // Load the List Events page with new data
-                bjørneparkappen.adminconsole.events.list.loadPage();
+                // If request status is 200
+                if (xhr.status == 200) {
 
-                // Display the List Events page
-                bjørneparkappen.adminconsole.navigation.displayPage(listEventsPage);
+                    // Parse response JSON
+                    resp = JSON.parse(xhr.responseText);
+                    eventsList = resp.events || [];
+                    feedingsList = resp.feedings || [];
 
-            } else {
+                    // Load the List Events page with new data
+                    bjørneparkappen.adminconsole.events.list.loadPage();
 
-                // Display error message
-                resp = JSON.parse(xhr.responseText);
-                alert(resp.error.message);
+                    // Display the List Events page
+                    bjørneparkappen.adminconsole.navigation.displayPage(listEventsPage);
+
+                } else {
+
+                    // Display error message
+                    resp = JSON.parse(xhr.responseText);
+                    alert(resp.error.message);
+                }
+
+                // Terminate UI wait state
+                bjørneparkappen.adminconsole.endWait();
+
             }
+        };
 
-            // Terminate UI wait state
-            bjørneparkappen.adminconsole.endWait();
-
-        }
-    };
-
-    // Send request
-    xhr.send();
+        // Send request
+        xhr.send();
+    });
 };
 bjørneparkappen.adminconsole.api.getAnimals = function(){
 
     // Put UI into wait state
     bjørneparkappen.adminconsole.startWait();
 
-    // Create new request
-    var xhr = new XMLHttpRequest();
+    // Retrieve current user token
+    firebase.auth().currentUser.getToken().then(function(idToken) {
 
-    // Open new GET request
-    xhr.open('GET', BASE_URL + "animals/all_languages?key=" + API_KEY);
+        // Create new request
+        var xhr = new XMLHttpRequest();
 
-    // GET request state change callback event
-    xhr.onreadystatechange = function() {
+        // Open new GET request
+        xhr.open('GET', BASE_URL + "animals/all_languages?key=" + API_KEY);
 
-        // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        // Set authorisation header using Firebase token
+        xhr.setRequestHeader('Authorization', 'Bearer ' + idToken);
 
-            var resp;
+        // GET request state change callback event
+        xhr.onreadystatechange = function () {
 
-            // If request status is 200
-            if (xhr.status == 200){
+            // If request has completed
+            if (xhr.readyState == XMLHttpRequest.DONE) {
 
-                // Parse response JSON
-                resp = JSON.parse(xhr.responseText);
-                animalsList = resp.animals || [];
+                var resp;
+
+                // If request status is 200
+                if (xhr.status == 200) {
+
+                    // Parse response JSON
+                    resp = JSON.parse(xhr.responseText);
+                    animalsList = resp.animals || [];
+                }
+
+                // Terminate UI wait state
+                bjørneparkappen.adminconsole.endWait();
             }
+        };
 
-            // Terminate UI wait state
-            bjørneparkappen.adminconsole.endWait();
-        }
-    };
-
-    // Send request
-    xhr.send();
+        // Send request
+        xhr.send();
+    });
 };
 bjørneparkappen.adminconsole.api.createAnimal = function(animal){
 
     // Put UI into wait state
     bjørneparkappen.adminconsole.startWait();
 
-    // Create new request
-    var xhr = new XMLHttpRequest();
+    // Retrieve current user token
+    firebase.auth().currentUser.getToken().then(function(idToken) {
 
-    // Open new POST request
-    xhr.open('POST', BASE_URL + "animals/create?key=" + API_KEY);
+        // Create new request
+        var xhr = new XMLHttpRequest();
 
-    // POST request state change callback event
-    xhr.onreadystatechange = function() {
+        // Open new POST request
+        xhr.open('POST', BASE_URL + "animals/create?key=" + API_KEY);
 
-        // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        // Set authorisation header using Firebase token
+        xhr.setRequestHeader('Authorization', 'Bearer ' + idToken);
 
-            var resp;
+        // POST request state change callback event
+        xhr.onreadystatechange = function () {
 
-            // If request status is 200
-            if (xhr.status == 200) {
+            // If request has completed
+            if (xhr.readyState == XMLHttpRequest.DONE) {
 
-                // Parse response JSON
-                resp = JSON.parse(xhr.responseText);
-                animalsList = resp.animals || [];
+                var resp;
 
-                // Load the List Animals page with new data
-                bjørneparkappen.adminconsole.animals.list.loadPage();
+                // If request status is 200
+                if (xhr.status == 200) {
 
-                // Display the List Animals page
-                bjørneparkappen.adminconsole.navigation.displayPage(listAnimalsPage);
+                    // Parse response JSON
+                    resp = JSON.parse(xhr.responseText);
+                    animalsList = resp.animals || [];
 
-            } else {
+                    // Load the List Animals page with new data
+                    bjørneparkappen.adminconsole.animals.list.loadPage();
 
-                // Display error message
-                resp = JSON.parse(xhr.responseText);
-                alert(resp.error.message);
+                    // Display the List Animals page
+                    bjørneparkappen.adminconsole.navigation.displayPage(listAnimalsPage);
+
+                } else {
+
+                    // Display error message
+                    resp = JSON.parse(xhr.responseText);
+                    alert(resp.error.message);
+                }
+
+                // Terminate UI wait state
+                bjørneparkappen.adminconsole.endWait();
             }
+        };
 
-            // Terminate UI wait state
-            bjørneparkappen.adminconsole.endWait();
-        }
-    };
+        // Set content type
+        xhr.setRequestHeader("Content-type", "application/json");
 
-    // Set content type
-    xhr.setRequestHeader("Content-type", "application/json");
-
-    // Send request
-    xhr.send(JSON.stringify(animal));
+        // Send request
+        xhr.send(JSON.stringify(animal));
+    });
 };
 bjørneparkappen.adminconsole.api.updateAnimal = function(animal){
 
     // Put UI into wait state
     bjørneparkappen.adminconsole.startWait();
 
-    // Create new request
-    var xhr = new XMLHttpRequest();
+    // Retrieve current user token
+    firebase.auth().currentUser.getToken().then(function(idToken) {
 
-    // Open new POST request
-    xhr.open('POST', BASE_URL + "animals/update?animal_id=" + animal.id + "&species_id=" + animal.species.id + "&enclosure_id=" + animal.enclosure_id + "&key=" + API_KEY);
+        // Create new request
+        var xhr = new XMLHttpRequest();
 
-    // POST request state change callback event
-    xhr.onreadystatechange = function() {
+        // Open new POST request
+        xhr.open('POST', BASE_URL + "animals/update?animal_id=" + animal.id + "&species_id=" + animal.species.id + "&enclosure_id=" + animal.enclosure_id + "&key=" + API_KEY);
 
-        // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        // Set authorisation header using Firebase token
+        xhr.setRequestHeader('Authorization', 'Bearer ' + idToken);
 
-            var resp;
+        // POST request state change callback event
+        xhr.onreadystatechange = function () {
 
-            // If request status is 200
-            if (xhr.status == 200) {
+            // If request has completed
+            if (xhr.readyState == XMLHttpRequest.DONE) {
 
-                // Parse response JSON
-                resp = JSON.parse(xhr.responseText);
-                animalsList = resp.animals || [];
+                var resp;
 
-                // Load the List Animals page with new data
-                bjørneparkappen.adminconsole.animals.list.loadPage();
+                // If request status is 200
+                if (xhr.status == 200) {
 
-                // Display the List Animals page
-                bjørneparkappen.adminconsole.navigation.displayPage(listAnimalsPage);
+                    // Parse response JSON
+                    resp = JSON.parse(xhr.responseText);
+                    animalsList = resp.animals || [];
 
-            } else {
+                    // Load the List Animals page with new data
+                    bjørneparkappen.adminconsole.animals.list.loadPage();
 
-                // Display error message
-                resp = JSON.parse(xhr.responseText);
-                alert(resp.error.message);
+                    // Display the List Animals page
+                    bjørneparkappen.adminconsole.navigation.displayPage(listAnimalsPage);
+
+                } else {
+
+                    // Display error message
+                    resp = JSON.parse(xhr.responseText);
+                    alert(resp.error.message);
+                }
+
+                // Terminate UI wait state
+                bjørneparkappen.adminconsole.endWait();
             }
+        };
 
-            // Terminate UI wait state
-            bjørneparkappen.adminconsole.endWait();
-        }
-    };
+        // Set content type
+        xhr.setRequestHeader("Content-type", "application/json");
 
-    // Set content type
-    xhr.setRequestHeader("Content-type", "application/json");
-
-    // Send request
-    xhr.send(JSON.stringify(animal));
+        // Send request
+        xhr.send(JSON.stringify(animal));
+    });
 };
 bjørneparkappen.adminconsole.api.deleteAnimal = function(animal){
 
     // Put UI into wait state
     bjørneparkappen.adminconsole.startWait();
 
-    // Create new request
-    var xhr = new XMLHttpRequest();
+    // Retrieve current user token
+    firebase.auth().currentUser.getToken().then(function(idToken) {
 
-    // Open new DELETE request
-    xhr.open('DELETE', BASE_URL + "animals/delete?animal_id=" + animal.id + "&species_id=" + animal.species.id + "key=" + API_KEY);
+        // Create new request
+        var xhr = new XMLHttpRequest();
 
-    // DELETE request state change callback event
-    xhr.onreadystatechange = function() {
+        // Open new DELETE request
+        xhr.open('DELETE', BASE_URL + "animals/delete?animal_id=" + animal.id + "&species_id=" + animal.species.id + "key=" + API_KEY);
 
-        // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        // Set authorisation header using Firebase token
+        xhr.setRequestHeader('Authorization', 'Bearer ' + idToken);
 
-            var resp;
+        // DELETE request state change callback event
+        xhr.onreadystatechange = function () {
 
-            // If request status is 200
-            if (xhr.status == 200){
+            // If request has completed
+            if (xhr.readyState == XMLHttpRequest.DONE) {
 
-                // Parse response JSON
-                resp = JSON.parse(xhr.responseText);
-                animalsList = resp.animals || [];
+                var resp;
 
-                // Load the List Animals page with new data
-                bjørneparkappen.adminconsole.animals.list.loadPage();
+                // If request status is 200
+                if (xhr.status == 200) {
 
-                // Display the List Animals page
-                bjørneparkappen.adminconsole.navigation.displayPage(listAnimalsPage);
+                    // Parse response JSON
+                    resp = JSON.parse(xhr.responseText);
+                    animalsList = resp.animals || [];
 
-            } else {
+                    // Load the List Animals page with new data
+                    bjørneparkappen.adminconsole.animals.list.loadPage();
 
-                // Display error message
-                resp = JSON.parse(xhr.responseText);
-                alert(resp.error.message);
+                    // Display the List Animals page
+                    bjørneparkappen.adminconsole.navigation.displayPage(listAnimalsPage);
+
+                } else {
+
+                    // Display error message
+                    resp = JSON.parse(xhr.responseText);
+                    alert(resp.error.message);
+                }
+
+                // Terminate UI wait state
+                bjørneparkappen.adminconsole.endWait();
+
             }
+        };
 
-            // Terminate UI wait state
-            bjørneparkappen.adminconsole.endWait();
-
-        }
-    };
-
-    // Send request
-    xhr.send();
+        // Send request
+        xhr.send();
+    });
 };
 bjørneparkappen.adminconsole.api.getKeepers = function(){
 
     // Put UI into wait state
     bjørneparkappen.adminconsole.startWait();
 
-    // Create new request
-    var xhr = new XMLHttpRequest();
+    // Retrieve current user token
+    firebase.auth().currentUser.getToken().then(function(idToken) {
 
-    // Open new GET request
-    xhr.open('GET', BASE_URL + "keepers/all_languages?key=" + API_KEY);
+        // Create new request
+        var xhr = new XMLHttpRequest();
 
-    // GET request state change callback event
-    xhr.onreadystatechange = function() {
+        // Open new GET request
+        xhr.open('GET', BASE_URL + "keepers/all_languages?key=" + API_KEY);
 
-        // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        // Set authorisation header using Firebase token
+        xhr.setRequestHeader('Authorization', 'Bearer ' + idToken);
 
-            var resp;
+        // GET request state change callback event
+        xhr.onreadystatechange = function () {
 
-            // If request status is 200
-            if (xhr.status == 200){
+            // If request has completed
+            if (xhr.readyState == XMLHttpRequest.DONE) {
 
-                // Parse response JSON
-                resp = JSON.parse(xhr.responseText);
-                keepersList = resp.keepers || [];
+                var resp;
+
+                // If request status is 200
+                if (xhr.status == 200) {
+
+                    // Parse response JSON
+                    resp = JSON.parse(xhr.responseText);
+                    keepersList = resp.keepers || [];
+                }
+
+                // Terminate UI wait state
+                bjørneparkappen.adminconsole.endWait();
             }
+        };
 
-            // Terminate UI wait state
-            bjørneparkappen.adminconsole.endWait();
-        }
-    };
-
-    // Send request
-    xhr.send();
+        // Send request
+        xhr.send();
+    });
 };
 bjørneparkappen.adminconsole.api.createKeeper = function(keeper){
 
     // Put UI into wait state
     bjørneparkappen.adminconsole.startWait();
 
-    // Create new request
-    var xhr = new XMLHttpRequest();
+    // Retrieve current user token
+    firebase.auth().currentUser.getToken().then(function(idToken) {
 
-    // Open new POST request
-    xhr.open('POST', BASE_URL + "keepers/create?key=" + API_KEY);
+        // Create new request
+        var xhr = new XMLHttpRequest();
 
-    // POST request state change callback event
-    xhr.onreadystatechange = function() {
+        // Open new POST request
+        xhr.open('POST', BASE_URL + "keepers/create?key=" + API_KEY);
 
-        // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        // Set authorisation header using Firebase token
+        xhr.setRequestHeader('Authorization', 'Bearer ' + idToken);
 
-            var resp;
+        // POST request state change callback event
+        xhr.onreadystatechange = function () {
 
-            // If request status is 200
-            if (xhr.status == 200) {
+            // If request has completed
+            if (xhr.readyState == XMLHttpRequest.DONE) {
 
-                // Parse response JSON
-                resp = JSON.parse(xhr.responseText);
-                keepersList = resp.keepers || [];
+                var resp;
 
-                // Load the List Keepers page with new data
-                bjørneparkappen.adminconsole.keepers.list.loadPage();
+                // If request status is 200
+                if (xhr.status == 200) {
 
-                // Display the List Keepers page
-                bjørneparkappen.adminconsole.navigation.displayPage(listKeepersPage);
+                    // Parse response JSON
+                    resp = JSON.parse(xhr.responseText);
+                    keepersList = resp.keepers || [];
 
-            } else {
+                    // Load the List Keepers page with new data
+                    bjørneparkappen.adminconsole.keepers.list.loadPage();
 
-                // Display error message
-                resp = JSON.parse(xhr.responseText);
-                alert(resp.error.message);
+                    // Display the List Keepers page
+                    bjørneparkappen.adminconsole.navigation.displayPage(listKeepersPage);
+
+                } else {
+
+                    // Display error message
+                    resp = JSON.parse(xhr.responseText);
+                    alert(resp.error.message);
+                }
+
+                // Terminate UI wait state
+                bjørneparkappen.adminconsole.endWait();
             }
+        };
 
-            // Terminate UI wait state
-            bjørneparkappen.adminconsole.endWait();
-        }
-    };
+        // Set content type
+        xhr.setRequestHeader("Content-type", "application/json");
 
-    // Set content type
-    xhr.setRequestHeader("Content-type", "application/json");
-
-    // Send request
-    xhr.send(JSON.stringify(keeper));
+        // Send request
+        xhr.send(JSON.stringify(keeper));
+    });
 };
 bjørneparkappen.adminconsole.api.updateKeeper = function(keeper){
 
     // Put UI into wait state
     bjørneparkappen.adminconsole.startWait();
 
-    // Create new request
-    var xhr = new XMLHttpRequest();
+    // Retrieve current user token
+    firebase.auth().currentUser.getToken().then(function(idToken) {
 
-    // Open new POST request
-    xhr.open('POST', BASE_URL + "keepers/update?id=" + keeper.id + "&key=" + API_KEY);
+        // Create new request
+        var xhr = new XMLHttpRequest();
 
-    // POST request state change callback event
-    xhr.onreadystatechange = function() {
+        // Open new POST request
+        xhr.open('POST', BASE_URL + "keepers/update?id=" + keeper.id + "&key=" + API_KEY);
 
-        // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        // Set authorisation header using Firebase token
+        xhr.setRequestHeader('Authorization', 'Bearer ' + idToken);
 
-            var resp;
+        // POST request state change callback event
+        xhr.onreadystatechange = function () {
 
-            // If request status is 200
-            if (xhr.status == 200) {
+            // If request has completed
+            if (xhr.readyState == XMLHttpRequest.DONE) {
 
-                // Parse response JSON
-                resp = JSON.parse(xhr.responseText);
-                keepersList = resp.keepers || [];
+                var resp;
 
-                // Load the List Keeper page with new data
-                bjørneparkappen.adminconsole.keepers.list.loadPage();
+                // If request status is 200
+                if (xhr.status == 200) {
 
-                // Display the List Keeper page
-                bjørneparkappen.adminconsole.navigation.displayPage(listKeepersPage);
+                    // Parse response JSON
+                    resp = JSON.parse(xhr.responseText);
+                    keepersList = resp.keepers || [];
 
-            } else {
+                    // Load the List Keeper page with new data
+                    bjørneparkappen.adminconsole.keepers.list.loadPage();
 
-                // Display error message
-                resp = JSON.parse(xhr.responseText);
-                alert(resp.error.message);
+                    // Display the List Keeper page
+                    bjørneparkappen.adminconsole.navigation.displayPage(listKeepersPage);
+
+                } else {
+
+                    // Display error message
+                    resp = JSON.parse(xhr.responseText);
+                    alert(resp.error.message);
+                }
+
+                // Terminate UI wait state
+                bjørneparkappen.adminconsole.endWait();
             }
+        };
 
-            // Terminate UI wait state
-            bjørneparkappen.adminconsole.endWait();
-        }
-    };
+        // Set content type
+        xhr.setRequestHeader("Content-type", "application/json");
 
-    // Set content type
-    xhr.setRequestHeader("Content-type", "application/json");
-
-    // Send request
-    xhr.send(JSON.stringify(keeper));
+        // Send request
+        xhr.send(JSON.stringify(keeper));
+    });
 };
 bjørneparkappen.adminconsole.api.deleteKeeper = function(keeper){
 
     // Put UI into wait state
     bjørneparkappen.adminconsole.startWait();
 
-    // Create new request
-    var xhr = new XMLHttpRequest();
+    // Retrieve current user token
+    firebase.auth().currentUser.getToken().then(function(idToken) {
 
-    // Open new DELETE request
-    xhr.open('DELETE', BASE_URL + "keepers/delete?id=" + keeper.id + "&key=" + API_KEY);
+        // Create new request
+        var xhr = new XMLHttpRequest();
 
-    // DELETE request state change callback event
-    xhr.onreadystatechange = function() {
+        // Open new DELETE request
+        xhr.open('DELETE', BASE_URL + "keepers/delete?id=" + keeper.id + "&key=" + API_KEY);
 
-        // If request has completed
-        if (xhr.readyState == XMLHttpRequest.DONE){
+        // Set authorisation header using Firebase token
+        xhr.setRequestHeader('Authorization', 'Bearer ' + idToken);
 
-            var resp;
+        // DELETE request state change callback event
+        xhr.onreadystatechange = function () {
 
-            // If request status is 200
-            if (xhr.status == 200){
+            // If request has completed
+            if (xhr.readyState == XMLHttpRequest.DONE) {
 
-                // Parse response JSON
-                resp = JSON.parse(xhr.responseText);
-                keepersList = resp.keepers || [];
+                var resp;
 
-                // Load the List Keepers page with new data
-                bjørneparkappen.adminconsole.keepers.list.loadPage();
+                // If request status is 200
+                if (xhr.status == 200) {
 
-                // Display the List Keepers page
-                bjørneparkappen.adminconsole.navigation.displayPage(listKeepersPage);
+                    // Parse response JSON
+                    resp = JSON.parse(xhr.responseText);
+                    keepersList = resp.keepers || [];
 
-            } else {
+                    // Load the List Keepers page with new data
+                    bjørneparkappen.adminconsole.keepers.list.loadPage();
 
-                // Display error message
-                resp = JSON.parse(xhr.responseText);
-                alert(resp.error.message);
+                    // Display the List Keepers page
+                    bjørneparkappen.adminconsole.navigation.displayPage(listKeepersPage);
+
+                } else {
+
+                    // Display error message
+                    resp = JSON.parse(xhr.responseText);
+                    alert(resp.error.message);
+                }
+
+                // Terminate UI wait state
+                bjørneparkappen.adminconsole.endWait();
+
             }
+        };
 
-            // Terminate UI wait state
-            bjørneparkappen.adminconsole.endWait();
-
-        }
-    };
-
-    // Send request
-    xhr.send();
+        // Send request
+        xhr.send();
+    });
 };
+
+
+
+/** Sign In */
+var signInPage = document.getElementById('sign_in_page');
+
+// Signing in/out nav items
+var homeNav = document.getElementById('bjørneparken');
+var userNav = document.getElementById('user');
+var signoutNav = document.getElementById('sign-out');
+signoutNav.onclick = function(){
+
+    // Select signout nav item
+    bjørneparkappen.adminconsole.navigation.selectNavItem(homeNav);
+
+    // Hide all pages
+    bjørneparkappen.adminconsole.navigation.hideAllPages();
+
+    // Perform signout
+    firebase.auth().signOut();
+};
+
+// Actions to perform based on sign-in status
+bjørneparkappen.adminconsole.signin.checkUser = function(user) {
+
+    if (user) {
+
+        // Retrieve all data asynchronously
+        bjørneparkappen.adminconsole.api.getSpecies();
+        bjørneparkappen.adminconsole.api.getAreas();
+        bjørneparkappen.adminconsole.api.getAnimals();
+        bjørneparkappen.adminconsole.api.getEvents();
+        bjørneparkappen.adminconsole.api.getKeepers();
+
+        // Load user name into nav item
+        userNav.innerHTML = user.displayName;
+
+        // Show nav items
+        speciesNav.style.display = DISPLAYED;
+        areasNav.style.display = DISPLAYED;
+        eventsNav.style.display = DISPLAYED;
+        animalsNav.style.display = DISPLAYED;
+        keepersNav.style.display = DISPLAYED;
+        userNav.style.display = DISPLAYED;
+        signoutNav.style.display = DISPLAYED;
+
+        // Select Species navigation item
+        bjørneparkappen.adminconsole.navigation.selectNavItem(speciesNav);
+
+        // Load View Species page
+        bjørneparkappen.adminconsole.species.list.loadPage();
+
+        // Reset the sign-in UI before rendering again
+        ui.reset();
+        ui.start('#firebaseui-auth-container', uiConfig);
+
+    } else {
+
+        // Clear user name from nav item
+        userNav.innerHTML = "USER";
+
+        // Show nav items
+        speciesNav.style.display = HIDDEN;
+        areasNav.style.display = HIDDEN;
+        eventsNav.style.display = HIDDEN;
+        animalsNav.style.display = HIDDEN;
+        keepersNav.style.display = HIDDEN;
+        userNav.style.display = HIDDEN;
+        signoutNav.style.display = HIDDEN;
+
+        // Select Home navigation item
+        bjørneparkappen.adminconsole.navigation.selectNavItem(homeNav);
+
+        // Show the sign-in page
+        bjørneparkappen.adminconsole.navigation.displayPage(signInPage);
+    }
+}
+
+var hasInitialised = false;
+
+// Firebase authentication change event
+firebase.auth().onAuthStateChanged(function(user){
+
+    bjørneparkappen.adminconsole.signin.checkUser(user);
+});
 
 
 

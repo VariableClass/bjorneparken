@@ -16,6 +16,11 @@ ul.sidenav {
     overflow: auto;
 }
 
+ul.sidenav li .endItem {
+    position: absolute;
+    bottom: 0;
+}
+
 ul.sidenav li a {
     display: block;
     color: #ffffff;
@@ -61,11 +66,10 @@ div.content {
 #loading-text {
     display: none;
     color: #d4135a;
-    text-align: justify;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    text-align: center;
+    vertical-align: middle;
+    line-height: 90px;
+    z-index: 999;
 }
 
 h2 {
@@ -75,6 +79,7 @@ h2 {
 div.content .page {
     display: none;
     position: relative;
+    height: 100vh;
 }
 
 .button {
@@ -96,7 +101,7 @@ div.content .page {
     color: #d4135a;
 }
 
-form {
+.page > form {
     margin: 0 auto;
     width: 600px;
 }
