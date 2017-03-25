@@ -66,6 +66,7 @@ div.content {
 #loading-text {
     display: none;
     color: #d4135a;
+    position: absolute;
     text-align: center;
     vertical-align: middle;
     line-height: 90px;
@@ -102,8 +103,7 @@ div.content .page {
 }
 
 .page > form {
-    margin: 0 auto;
-    width: 600px;
+    margin: 20%;
 }
 
 .button.create {
@@ -114,7 +114,7 @@ div.content .page {
 
 .button.submit {
     position: absolute;
-    bottom: 0;
+    bottom: 50px;
     right: 0;
 }
 
@@ -124,7 +124,7 @@ div.content .page {
     color: gray;
     border: none;
     position: absolute;
-    bottom: 0;
+    bottom: 50px;
     right: 100px;
 }
 
@@ -197,11 +197,30 @@ label {
         padding: 15px;
     }
     .content {margin-left:0;}
+    div.content {
+        margin-left: 5%;
+    }
+    .page > form {
+        margin: 10%;
+    }
+    label {
+        text-align: center;
+    }
 }
 
 @media screen and (max-width: 400px) {
     ul.sidenav li a {
         text-align: center;
         float: none;
+    }
+    div.content {
+        margin-left: 5%;
+        margin-right: 5%;
+    }
+    .page > form {
+        margin: 5%;
+    }
+    label {
+        text-align: left;
     }
 }
