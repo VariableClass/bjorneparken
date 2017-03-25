@@ -3009,12 +3009,32 @@ bjørneparkappen.adminconsole.events.detail.loadUpdatePage = function(event){
     // Set event item
     eventDetailEvent = event;
 
+    eventDetailConfirm.onclick = function(){
+
+        eventDetailEvent.start_time = eventStartTimeInput.value;
+        eventDetailEvent.end_time = eventEndTimeInput.value;
+        eventDetailEvent.is_active = eventActiveInput.checked;
+
+        if (bjørneparkappen.adminconsole.events.detail.validate()) {
+
+            if (eventTypeSelector.value == "event"){
+
+                bjørneparkappen.adminconsole.api.updateEvent(eventDetailEvent);
+
+            } else {
+
+                eventDetailEvent.keeper_id = eventKeeperInput.value;
+
+                bjørneparkappen.adminconsole.api.updateFeeding(eventDetailEvent);
+            }
+        }
+    };
+
     // Populate page with new data
     eventLabelInput.value = bjørneparkappen.adminconsole.getTranslation(eventDetailEvent, 'label', eventLabelLanguageInput.value);
-    eventStartTimeInput.value = eventDetailEvent.start_time;
-    eventEndTimeInput.value = eventDetailEvent.end_time;
-    eventAreaInput.value = eventDetailEvent.location.id;
-    eventDescriptionInput.value = bjørneparkappen.adminconsole.getTranslation(eventDetailEvent, 'description', eventLabelLanguageInput.value);
+    eventStartTimeInput.value = eventDetailEvent.start_time.substring(0, 2) + ":" + eventDetailEvent.start_time.substring(3, 5);
+    eventEndTimeInput.value = eventDetailEvent.end_time.substring(0, 2) + ":" + eventDetailEvent.end_time.substring(3, 5);
+    eventDescriptionInput.value = bjørneparkappen.adminconsole.getTranslation(eventDetailEvent, 'description', eventDescriptionLanguageInput.value);
 
     // If item is a feeding
     if (eventDetailEvent.keeper){
@@ -3050,28 +3070,8 @@ bjørneparkappen.adminconsole.events.detail.loadUpdatePage = function(event){
         }
     }
 
+    eventAreaInput.value = eventDetailEvent.location.id;
     eventActiveInput.checked = eventDetailEvent.is_active;
-
-    eventDetailConfirm.onclick = function(){
-
-        eventDetailEvent.start_time = eventStartTimeInput.value;
-        eventDetailEvent.end_time = eventEndTimeInput.value;
-        eventDetailEvent.is_active = eventActiveInput.checked;
-
-        if (bjørneparkappen.adminconsole.events.detail.validate()) {
-
-            if (eventTypeSelector.value == "event"){
-
-                bjørneparkappen.adminconsole.api.updateEvent(eventDetailEvent);
-
-            } else {
-
-                eventDetailEvent.keeper_id = eventKeeperInput.value;
-
-                bjørneparkappen.adminconsole.api.updateFeeding(eventDetailEvent);
-            }
-        }
-    };
 
     // Display the detail page
     bjørneparkappen.adminconsole.navigation.displayPage(eventDetailPage);
