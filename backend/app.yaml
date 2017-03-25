@@ -9,11 +9,12 @@ handlers:
     secure: always
 
 libraries:
- - name: pycrypto
-   version: 2.6
- - name: ssl
-   version: 2.7.11
+- name: pycrypto
+  version: 2.6
+- name: ssl
+  version: latest
 
 env_variables:
    ENDPOINTS_SERVICE_NAME: api.bjorneparkappen.appspot.com
-   ENDPOINTS_SERVICE_VERSION: 2017-03-21r0
+   ENDPOINTS_SERVICE_VERSION: 2017-03-25r1
+   FIREBASE_PROJECT_ID: 'bjorneparkappen'

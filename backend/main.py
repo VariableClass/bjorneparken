@@ -2,6 +2,7 @@
 # [START imports]
 import datetime
 import endpoints
+import token_handler
 from google.appengine.ext import ndb
 from models.amenity import Amenity
 from models.animal import Animal
@@ -360,7 +361,10 @@ SYNC_STARRED_SPECIES_REQUEST = endpoints.ResourceContainer(
 # [END request resources]
 
 # [START bjorneparkappen_api]
-bjorneparkappen_api = endpoints.api(name='bjorneparkappen_api', version="v1.0", api_key_required=True)
+firebase_issuer = endpoints.Issuer(issuer='https://securetoken.google.com/bjorneparkappen',
+                            jwks_uri='https://www.googleapis.com/service_accounts/v1/metadata/x509/securetoken@system.gserviceaccount.com')
+
+bjorneparkappen_api = endpoints.api(name='bjorneparkappen_api', version="v1.0", api_key_required=True, issuers={"firebase":firebase_issuer})
 
 # [START ApiHelper]
 class ApiHelper():
@@ -392,6 +396,18 @@ class ApiHelper():
         if not InternationalText.validate_language_code(language_code):
             raise endpoints.BadRequestException("The provided language_code; "
                     + language_code + ", is not currently supported.")
+
+    @staticmethod
+    def validate_user(service):
+
+        try:
+            # Retrieve user token
+            id_token = service.request_state.headers.get_all('Authorization')[0].split(' ').pop()
+            token_handler.validate_token(id_token)
+
+        except(IndexError):
+            # Return 401 Unauthorized
+            raise endpoints.UnauthorizedException('Please provide user credentials')
 
     @staticmethod
     def convert_i18n_messages_to_i18n_texts(international_messages):
@@ -844,6 +860,9 @@ class SpeciesApi(remote.Service):
         name='species.create')
     def create_species(self, request):
 
+        # Check authorisation
+        ApiHelper.validate_user(self)
+
         # Validate all required values have been provided
         if not request.common_name and request.latin and request.description:
             raise endpoints.BadRequestException("Please provided values for 'common_name', 'latin' and 'description'.")
@@ -884,6 +903,9 @@ class SpeciesApi(remote.Service):
         http_method='POST',
         name='species.update')
     def update_species(self, request):
+
+        # Check authorisation
+        ApiHelper.validate_user(self)
 
         # Attempt to retrieve species
         species = Species.get_by_id(request.id)
@@ -935,6 +957,9 @@ class SpeciesApi(remote.Service):
         name='species.delete')
     def delete_species(self, request):
 
+        # Check authorisation
+        ApiHelper.validate_user(self)
+
         # Retrieve species from ID
         species = Species.get_by_id(request.id)
 
@@ -977,6 +1002,10 @@ class SpeciesApi(remote.Service):
         http_method='GET',
         name='species.all_languages')
     def list_species_all_languages(self, request):
+
+        # Check authorisation
+        ApiHelper.validate_user(self)
+
         return SpeciesApi.list_species_with_translations()
 
     @staticmethod
@@ -1036,6 +1065,9 @@ class AnimalsApi(remote.Service):
         name='animals.create')
     def create_animal(self, request):
 
+        # Check authorisation
+        ApiHelper.validate_user(self)
+
         # Validate all required values have been provided
         if not request.name and request.species_id and request.description and request.enclosure_id and request.is_available is not None:
             raise endpoints.BadRequestException("Please provided values for 'name', 'species_id', 'description' and 'is_available'.")
@@ -1079,6 +1111,9 @@ class AnimalsApi(remote.Service):
         http_method='POST',
         name='animals.update')
     def update_animal(self, request):
+
+        # Check authorisation
+        ApiHelper.validate_user(self)
 
         # Retrieve animal
         animal = Animal.get_by_id(request.animal_id, parent=ndb.Key(Species, request.species_id))
@@ -1138,6 +1173,9 @@ class AnimalsApi(remote.Service):
         name='animals.delete')
     def delete_animal(self, request):
 
+        # Check authorisation
+        ApiHelper.validate_user(self)
+
         # Retrieve animal
         animal = Animal.get_by_id(request.animal_id, parent=ndb.Key(Species, request.species_id))
 
@@ -1181,6 +1219,10 @@ class AnimalsApi(remote.Service):
         http_method='GET',
         name='animals.all_languages')
     def list_animals_all_languages(self, request):
+
+        # Check authorisation
+        ApiHelper.validate_user(self)
+
         return AnimalsApi.list_animals_with_translations()
 
     @staticmethod
@@ -1358,6 +1400,9 @@ class AreasApi(remote.Service):
         name='areas.enclosures.create')
     def create_enclosure(self, request):
 
+        # Check authorisation
+        ApiHelper.validate_user(self)
+
         # TODO Check for intersection of any existing areas
 
         # Validate all required values have been provided
@@ -1407,6 +1452,9 @@ class AreasApi(remote.Service):
         http_method='POST',
         name='areas.amenities.create')
     def create_amenity(self, request):
+
+        # Check authorisation
+        ApiHelper.validate_user(self)
 
         # TODO Check for intersection of any existing areas
 
@@ -1477,6 +1525,9 @@ class AreasApi(remote.Service):
         name='areas.enclosures.update')
     def update_enclosure(self, request):
 
+        # Check authorisation
+        ApiHelper.validate_user(self)
+
         # Attempt to retrieve enclosure
         enclosure = Enclosure.get_by_id(request.id)
 
@@ -1537,6 +1588,9 @@ class AreasApi(remote.Service):
         name='areas.enclosures.animals.add')
     def add_animal_to_enclosure(self, request):
 
+        # Check authorisation
+        ApiHelper.validate_user(self)
+
         # Attempt to retrieve enclosure
         enclosure = Enclosure.get_by_id(request.enclosure_id)
 
@@ -1590,6 +1644,9 @@ class AreasApi(remote.Service):
         http_method='POST',
         name='areas.amenities.update')
     def update_amenity(self, request):
+
+        # Check authorisation
+        ApiHelper.validate_user(self)
 
         # Attempt to retrieve amenity
         amenity = Amenity.get_by_id(request.id)
@@ -1675,6 +1732,9 @@ class AreasApi(remote.Service):
         name='areas.delete')
     def delete_area(self, request):
 
+        # Check authorisation
+        ApiHelper.validate_user(self)
+
         # Retrieve area from ID
         area = Area.get_by_id(request.id)
 
@@ -1709,6 +1769,10 @@ class AreasApi(remote.Service):
         http_method='GET',
         name='areas.all_languages')
     def list_areas_all_languages(self, request):
+
+        # Check authorisation
+        ApiHelper.validate_user(self)
+
         return AreasApi.list_areas_with_translations()
 
     @staticmethod
@@ -1927,6 +1991,9 @@ class EventsApi(remote.Service):
         name='events.create')
     def create_event(self, request):
 
+        # Check authorisation
+        ApiHelper.validate_user(self)
+
         # Validate all required values have been provided
         if not request.label and request.description and request.location_id and request.start_time and request.end_time and request.is_active is not None:
             raise endpoints.BadRequestException("Please provided values for 'label', 'description', 'location_id', 'start_time', 'end_time' and 'is_active'.")
@@ -1978,6 +2045,9 @@ class EventsApi(remote.Service):
         http_method='POST',
         name='events.update')
     def update_event(self, request):
+
+        # Check authorisation
+        ApiHelper.validate_user(self)
 
         # Attempt to retrieve event
         event = Event.get_by_id(request.event_id, parent=ndb.Key(Amenity, request.location_id))
@@ -2066,6 +2136,9 @@ class EventsApi(remote.Service):
         name='events.feedings.create')
     def create_feeding(self, request):
 
+        # Check authorisation
+        ApiHelper.validate_user(self)
+
         # Validate all required values have been provided
         if not request.label and request.description and request.location_id and request.start_time and request.end_time and request.is_active is not None:
             raise endpoints.BadRequestException("Please provided values for 'label', 'description', 'location_id', 'start_time', 'end_time' and 'is_active'.")
@@ -2141,6 +2214,9 @@ class EventsApi(remote.Service):
         http_method='POST',
         name='events.feedings.update')
     def update_feeding(self, request):
+
+        # Check authorisation
+        ApiHelper.validate_user(self)
 
         # Attempt to retrieve feeding
         feeding = Feeding.get_by_id(request.feeding_id, parent=ndb.Key(Enclosure, request.location_id))
@@ -2242,6 +2318,9 @@ class EventsApi(remote.Service):
         name='events.delete')
     def delete_event(self, request):
 
+        # Check authorisation
+        ApiHelper.validate_user(self)
+
         # Attempt to retrieve event
         event = Event.get_by_id(request.event_id, parent=ndb.Key(Amenity, request.location_id))
 
@@ -2296,6 +2375,10 @@ class EventsApi(remote.Service):
         http_method='GET',
         name='events.all_languages')
     def list_all_events_all_languages(self, request):
+
+        # Check authorisation
+        ApiHelper.validate_user(self)
+
         return EventsApi.list_all_events_with_translations()
 
     @staticmethod
@@ -2369,6 +2452,9 @@ class KeepersApi(remote.Service):
         name='keepers.create')
     def create_keeper(self, request):
 
+        # Check authorisation
+        ApiHelper.validate_user(self)
+
         # Validate all required values have been provided
         if not request.name and request.bio:
             raise endpoints.BadRequestException("Please provided values for 'name' and 'bio'.")
@@ -2393,6 +2479,9 @@ class KeepersApi(remote.Service):
         http_method='POST',
         name='keepers.update')
     def update_keeper(self, request):
+
+        # Check authorisation
+        ApiHelper.validate_user(self)
 
         # Attempt to retrieve keeper
         keeper = Keeper.get_by_id(request.id)
@@ -2431,6 +2520,9 @@ class KeepersApi(remote.Service):
         name='keepers.delete')
     def delete_keeper(self, request):
 
+        # Check authorisation
+        ApiHelper.validate_user(self)
+
         # Retrieve keeper from ID
         keeper = Keeper.get_by_id(request.id)
 
@@ -2453,6 +2545,10 @@ class KeepersApi(remote.Service):
         http_method='GET',
         name='keepers.all_languages')
     def list_keepers_all_languages(self, request):
+
+        # Check authorisation
+        ApiHelper.validate_user(self)
+
         return KeepersApi.list_keepers_with_translations()
 
     @staticmethod
