@@ -2614,9 +2614,34 @@ class VisitorsApi(remote.Service):
         if (request.visit_end - request.visit_start).total_seconds() < 0 or (request.visit_end - request.visit_start).total_seconds() > 604800:
             raise endpoints.BadRequestException("End date must be equal to or greater than start date. Duration may not exceed 14 days.")
 
+        # Build up default itinerary and starred_species list
+        itinerary = []
+        starred_species = []
+        events = Event.get_all()
+
+        for event in events:
+
+            if type(event) is Feeding:
+
+                if event.is_active:
+
+                    # Retrieve event location
+                    location = event.key.parent().get()
+
+                    # Retrieve species at location
+                    species_list = location.get_species()
+
+                    # Add each species id to starred species
+                    for species in species_list:
+                        if species.key.id() not in starred_species:
+                            starred_species.append(species.key.id())
+
+                    # Add feeding to default itinerary
+                    itinerary.append(Event.EventLookup(event_id=event.key.id(), location_id=location.key.id()))
+
         # Create new visitor
-        visitor_key = Visitor(starred_species=[],
-            itinerary=[],
+        visitor_key = Visitor(starred_species=starred_species,
+            itinerary=itinerary,
             visit_start=request.visit_start,
             visit_end=request.visit_start).put()
 
