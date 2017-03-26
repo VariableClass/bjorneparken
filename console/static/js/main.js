@@ -3012,8 +3012,8 @@ bjørneparkappen.adminconsole.events.detail.clearPageData = function(){
     bjørneparkappen.adminconsole.clearTranslations(eventDescriptionInput, eventDescriptionLanguageInput, eventDescriptionTranslations, eventDescriptionAddTranslation);
 
     // Clear and hide the image
-    areaImagePreview.src = "";
-    areaImagePreview.style.display = HIDDEN;
+    eventImagePreview.src = "";
+    eventImagePreview.style.display = HIDDEN;
 
     // Clear the form
     eventDetailForm.reset();
@@ -3076,8 +3076,8 @@ bjørneparkappen.adminconsole.events.detail.loadCreatePage = function(){
 
     eventDetailConfirm.onclick = function(){
 
-        eventDetailEvent.start_time = eventStartTimeInput.value;
-        eventDetailEvent.end_time = eventEndTimeInput.value;
+        eventDetailEvent.start_time = eventStartTimeInput.value.substring(0, 2) + "." + eventStartTimeInput.value.substring(3, 5);
+        eventDetailEvent.end_time = eventEndTimeInput.value.substring(0, 2) + "." + eventEndTimeInput.value.substring(3, 5);
         eventDetailEvent.location_id = eventAreaInput.value;
         eventDetailEvent.is_active = eventActiveInput.checked;
 
@@ -3117,8 +3117,8 @@ bjørneparkappen.adminconsole.events.detail.loadUpdatePage = function(event){
 
     eventDetailConfirm.onclick = function(){
 
-        eventDetailEvent.start_time = eventStartTimeInput.value;
-        eventDetailEvent.end_time = eventEndTimeInput.value;
+        eventDetailEvent.start_time = eventStartTimeInput.value.substring(0, 2) + "." + eventStartTimeInput.value.substring(3, 5);
+        eventDetailEvent.end_time = eventEndTimeInput.value.substring(0, 2) + "." + eventEndTimeInput.value.substring(3, 5);
         eventDetailEvent.is_active = eventActiveInput.checked;
 
         if (bjørneparkappen.adminconsole.events.detail.validate()) {
@@ -3129,7 +3129,10 @@ bjørneparkappen.adminconsole.events.detail.loadUpdatePage = function(event){
 
             } else {
 
-                eventDetailEvent.keeper_id = eventKeeperInput.value;
+                if (eventKeeperInput.value != eventDetailEvent.keeper.id){
+
+                    eventDetailEvent.keeper_id = eventKeeperInput.value;
+                }
 
                 bjørneparkappen.adminconsole.api.updateFeeding(eventDetailEvent);
             }
