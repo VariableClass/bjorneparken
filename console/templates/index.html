@@ -85,6 +85,9 @@
                     <label for="species_image">Image:</label>
                     <input name="species_image" id="species_image" type="file" accept="image/*" size="4" required/>
                 </p>
+                <p>
+                    <img id="species_image_preview" src="" alt="Species Image Preview" width="100">
+                </p>
                 <input id="species_detail_cancel" type="button" class="button cancel" value="Cancel" />
                 <input id="species_detail_confirm" type="button" class="button submit" value="Create" />
             </form>
@@ -151,6 +154,9 @@
                 <p>
                     <label for="area_image">Image:</label>
                     <input name="area_image" id="area_image" type="file" accept="image/*" size="4" required/>
+                </p>
+                <p>
+                    <img id="area_image_preview" src="" alt="Area Image Preview" width="100">
                 </p>
                 <input id="area_detail_cancel" type="button" class="button cancel" value="Cancel" />
                 <input id="area_detail_confirm" type="button" class="button submit" value="Create" />
@@ -263,6 +269,13 @@
                     <label for="event_keeper">Keeper:</label>
                     <select name="event_keeper" id="event_keeper" form="event_detail_form" >
                     </select>
+                </p>
+                <p>
+                    <label for="event_image">Image:</label>
+                    <input name="event_image" id="event_image" type="file" accept="image/*" size="4" required/>
+                </p>
+                <p>
+                    <img id="event_image_preview" src="" alt="Event Image Preview" width="100">
                 </p>
                 <p>
                     <label for="event_active">Active:</label>
