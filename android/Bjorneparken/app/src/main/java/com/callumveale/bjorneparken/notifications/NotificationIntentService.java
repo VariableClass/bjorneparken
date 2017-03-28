@@ -20,19 +20,20 @@ import com.callumveale.bjorneparken.models.Event;
  */
 public class NotificationIntentService extends IntentService {
 
-    private static final int NOTIFICATION_ID = 1;
     private static final String ACTION_START = "ACTION_START";
     private static final String ACTION_DELETE = "ACTION_DELETE";
-    private static final String EVENT = "EVENT";
-    private static final String START_TIME = "START_TIME";
+    public static final String NOTIFICATION_ID = "NOTIFICATION_ID";
+    public static final String EVENT = "EVENT";
+    public static final String START_TIME = "START_TIME";
 
     public NotificationIntentService() {
         super(NotificationIntentService.class.getSimpleName());
     }
 
-    public static Intent createIntentStartNotificationService(Context context, Event event, long startTime) {
+    public static Intent createIntentStartNotificationService(Context context, int notificationId, Event event, long startTime) {
         Intent intent = new Intent(context, NotificationIntentService.class);
         Bundle args = new Bundle();
+        args.putInt(NOTIFICATION_ID, notificationId);
         args.putParcelable(EVENT, event);
         args.putLong(START_TIME, startTime);
         intent.putExtras(args);
@@ -40,9 +41,12 @@ public class NotificationIntentService extends IntentService {
         return intent;
     }
 
-    public static Intent createIntentDeleteNotification(Context context) {
+    public static Intent createIntentDeleteNotification(Context context, int notificationId) {
         Intent intent = new Intent(context, NotificationIntentService.class);
         intent.setAction(ACTION_DELETE);
+        Bundle args = new Bundle();
+        args.putInt(NOTIFICATION_ID, notificationId);
+        intent.putExtras(args);
         return intent;
     }
 
@@ -52,7 +56,7 @@ public class NotificationIntentService extends IntentService {
         try {
             String action = intent.getAction();
             if (ACTION_START.equals(action)) {
-                processStartNotification((Event) intent.getExtras().get(EVENT), intent.getExtras().getLong(START_TIME));
+                processStartNotification((int) intent.getExtras().get(NOTIFICATION_ID), (Event) intent.getExtras().get(EVENT), intent.getExtras().getLong(START_TIME));
             }
             if (ACTION_DELETE.equals(action)) {
                 processDeleteNotification(intent);
@@ -66,11 +70,14 @@ public class NotificationIntentService extends IntentService {
 
         // Cancel any future notification showings
         NotificationManager manager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
-        manager.cancel(NOTIFICATION_ID);
+        if (intent.getExtras() != null) {
+
+            manager.cancel((int) intent.getExtras().get(NOTIFICATION_ID));
+        }
 
     }
 
-    private void processStartNotification(Event event, long startTime) {
+    private void processStartNotification(final int notificationId, Event event, long startTime) {
 
         final Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.logo_square);
 
@@ -91,15 +98,15 @@ public class NotificationIntentService extends IntentService {
                 .setContentText(String.format(getString(R.string.event_warning), difference));
 
         final PendingIntent pendingIntent = PendingIntent.getActivity(this,
-                NOTIFICATION_ID,
+                notificationId,
                 new Intent(this, HomeActivity.class),
                 PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(pendingIntent);
-        builder.setDeleteIntent(NotificationEventReceiver.getDeleteIntent(this));
+        builder.setDeleteIntent(NotificationEventReceiver.getDeleteIntent(this, notificationId));
 
         final NotificationManager manager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        manager.notify(NOTIFICATION_ID, builder.build());
+        manager.notify(notificationId, builder.build());
 
         final NotificationCompat.Builder repeatBuilder = new NotificationCompat.Builder(this);
         final Event repeatEvent = event;
@@ -129,8 +136,8 @@ public class NotificationIntentService extends IntentService {
                                         .setLargeIcon(icon)
                                         .setContentText(String.format(getString(R.string.event_warning), difference))
                                         .setContentIntent(pendingIntent)
-                                        .setDeleteIntent(NotificationEventReceiver.getDeleteIntent(getApplicationContext()));
-                                manager.notify(NOTIFICATION_ID, repeatBuilder.build());
+                                        .setDeleteIntent(NotificationEventReceiver.getDeleteIntent(getApplicationContext(), notificationId));
+                                manager.notify(notificationId, repeatBuilder.build());
 
                                 try {
                                     // Wait 1 minute
@@ -150,7 +157,7 @@ public class NotificationIntentService extends IntentService {
                                 .setSmallIcon(R.drawable.notification_icon)
                                 .setLargeIcon(icon)
                                 .setContentText(getString(R.string.event_now));
-                        manager.notify(NOTIFICATION_ID, repeatBuilder.build());
+                        manager.notify(notificationId, repeatBuilder.build());
                     }
                 }
         ).start();

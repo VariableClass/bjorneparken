@@ -21,8 +21,6 @@ public class NotificationEventReceiver extends WakefulBroadcastReceiver {
 
     private static final String ACTION_START_NOTIFICATION_SERVICE = "ACTION_START_NOTIFICATION_SERVICE";
     private static final String ACTION_DELETE_NOTIFICATION = "ACTION_DELETE_NOTIFICATION";
-    private static final String EVENT = "EVENT";
-    private static final String START_TIME = "START_TIME";
     public static final int WARNING_TIME_MINUTES = 15;
 
     public static void setupAlarm(Context context, ArrayList<Event> events, DateTime visitStartDate, DateTime visitEndDate) {
@@ -56,7 +54,7 @@ public class NotificationEventReceiver extends WakefulBroadcastReceiver {
                     Calendar startTime = event.getEventStartCalendar(visitStart, i);
 
                     // Retrieve an intent for the event at it's start time
-                    PendingIntent alarmIntent = getStartPendingIntent(context, event, startTime);
+                    PendingIntent alarmIntent = getStartPendingIntent(context, i, event, startTime);
 
                     // Set an alarm for the specified number of minutes prior to the event
                     startTime.add(Calendar.MINUTE, -WARNING_TIME_MINUTES);
@@ -72,10 +70,10 @@ public class NotificationEventReceiver extends WakefulBroadcastReceiver {
         Intent serviceIntent = null;
         if (ACTION_START_NOTIFICATION_SERVICE.equals(action)) {
 
-            serviceIntent = NotificationIntentService.createIntentStartNotificationService(context, (Event) intent.getExtras().get(EVENT), intent.getExtras().getLong(START_TIME));
+            serviceIntent = NotificationIntentService.createIntentStartNotificationService(context, (int) intent.getExtras().get(NotificationIntentService.NOTIFICATION_ID), (Event) intent.getExtras().get(NotificationIntentService.EVENT), intent.getExtras().getLong(NotificationIntentService.START_TIME));
         } else if (ACTION_DELETE_NOTIFICATION.equals(action)) {
 
-            serviceIntent = NotificationIntentService.createIntentDeleteNotification(context);
+            serviceIntent = NotificationIntentService.createIntentDeleteNotification(context, (int) intent.getExtras().get(NotificationIntentService.NOTIFICATION_ID));
         }
 
         if (serviceIntent != null) {
@@ -83,19 +81,20 @@ public class NotificationEventReceiver extends WakefulBroadcastReceiver {
         }
     }
 
-    private static PendingIntent getStartPendingIntent(Context context, Event event, Calendar eventStartTime) {
+    private static PendingIntent getStartPendingIntent(Context context, int notificationId, Event event, Calendar eventStartTime) {
         Intent intent = new Intent(context, NotificationEventReceiver.class);
         Bundle args = new Bundle();
-        args.putParcelable(EVENT, event);
-        args.putLong(START_TIME, eventStartTime.getTimeInMillis());
+        args.putInt(NotificationIntentService.NOTIFICATION_ID, notificationId);
+        args.putParcelable(NotificationIntentService.EVENT, event);
+        args.putLong(NotificationIntentService.START_TIME, eventStartTime.getTimeInMillis());
         intent.putExtras(args);
         intent.setAction(ACTION_START_NOTIFICATION_SERVICE);
-        return PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        return PendingIntent.getBroadcast(context, notificationId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
-    public static PendingIntent getDeleteIntent(Context context) {
+    public static PendingIntent getDeleteIntent(Context context, int notificationId) {
         Intent intent = new Intent(context, NotificationEventReceiver.class);
         intent.setAction(ACTION_DELETE_NOTIFICATION);
-        return PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        return PendingIntent.getBroadcast(context, notificationId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 }
