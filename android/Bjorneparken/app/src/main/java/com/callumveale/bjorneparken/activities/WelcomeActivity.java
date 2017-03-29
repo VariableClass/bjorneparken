@@ -96,6 +96,10 @@ public class WelcomeActivity extends AppCompatActivity {
         mVisitStart = (DateTime) intent.getSerializableExtra(HomeActivity.ARG_VISIT_START);
         mVisitEnd = (DateTime) intent.getSerializableExtra(HomeActivity.ARG_VISIT_END);
 
+        // Set both times to midnight
+        mVisitStart = setToMidnight(mVisitStart);
+        mVisitEnd = setToMidnight(mVisitEnd);
+
         // Set title
         mTitle = (TextView) findViewById(R.id.welcome_title);
         mTitle.setText(getString(R.string.welcome_start));
@@ -201,7 +205,7 @@ public class WelcomeActivity extends AppCompatActivity {
     private void setDate(int year, int monthOfYear, int dayOfMonth){
 
         Calendar date = Calendar.getInstance();
-        date.set(year, monthOfYear, dayOfMonth, 0, 0, 0);
+        date.set(year, monthOfYear, dayOfMonth);
 
         if (!mStartDateSet){
 
@@ -212,6 +216,19 @@ public class WelcomeActivity extends AppCompatActivity {
             mVisitEnd = new DateTime(date.getTimeInMillis());
             mEndDateSet = true;
         }
+    }
+
+    private DateTime setToMidnight(DateTime dateTime){
+
+        Calendar date = Calendar.getInstance();
+        date.setTimeInMillis(dateTime.getValue());
+
+        int year = date.get(Calendar.YEAR);
+        int month = date.get(Calendar.MONTH);
+        int day = date.get(Calendar.DAY_OF_MONTH);
+        date.set(year, month, day, 0, 0, 0);
+
+        return new DateTime(date.getTimeInMillis());
     }
 
     @Override
