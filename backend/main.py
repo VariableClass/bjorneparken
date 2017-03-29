@@ -888,7 +888,7 @@ class SpeciesApi(remote.Service):
 
         # If image attached, create one
         if request.image:
-            species.image = Image.upload(species_key.id(), request.image)
+            species.image = Image.upload(str(species_key.id()), request.image)
             species.put()
 
         # Update version
@@ -939,7 +939,7 @@ class SpeciesApi(remote.Service):
 
         # If value for image provided:
         if request.image:
-            species.image = Image.upload(species.key.id(), request.image)
+            species.image = Image.upload(str(species.key.id()), request.image)
 
         # Write changes
         species.put()
@@ -1437,7 +1437,7 @@ class AreasApi(remote.Service):
 
         # If image attached, create one
         if request.image:
-            enclosure.image = Image.upload(enclosure_key.id(), request.image)
+            enclosure.image = Image.upload(str(enclosure_key.id()), request.image)
             enclosure.put()
 
         # Update version
@@ -1509,7 +1509,7 @@ class AreasApi(remote.Service):
 
         # If image attached, create one
         if request.image:
-            amenity.image = Image.upload(amenity_key.id(), request.image)
+            amenity.image = Image.upload(str(amenity_key.id()), request.image)
             amenity.put()
 
         # Update version
@@ -1570,7 +1570,7 @@ class AreasApi(remote.Service):
 
         # If value for image provided:
         if request.image:
-            enclosure.image = Image.upload(enclosure.key.id(), request.image)
+            enclosure.image = Image.upload(str(enclosure.key.id()), request.image)
 
         # Write changes
         enclosure.put()
@@ -1714,7 +1714,7 @@ class AreasApi(remote.Service):
 
         # If value for image provided:
         if request.image:
-            amenity.image = Image.upload(amenity.key.id(), request.image)
+            amenity.image = Image.upload(str(amenity.key.id()), request.image)
 
         # Write changes
         amenity.put()
@@ -2030,7 +2030,7 @@ class EventsApi(remote.Service):
 
         # If image attached, create one
         if request.image:
-            event.image = Image.upload(event_key.id(), request.image)
+            event.image = Image.upload(str(event_key.parent().id()) + "-" + str(event_key.id()), request.image)
             event.put()
 
         # Update version
@@ -2106,7 +2106,7 @@ class EventsApi(remote.Service):
 
         # If value for image provided:
         if request.image:
-            event.image = Image.upload(event.key.id(), request.image)
+            event.image = Image.upload(str(event.key.parent().id()) + "-" + str(event.key.id()), request.image)
 
         # Check if value for is_active provided
         try:
@@ -2199,7 +2199,7 @@ class EventsApi(remote.Service):
 
         # If image attached, create one
         if request.image:
-            feeding.image = Image.upload(feeding_key.id(), request.image)
+            feeding.image = Image.upload(str(feeding_key.parent().id()) + "-" + str(feeding_key.id()), request.image)
             feeding.put()
 
         # Update version
@@ -2271,7 +2271,7 @@ class EventsApi(remote.Service):
 
         # If value for image provided:
         if request.image:
-            feeding.image = Image.upload(feeding.key.id(), request.image)
+            feeding.image = Image.upload(str(feeding.key.parent().id()) + "-" + str(feeding.key.id()), request.image)
 
         # Check if value for is_active provided
         try:

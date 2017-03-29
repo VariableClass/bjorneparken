@@ -6,7 +6,7 @@ from google.appengine.ext import ndb
 class Image(ndb.Model):
     accepted_mime_types = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/bmp", "image/tiff", "image/ico"]
 
-    name = ndb.IntegerProperty()
+    name = ndb.StringProperty()
     mime_type = ndb.StringProperty()
 
     # Methods
