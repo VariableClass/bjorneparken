@@ -92,6 +92,12 @@ public class RequestsModule {
         getAllSpecies.execute();
     }
 
+    public void getAllEvents(){
+
+        GetAllEventsTask getAllEvents = new GetAllEventsTask(mBuilder, mActivity, mLanguage);
+        getAllEvents.execute();
+    }
+
     public void getAllFeedings(){
 
         GetAllFeedingsTask getAllFeedings = new GetAllFeedingsTask(mBuilder, mActivity, mLanguage);

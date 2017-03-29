@@ -129,6 +129,7 @@ public class HomeActivity
     private ArrayList<Amenity> mAttractions;
     private ArrayList<Feeding> mFeedings;
     private ArrayList<Species> mSpecies;
+    private ArrayList<Event> mEvents;
 
     //endregion Data Retrieval
 
@@ -186,6 +187,7 @@ public class HomeActivity
                 getString(R.string.home),
                 getString(R.string.my_visit),
                 getString(R.string.animals),
+                getString(R.string.events),
                 getString(R.string.attractions),
                 getString(R.string.amenities),
                 getString(R.string.park_map),
@@ -334,6 +336,15 @@ public class HomeActivity
             getImage(attraction);
         }
 
+        // Attempt to retrieve events from file
+        mEvents = mFileWriter.getEventsFromFile();
+
+        // Retrieve images for any event which has them
+        for (Event event : mEvents){
+
+            getImage(event);
+        }
+
         // Attempt to retrieve feedings from file
         mFeedings = mFileWriter.getFeedingsFromFile();
 
@@ -433,12 +444,6 @@ public class HomeActivity
     //endregion Data From File
 
     //region Data From Server
-
-    private void checkServerAvailability(){
-
-        // Check whether the server can be reached
-        mRequester.checkServerAvailability();
-    }
 
     public void setServerAvailability(boolean available) {
 
@@ -548,6 +553,9 @@ public class HomeActivity
         // Fetch attractions
         mRequester.getAllAttractions();
 
+        // Fetch events
+        mRequester.getAllEvents();
+
         // Fetch feedings
         mRequester.getAllFeedings();
 
@@ -586,6 +594,21 @@ public class HomeActivity
         for (Amenity attraction : mAttractions){
 
             getImage(attraction);
+        }
+    }
+
+    public void saveEvents(MainEventListResponse events){
+
+        // Cache response
+        mEvents = ResponseConverter.convertEventListResponse(events);
+
+        // Write response to file
+        mFileWriter.writeEventsToFile(events);
+
+        // Retrieve images for any events which have them
+        for (Event event : mEvents){
+
+            getImage(event);
         }
     }
 
@@ -788,57 +811,65 @@ public class HomeActivity
                 fragment = ListFragment.newInstance(mSpecies, 1, Species.class.getSimpleName(), true);
                 break;
 
-            case 3: // If selection is 'Attractions'
+            case 3: // If selection is 'Events'
                 // Retrieve title for page
                 title = mNavigationOptions[3].name;
+
+                // Retrieve new list fragment, populating from list of events
+                fragment = ListFragment.newInstance(mEvents, 1, Event.class.getSimpleName(), true);
+                break;
+
+            case 4: // If selection is 'Attractions'
+                // Retrieve title for page
+                title = mNavigationOptions[4].name;
 
                 // Retrieve new list fragment, populating from list of attractions
                 fragment = ListFragment.newInstance(mAttractions, 1, Amenity.class.getSimpleName());
                 break;
 
-            case 4: // If selection is 'Amenities'
+            case 5: // If selection is 'Amenities'
                 // Retrieve title for page
-                title = mNavigationOptions[4].name;
+                title = mNavigationOptions[5].name;
 
                 // Retrieve new list fragment, populating from list of amenities
                 fragment = ListFragment.newInstance(mAmenities, 1, Amenity.class.getSimpleName());
                 break;
 
-            case 5: // If selection is 'Map'
+            case 6: // If selection is 'Map'
                 // Retrieve title for page
-                title = mNavigationOptions[5].name;
+                title = mNavigationOptions[6].name;
 
                 // Retrieve new menu fragment
                 fragment = ImageFragment.newMapInstance();
                 break;
 
-            case 6: // If selection is 'Restaurant Menu'
+            case 7: // If selection is 'Restaurant Menu'
                 // Retrieve title for page
-                title = mNavigationOptions[6].name;
+                title = mNavigationOptions[7].name;
 
                 // Retrieve new menu fragment
                 fragment = ImageFragment.newMenuInstance();
                 break;
 
-            case 7: // If selection is 'Social'
+            case 8: // If selection is 'Social'
                 // Retrieve title for page
-                title = mNavigationOptions[7].name;
+                title = mNavigationOptions[8].name;
 
                 // Retrieve new social fragment
                 fragment = SocialFragment.newInstance(mServerAvailable);
                 break;
 
-            case 8: // If selection is 'Settings'
+            case 9: // If selection is 'Settings'
                 // Retrieve title for page
-                title = mNavigationOptions[8].name;
+                title = mNavigationOptions[9].name;
 
                 // Retrieve new settings fragment
                 fragment = SettingsFragment.newInstance(mConfig);
                 break;
 
-            case 9: // If selection is 'Help'
+            case 10: // If selection is 'Help'
                 // Retrieve title for page
-                title = mNavigationOptions[9].name;
+                title = mNavigationOptions[10].name;
 
                 // Retrieve new help fragment
                 fragment = HelpFragment.newInstance();

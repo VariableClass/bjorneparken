@@ -40,6 +40,7 @@ public class FileWriter {
     private static final String AMENITIES_FILE = "amenities";
     private static final String ATTRACTIONS_FILE = "attractions";
     private static final String CONFIG_FILE = "config";
+    private static final String EVENTS_FILE = "events";
     private static final String FEEDINGS_FILE = "feedings";
     private static final String ITINERARY_FILE = "itinerary";
     private static final String SPECIES_FILE = "species";
@@ -402,6 +403,37 @@ public class FileWriter {
     //endregion Species
 
     //region Events
+
+    //region Events
+
+    public void writeEventsToFile(MainEventListResponse eventsJson){
+
+        writeJsonToFile(eventsJson, EVENTS_FILE);
+    }
+
+    public ArrayList<Event> getEventsFromFile(){
+
+        MainEventListResponse events = new MainEventListResponse();
+
+        try {
+            InputStream inputStream = mContext.openFileInput(EVENTS_FILE);
+
+            if (inputStream != null) {
+
+                events = new JacksonFactory().fromInputStream(inputStream, MainEventListResponse.class);
+                inputStream.close();
+            }
+        }
+        catch (FileNotFoundException fileNotFoundException) {
+            fileNotFoundException.printStackTrace();
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
+
+        return ResponseConverter.convertEventListResponse(events);
+    }
+
+    //endregion Events
 
     //region Feedings
 

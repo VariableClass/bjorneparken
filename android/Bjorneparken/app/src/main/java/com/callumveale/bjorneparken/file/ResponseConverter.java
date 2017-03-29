@@ -567,8 +567,12 @@ public class ResponseConverter {
             // Create a new event
             Event event = convertEventResponse(eventResponse);
 
-            // Add it to the return list
-            returnList.add(event);
+            // If the event is active
+            if (event.isActive()){
+
+                // Add it to the return list
+                returnList.add(event);
+            }
         }
 
         // Return populated list
@@ -613,8 +617,12 @@ public class ResponseConverter {
             // Create a new feeding
             Feeding feeding = convertFeedingResponse(feedingResponse);
 
-            // Add it to the return list
-            returnList.add(feeding);
+            // If the feeding is active
+            if (feeding.isActive()){
+
+                // Add it to the return list
+                returnList.add(feeding);
+            }
         }
 
         // Return populated list
