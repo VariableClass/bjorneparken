@@ -28,6 +28,7 @@ import com.callumveale.bjorneparken.fragments.DetailFragment;
 import com.callumveale.bjorneparken.fragments.DialogListFragment;
 import com.callumveale.bjorneparken.fragments.HelpFragment;
 import com.callumveale.bjorneparken.fragments.HomeFragment;
+import com.callumveale.bjorneparken.fragments.ImageFragment;
 import com.callumveale.bjorneparken.fragments.ListFragment;
 import com.callumveale.bjorneparken.fragments.SettingsFragment;
 import com.callumveale.bjorneparken.fragments.SocialFragment;
@@ -806,11 +807,17 @@ public class HomeActivity
             case 5: // If selection is 'Map'
                 // Retrieve title for page
                 title = mNavigationOptions[5].name;
+
+                // Retrieve new menu fragment
+                fragment = ImageFragment.newMapInstance();
                 break;
 
             case 6: // If selection is 'Restaurant Menu'
                 // Retrieve title for page
                 title = mNavigationOptions[6].name;
+
+                // Retrieve new menu fragment
+                fragment = ImageFragment.newMenuInstance();
                 break;
 
             case 7: // If selection is 'Social'
@@ -1190,7 +1197,7 @@ public class HomeActivity
             Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.content_frame);
 
             // If it is a detail fragment, return to the list which provided it
-            if ((currentFragment.getClass() == DetailFragment.class)) {
+            if (currentFragment.getClass() == DetailFragment.class) {
 
                 super.onBackPressed();
 
