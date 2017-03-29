@@ -103,7 +103,7 @@ public class NotificationIntentService extends IntentService {
         // Calculate the number of minutes remaining
         long difference = (long)((float)(startTime - System.currentTimeMillis()) / 60000);
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+        final NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
         builder.setContentTitle(event.getHeader())
                 .setOngoing(true)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -127,7 +127,6 @@ public class NotificationIntentService extends IntentService {
 
         manager.notify(notificationId, builder.build());
 
-        final NotificationCompat.Builder repeatBuilder = new NotificationCompat.Builder(this);
         final long startTimeMillis = startTime;
 
         // Start a background thread to update the time to event
@@ -145,17 +144,9 @@ public class NotificationIntentService extends IntentService {
                             if (difference > 0) {
 
                                 // Update the text and renotify
-                                repeatBuilder.setContentTitle(event.getHeader())
-                                        .setOngoing(true)
-                                        .setPriority(NotificationCompat.PRIORITY_HIGH)
-                                        .setAutoCancel(false)
-                                        .setColor(getApplication().getResources().getColor(R.color.primary))
-                                        .setSmallIcon(R.drawable.notification_icon)
-                                        .setLargeIcon(icon)
-                                        .setContentText(String.format(getString(R.string.event_warning), difference))
-                                        .setContentIntent(pendingIntent)
-                                        .setDeleteIntent(NotificationEventReceiver.getDeleteIntent(getApplicationContext(), notificationId));
-                                manager.notify(notificationId, repeatBuilder.build());
+                                builder.setVibrate(new long[] { 0, 0, 0 })
+                                        .setContentText(String.format(getString(R.string.event_warning), difference));
+                                manager.notify(notificationId, builder.build());
 
                                 try {
                                     // Wait 1 minute
@@ -167,15 +158,10 @@ public class NotificationIntentService extends IntentService {
                         }
 
                         // Update the text and renotify
-                        repeatBuilder.setContentTitle(event.getHeader())
-                                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                                .setOngoing(false)
+                        builder.setOngoing(false)
                                 .setAutoCancel(true)
-                                .setColor(getApplication().getResources().getColor(R.color.primary))
-                                .setSmallIcon(R.drawable.notification_icon)
-                                .setLargeIcon(icon)
                                 .setContentText(getString(R.string.event_now));
-                        manager.notify(notificationId, repeatBuilder.build());
+                        manager.notify(notificationId, builder.build());
                     }
                 }
         ).start();

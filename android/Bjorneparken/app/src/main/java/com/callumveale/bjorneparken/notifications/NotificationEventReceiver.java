@@ -125,6 +125,7 @@ public class NotificationEventReceiver extends WakefulBroadcastReceiver {
     public static PendingIntent getDeleteIntent(Context context, int notificationId) {
         Intent intent = new Intent(context, NotificationEventReceiver.class);
         intent.setAction(ACTION_DELETE_NOTIFICATION);
+        intent.putExtra(NotificationIntentService.NOTIFICATION_ID, notificationId);
         return PendingIntent.getBroadcast(context, notificationId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 }
