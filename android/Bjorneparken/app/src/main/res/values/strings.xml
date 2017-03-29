@@ -49,7 +49,7 @@
     <string name="event_now">Now</string>
 
     <!-- My Visit Fragment -->
-    <string name="empty_itinerary">You don\'t currently have any favourites. Go to the \'Animals\' tab to favourite some feedings!</string>
+    <string name="empty_itinerary">You don\'t currently have any favourites. Go to the \'Animals\' tab to favourite some feedings, or the \'Events\' tab to browse our events!</string>
     <string name="no_more_events">That\'s it for today!</string>
 
     <!-- Animals Fragment -->
@@ -83,7 +83,4 @@
     <string name="help_email_label">E-mail:</string>
     <string name="help_email">rugg@bjorneparken.no</string>
     <string name="email_subject">Enquiry</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

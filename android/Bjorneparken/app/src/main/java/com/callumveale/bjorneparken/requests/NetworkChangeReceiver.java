@@ -17,7 +17,7 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
 
     //region Constructors
 
-    public NetworkChangeReceiver(RequestsModule requester){
+    public NetworkChangeReceiver(RequestsModule requester) {
 
         mRequester = requester;
     }

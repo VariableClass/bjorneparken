@@ -76,7 +76,11 @@ public class UnstarSpeciesTask extends AsyncTask<Void, Void, MainSpeciesListResp
 
         if (starredSpeciesResponse != null) {
 
+            // Update list of starred species
             mActivity.saveStarredSpecies(starredSpeciesResponse);
+
+            // Retrieve new itinerary
+            mActivity.getItinerary();
 
         } else {
 

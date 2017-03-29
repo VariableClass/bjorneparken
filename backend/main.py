@@ -3099,6 +3099,22 @@ class VisitorsApi(remote.Service):
         # Remove species starred_species list
         visitor.starred_species.remove(species_to_remove)
 
+        # Retrieve all feedings of that species
+        feedings = Feeding.get_all_for_species(species_to_remove)
+
+        # For each feeding for that species
+        for feeding in feedings:
+
+            # Check visitor itinerary for the feeding
+            for event_ref in visitor.itinerary:
+
+                # If they have starred the feeding
+                if event_ref.event_id == feeding.key.id() and event_ref.location_id == feeding.key.parent().id():
+
+                    # Remove it
+                    visitor.itinerary.remove(event_ref)
+                    break
+
         # Write changes
         visitor.put()
 

@@ -1,11 +1,15 @@
 package com.callumveale.bjorneparken.requests;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 
 import com.callumveale.bjorneparken.activities.HomeActivity;
 import com.callumveale.bjorneparken.models.Species;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLConnection;
@@ -49,15 +53,25 @@ public class CheckConnectionTask extends AsyncTask<Void, Void, Boolean> {
     @Override
     protected Boolean doInBackground(Void... params) {
 
-        try{
+        if (isOnline()) {
 
-            URL root = new URL(mRootUrl);
-            URLConnection connection = root.openConnection();
-            connection.setConnectTimeout(30000);
-            connection.connect();
-            return true;
+            try {
 
-        } catch (Exception e) {
+                URL root = new URL(mRootUrl);
+                HttpURLConnection connection = (HttpURLConnection) root.openConnection();
+                connection.setConnectTimeout(5000);
+                connection.connect();
+
+                int responseCode = connection.getResponseCode();
+
+                return (responseCode > 200);
+
+            } catch (Exception e) {
+
+                return false;
+            }
+
+        } else {
 
             return false;
         }
@@ -71,6 +85,13 @@ public class CheckConnectionTask extends AsyncTask<Void, Void, Boolean> {
     }
 
     //endregion AsyncTask<Void, Void, Boolean> Overridden Methods
+
+    public boolean isOnline() {
+
+        ConnectivityManager cm = (ConnectivityManager) mActivity.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
+    }
 
     //endregion Methods
 }

@@ -545,6 +545,12 @@ public class HomeActivity
         mRequester.getStarredSpecies(mVisitorId);
     }
 
+    public void getItinerary(){
+
+        // Update itinerary
+        mRequester.getItinerary(mVisitorId);
+    }
+
     public void getParkDataFromServer(){
 
         // Fetch amenities
@@ -938,8 +944,10 @@ public class HomeActivity
         // If index was found
         if (speciesIndex != -1){
 
+            Species species = mStarredSpecies.get(speciesIndex);
+
             // Remove the species from the local starred species list
-            mStarredSpecies.remove(speciesIndex);
+            mStarredSpecies.remove(species);
 
             // If the server is available
             if (mServerAvailable) {
@@ -954,6 +962,9 @@ public class HomeActivity
 
                 // Write to file
                 mFileWriter.writeStarredSpeciesToFile(mStarredSpecies);
+
+                // Remove all feedings for the species
+                removeFeedingsForSpecies(species);
             }
 
         } else {
@@ -996,6 +1007,35 @@ public class HomeActivity
                 mFileWriter.writeStarredSpeciesToFile(mStarredSpecies);
             }
         }
+    }
+
+    private void removeFeedingsForSpecies(Species species){
+
+        // Retrieve all feedings for the species
+        ArrayList<Feeding> feedings = getFeedingsForSpecies(species);
+
+        // For each feedings
+        for (Feeding feeding : feedings){
+
+            // For each event in the itinerary
+            for (Event event : mItinerary){
+
+                // If the event is found in the itinerary
+                if (feeding.getId() == event.getId() && feeding.getLocation().getId() == event.getLocation().getId()){
+
+                    // Remove it
+                    mItinerary.remove(event);
+
+                    break;
+                }
+            }
+        }
+
+        // Update flag
+        mItineraryUpdated = true;
+
+        // Update stored itinerary
+        mFileWriter.writeItineraryToFile(mItinerary);
     }
 
     private void onEventStarred(Event eventToStar){
