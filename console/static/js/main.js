@@ -1825,6 +1825,33 @@ speciesDescriptionAddTranslation.onclick = function(){
         bjørneparkappen.adminconsole.updateTranslation(speciesDetailSpecies, 'description', speciesDescriptionInput.value, speciesDescriptionLanguageInput.value);
     }
 };
+var speciesImagePreview = document.getElementById('species_image_preview');
+var speciesImageInput = document.getElementById('species_image');
+speciesImageInput.onchange = function(){
+
+    // If file uploaded, read in file, initiating callback event
+    if (speciesImageInput.files && speciesImageInput.files[0]) {
+
+        // Retrieve uploaded file
+        var file = speciesImageInput.files[0];
+
+        // Initialise new FileReader
+        var reader = new FileReader();
+
+        // On new FileReader
+        reader.onload = function () {
+
+            // Set item image to file
+            speciesDetailSpecies.image = reader.result;
+
+            // Show image preview
+            speciesImagePreview.src = speciesDetailSpecies.image;
+            speciesImagePreview.style.display = DISPLAYED;
+        };
+
+        reader.readAsDataURL(file);
+    }
+}
 
 // Clears the Species Detail page
 bjørneparkappen.adminconsole.species.detail.clearPageData = function(){
@@ -1837,6 +1864,10 @@ bjørneparkappen.adminconsole.species.detail.clearPageData = function(){
 
     // Clear translation inputs and re-enable associated controls
     bjørneparkappen.adminconsole.clearTranslations(speciesDescriptionInput, speciesDescriptionLanguageInput, speciesDescriptionTranslations, speciesDescriptionAddTranslation);
+
+    // Clear and hide the image
+    speciesImagePreview.src = "";
+    speciesImagePreview.style.display = HIDDEN;
 
     // Clear form
     speciesDetailForm.reset();
@@ -1897,6 +1928,12 @@ bjørneparkappen.adminconsole.species.detail.loadUpdatePage = function(species){
     speciesCommonNameInput.value = bjørneparkappen.adminconsole.getTranslation(speciesDetailSpecies, 'common_name', speciesCommonNameLanguageInput.value);
     speciesLatinInput.value = speciesDetailSpecies.latin;
     speciesDescriptionInput.value = bjørneparkappen.adminconsole.getTranslation(speciesDetailSpecies, 'description', speciesDescriptionLanguageInput.value);
+
+    if (speciesDetailSpecies.image){
+
+        speciesImagePreview.src = speciesDetailSpecies.image;
+        speciesImagePreview.style.display = DISPLAYED;
+    }
 
     // Display the detail page
     bjørneparkappen.adminconsole.navigation.displayPage(speciesDetailPage);
@@ -2160,7 +2197,33 @@ amenityDescriptionAddTranslation.onclick = function(){
         bjørneparkappen.adminconsole.updateTranslation(areaDetailArea, 'description', amenityDescriptionInput.value, amenityDescriptionLanguageInput.value);
     }
 };
-var amenityImage = document.getElementById('amenity_image');
+var areaImagePreview = document.getElementById('area_image_preview');
+var areaImageInput = document.getElementById('area_image');
+areaImageInput.onchange = function(){
+
+    // If file uploaded, read in file, initiating callback event
+    if (areaImageInput.files && areaImageInput.files[0]) {
+
+        // Retrieve uploaded file
+        var file = areaImageInput.files[0];
+
+        // Initialise new FileReader
+        var reader = new FileReader();
+
+        // On new FileReader
+        reader.onload = function () {
+
+            // Set item image to file
+            areaDetailArea.image = reader.result;
+
+            // Show image preview
+            areaImagePreview.src = areaDetailArea.image;
+            areaImagePreview.style.display = DISPLAYED;
+        };
+
+        reader.readAsDataURL(file);
+    }
+}
 
 // Clears the Area Detail page
 bjørneparkappen.adminconsole.areas.detail.clearPageData = function(){
@@ -2175,6 +2238,10 @@ bjørneparkappen.adminconsole.areas.detail.clearPageData = function(){
     bjørneparkappen.adminconsole.clearTranslations(amenityDescriptionInput, amenityDescriptionLanguageInput, amenityDescriptionTranslations, amenityDescriptionAddTranslation);
 
     areaTypeSelector.disabled = false;
+
+    // Clear and hide the image
+    areaImagePreview.src = "";
+    areaImagePreview.style.display = HIDDEN;
 
     // Clear form
     areaDetailForm.reset();
@@ -2201,6 +2268,7 @@ bjørneparkappen.adminconsole.areas.detail.loadCreatePage = function(){
             if (areaTypeSelector.value == "amenity") {
 
                 areaDetailArea.amenity_type = amenityTypeInput.value;
+
                 bjørneparkappen.adminconsole.api.createAmenity(areaDetailArea);
 
             } else {
@@ -2265,6 +2333,12 @@ bjørneparkappen.adminconsole.areas.detail.loadUpdatePage = function(area){
     // Populate form with new data
     areaLabelInput.value = bjørneparkappen.adminconsole.getTranslation(area, 'label', areaLabelLanguageInput.value);
     areaVisitorDestinationInput.value = area.visitor_destination;
+
+    if (areaDetailArea.image){
+
+        areaImagePreview.src = areaDetailArea.image;
+        areaImagePreview.style.display = DISPLAYED;
+    }
 
     // Display the detail page
     bjørneparkappen.adminconsole.navigation.displayPage(areaDetailPage);
@@ -2894,6 +2968,33 @@ eventDescriptionAddTranslation.onclick = function(){
     }
 };
 var eventKeeperInput = document.getElementById('event_keeper');
+var eventImagePreview = document.getElementById('event_image_preview');
+var eventImageInput = document.getElementById('event_image');
+eventImageInput.onchange = function(){
+
+    // If file uploaded, read in file, initiating callback event
+    if (eventImageInput.files && eventImageInput.files[0]) {
+
+        // Retrieve uploaded file
+        var file = eventImageInput.files[0];
+
+        // Initialise new FileReader
+        var reader = new FileReader();
+
+        // On new FileReader
+        reader.onload = function () {
+
+            // Set item image to file
+            eventDetailEvent.image = reader.result;
+
+            // Show image preview
+            eventImagePreview.src = eventDetailEvent.image;
+            eventImagePreview.style.display = DISPLAYED;
+        };
+
+        reader.readAsDataURL(file);
+    }
+};
 var eventActiveInput = document.getElementById('event_active');
 
 // Clears the Event Detail page
@@ -2909,6 +3010,10 @@ bjørneparkappen.adminconsole.events.detail.clearPageData = function(){
 
     // Clear translation inputs and re-enable associated controls
     bjørneparkappen.adminconsole.clearTranslations(eventDescriptionInput, eventDescriptionLanguageInput, eventDescriptionTranslations, eventDescriptionAddTranslation);
+
+    // Clear and hide the image
+    eventImagePreview.src = "";
+    eventImagePreview.style.display = HIDDEN;
 
     // Clear the form
     eventDetailForm.reset();
@@ -2971,13 +3076,14 @@ bjørneparkappen.adminconsole.events.detail.loadCreatePage = function(){
 
     eventDetailConfirm.onclick = function(){
 
-        eventDetailEvent.start_time = eventStartTimeInput.value;
-        eventDetailEvent.end_time = eventEndTimeInput.value;
+        eventDetailEvent.start_time = eventStartTimeInput.value.substring(0, 2) + "." + eventStartTimeInput.value.substring(3, 5);
+        eventDetailEvent.end_time = eventEndTimeInput.value.substring(0, 2) + "." + eventEndTimeInput.value.substring(3, 5);
         eventDetailEvent.location_id = eventAreaInput.value;
         eventDetailEvent.is_active = eventActiveInput.checked;
 
         if (eventTypeSelector.value == "event"){
 
+            // Upload new area
             bjørneparkappen.adminconsole.api.createEvent(eventDetailEvent);
 
         } else {
@@ -3009,12 +3115,41 @@ bjørneparkappen.adminconsole.events.detail.loadUpdatePage = function(event){
     // Set event item
     eventDetailEvent = event;
 
+    eventDetailConfirm.onclick = function(){
+
+        eventDetailEvent.start_time = eventStartTimeInput.value.substring(0, 2) + "." + eventStartTimeInput.value.substring(3, 5);
+        eventDetailEvent.end_time = eventEndTimeInput.value.substring(0, 2) + "." + eventEndTimeInput.value.substring(3, 5);
+        eventDetailEvent.is_active = eventActiveInput.checked;
+
+        if (bjørneparkappen.adminconsole.events.detail.validate()) {
+
+            if (eventTypeSelector.value == "event"){
+
+                bjørneparkappen.adminconsole.api.updateEvent(eventDetailEvent);
+
+            } else {
+
+                if (eventKeeperInput.value != eventDetailEvent.keeper.id){
+
+                    eventDetailEvent.keeper_id = eventKeeperInput.value;
+                }
+
+                bjørneparkappen.adminconsole.api.updateFeeding(eventDetailEvent);
+            }
+        }
+    };
+
     // Populate page with new data
     eventLabelInput.value = bjørneparkappen.adminconsole.getTranslation(eventDetailEvent, 'label', eventLabelLanguageInput.value);
-    eventStartTimeInput.value = eventDetailEvent.start_time;
-    eventEndTimeInput.value = eventDetailEvent.end_time;
-    eventAreaInput.value = eventDetailEvent.location.id;
-    eventDescriptionInput.value = bjørneparkappen.adminconsole.getTranslation(eventDetailEvent, 'description', eventLabelLanguageInput.value);
+    eventStartTimeInput.value = eventDetailEvent.start_time.substring(0, 2) + ":" + eventDetailEvent.start_time.substring(3, 5);
+    eventEndTimeInput.value = eventDetailEvent.end_time.substring(0, 2) + ":" + eventDetailEvent.end_time.substring(3, 5);
+    eventDescriptionInput.value = bjørneparkappen.adminconsole.getTranslation(eventDetailEvent, 'description', eventDescriptionLanguageInput.value);
+
+    if (eventDetailEvent.image){
+
+        eventImagePreview.src = eventDetailEvent.image;
+        eventImagePreview.style.display = DISPLAYED;
+    }
 
     // If item is a feeding
     if (eventDetailEvent.keeper){
@@ -3050,28 +3185,8 @@ bjørneparkappen.adminconsole.events.detail.loadUpdatePage = function(event){
         }
     }
 
+    eventAreaInput.value = eventDetailEvent.location.id;
     eventActiveInput.checked = eventDetailEvent.is_active;
-
-    eventDetailConfirm.onclick = function(){
-
-        eventDetailEvent.start_time = eventStartTimeInput.value;
-        eventDetailEvent.end_time = eventEndTimeInput.value;
-        eventDetailEvent.is_active = eventActiveInput.checked;
-
-        if (bjørneparkappen.adminconsole.events.detail.validate()) {
-
-            if (eventTypeSelector.value == "event"){
-
-                bjørneparkappen.adminconsole.api.updateEvent(eventDetailEvent);
-
-            } else {
-
-                eventDetailEvent.keeper_id = eventKeeperInput.value;
-
-                bjørneparkappen.adminconsole.api.updateFeeding(eventDetailEvent);
-            }
-        }
-    };
 
     // Display the detail page
     bjørneparkappen.adminconsole.navigation.displayPage(eventDetailPage);

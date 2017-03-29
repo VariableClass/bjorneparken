@@ -9,14 +9,16 @@ class Enclosure(Area):
     animals = ndb.StructuredProperty(Animal.AnimalLookup, repeated=True)
 
     # Methods
-    def get_species():
+    def get_species(self):
 
         species = []
 
         # Retrieve the species of each animal in the enclosure and append
         # it to a return list
-        for animal in animals:
-            species.append(animal.species)
+        for animal_reference in self.animals:
+
+            animal_species = ndb.Key(Species, animal_reference.species_id).get()
+            species.append(animal_species)
 
         return species
 

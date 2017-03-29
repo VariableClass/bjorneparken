@@ -1,5 +1,5 @@
 import os
-import lib.cloudstorage as gcs
+import cloudstorage as gcs
 from google.appengine.api import app_identity
 from google.appengine.api import images
 from google.appengine.ext import blobstore
