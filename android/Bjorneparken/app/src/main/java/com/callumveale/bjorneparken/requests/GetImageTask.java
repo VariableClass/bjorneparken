@@ -52,7 +52,7 @@ public class GetImageTask extends AsyncTask<Void, Void, Void> {
 
         try {
 
-            URL imageUrl = new URL(mItem.getImageUrl() + "=s128");
+            URL imageUrl = new URL(mItem.getImageUrl() + "=s128-pp");
 
             InputStream inputStream = imageUrl.openStream();
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
