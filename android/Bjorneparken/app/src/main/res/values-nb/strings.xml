@@ -67,4 +67,13 @@
 
     <!-- Settings Fragment -->
     <string name="notifications">Notifikasjoner</string>
+
+    <!-- Help Fragment -->
+    <string name="help_about_label">Om oss</string>
+    <string name="help_about">I Bjørneparken oppstår det magiske møter mellom dyr og mennesker hver neste dag, vi har stor variasjon av norske rovdyr og ville dyr, samt kjente husdyr fra bondegården. I tillegg åpnet vi Norges største krokodilleutstilling med 30 krokodiller, slanger og andre eksotiske dyr i mars 2016. I Bjørneparken trives både dyr og mennesker. Vi har store naturlige innhegninger, tilrettelagte fôringsarenaer med fôring hver time i åpningstiden. Her kommer du tett på dyrene, og lærer mer om de av engasjerte dyrepassere. I tillegg har vi mange spennende aktiviteter, hinderløyper, Zipline, utendørs- og innendørs lekeland, samt flere gode serveringssteder. Bjørneparken er full av uforglemmelige opplevelser for hele familien. Velkommen til Bjørneparken.</string>
+    <string name="help_emergency_label">Hva å gjøre i nødstilfeller</string>
+    <string name="help_emergency">I tilfelle du eller et medlem av partiet blir skadet, ta kontakt med et medlem av park ansatte så snart som mulig.</string>
+    <string name="help_contact_details">Kontaktinformasjon</string>
+    <string name="help_tel_label">Telefon:</string>
+    <string name="help_email_label">E-post:</string>
 </resources>

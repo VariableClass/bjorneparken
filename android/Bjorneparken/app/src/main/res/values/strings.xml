@@ -70,4 +70,15 @@
 
     <!-- Settings Fragment -->
     <string name="notifications">Notifications</string>
+
+    <!-- Help Fragment -->
+    <string name="help_about_label">About Us</string>
+    <string name="help_about">In Bjørneparken our presenters will give free animal talks and escort you to animal encounters, every hour, every day. The animals include a variety of Norwegian predators and wild animals, as well as familiar domestic farm animals. In March of 2016, we opened the largest crocodile exhibition in Norway, with 30 crocodiles, snakes and tortoises. Our animals are housed in large natural enclosures. You can watch the animals up close and learn about them from our dedicated presenters. We have loads for the kids to explore and do in our play areas, like obstacle courses, zip-line, outdoor and indoor playgrounds, and several restaurants. Bjørneparken is full of unforgettable experiences for the whole family. Welcome to Bjørneparken!</string>
+    <string name="help_emergency_label">What to Do in Case of Emergency</string>
+    <string name="help_emergency">In the event that you or a member of your party becomes injured, contact a member of park staff as soon as possible.</string>
+    <string name="help_contact_details">Contact Details</string>
+    <string name="help_tel_label">Telephone:</string>
+    <string name="help_tel">+47 32 05 35 10</string>
+    <string name="help_email_label">E-mail:</string>
+    <string name="help_email">rugg@bjorneparken.no</string>
 </resources>

@@ -26,6 +26,7 @@ import com.callumveale.bjorneparken.file.FileWriter;
 import com.callumveale.bjorneparken.file.ResponseConverter;
 import com.callumveale.bjorneparken.fragments.DetailFragment;
 import com.callumveale.bjorneparken.fragments.DialogListFragment;
+import com.callumveale.bjorneparken.fragments.HelpFragment;
 import com.callumveale.bjorneparken.fragments.HomeFragment;
 import com.callumveale.bjorneparken.fragments.ListFragment;
 import com.callumveale.bjorneparken.fragments.SettingsFragment;
@@ -831,6 +832,9 @@ public class HomeActivity
             case 9: // If selection is 'Help'
                 // Retrieve title for page
                 title = mNavigationOptions[9].name;
+
+                // Retrieve new help fragment
+                fragment = HelpFragment.newInstance();
                 break;
 
             default:
