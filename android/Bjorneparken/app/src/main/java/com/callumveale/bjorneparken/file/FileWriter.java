@@ -10,19 +10,24 @@ import com.callumveale.bjorneparken.models.Event;
 import com.callumveale.bjorneparken.models.Feeding;
 import com.callumveale.bjorneparken.models.IModel;
 import com.callumveale.bjorneparken.models.Species;
+import com.callumveale.bjorneparken.notifications.Notification;
 import com.google.api.client.json.GenericJson;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.DateTime;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.ArrayList;
 
 import none.bjorneparkappen_api.model.MainAreaListResponse;
@@ -43,6 +48,7 @@ public class FileWriter {
     private static final String EVENTS_FILE = "events";
     private static final String FEEDINGS_FILE = "feedings";
     private static final String ITINERARY_FILE = "itinerary";
+    private static final String NOTIFICATIONS_FILE = "notifications";
     private static final String SPECIES_FILE = "species";
     private static final String STARRED_SPECIES_FILE = "starred_species";
     private static final String VERSION_FILE = "version";
@@ -565,6 +571,69 @@ public class FileWriter {
     }
 
     //endregion Images
+
+    //region Notifications
+
+    public void writeNotificationsToFile(ArrayList<Notification> notifications){
+
+        try {
+
+            OutputStream outputStream = mContext.openFileOutput(NOTIFICATIONS_FILE, Context.MODE_PRIVATE);
+            BufferedOutputStream bos = new BufferedOutputStream(outputStream);
+
+            // Write out each notification to notifications file
+            for (Notification notification : notifications){
+
+                String line = notification.toString() + "\n";
+                bos.write(line.getBytes());
+            }
+
+            bos.flush();
+            bos.close();
+
+            outputStream.close();
+
+        } catch (IOException e){
+
+            e.printStackTrace();
+        }
+
+    }
+
+    public ArrayList<Notification> getNotificationsFromFile(){
+
+        ArrayList<Notification> notifications = new ArrayList<>();
+
+        try {
+
+            // Read in all notifications from the notifications file
+            InputStream inputStream = mContext.openFileInput(NOTIFICATIONS_FILE);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+
+            String line = null;
+
+            while((line = reader.readLine()) != null){
+
+                String[] tokens = line.split(",");
+
+                if (tokens.length > 0) {
+
+                    Notification notification = new Notification(Integer.parseInt(tokens[0]), Long.parseLong(tokens[1]), Long.parseLong(tokens[2]), Long.parseLong(tokens[3]));
+                    notifications.add(notification);
+                }
+            }
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        }
+
+
+        return notifications;
+    }
+
+
+    //endregion Notifications
 
     private void writeJsonToFile(GenericJson jsonToWrite, String filename){
 

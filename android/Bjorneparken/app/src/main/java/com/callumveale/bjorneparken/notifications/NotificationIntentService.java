@@ -16,6 +16,8 @@ import com.callumveale.bjorneparken.activities.HomeActivity;
 import com.callumveale.bjorneparken.file.FileWriter;
 import com.callumveale.bjorneparken.models.Event;
 
+import java.util.ArrayList;
+
 /**
  * Created by callum on 05/03/2017.
  */
@@ -24,18 +26,20 @@ public class NotificationIntentService extends IntentService {
     private static final String ACTION_START = "ACTION_START";
     private static final String ACTION_DELETE = "ACTION_DELETE";
     public static final String NOTIFICATION_ID = "NOTIFICATION_ID";
-    public static final String EVENT = "EVENT";
+    public static final String EVENT_ID = "EVENT_ID";
+    public static final String AREA_ID = "AREA_ID";
     public static final String START_TIME = "START_TIME";
 
     public NotificationIntentService() {
         super(NotificationIntentService.class.getSimpleName());
     }
 
-    public static Intent createIntentStartNotificationService(Context context, int notificationId, Event event, long startTime) {
+    public static Intent createIntentStartNotificationService(Context context, int notificationId, long areaId, long eventId, long startTime) {
         Intent intent = new Intent(context, NotificationIntentService.class);
         Bundle args = new Bundle();
         args.putInt(NOTIFICATION_ID, notificationId);
-        args.putParcelable(EVENT, event);
+        args.putLong(AREA_ID, areaId);
+        args.putLong(EVENT_ID, eventId);
         args.putLong(START_TIME, startTime);
         intent.putExtras(args);
         intent.setAction(ACTION_START);
@@ -57,7 +61,7 @@ public class NotificationIntentService extends IntentService {
         try {
             String action = intent.getAction();
             if (ACTION_START.equals(action)) {
-                processStartNotification((int) intent.getExtras().get(NOTIFICATION_ID), (Event) intent.getExtras().get(EVENT), intent.getExtras().getLong(START_TIME));
+                processStartNotification((int) intent.getExtras().get(NOTIFICATION_ID), (long) intent.getExtras().get(AREA_ID), (long) intent.getExtras().get(EVENT_ID), intent.getExtras().getLong(START_TIME));
             }
             if (ACTION_DELETE.equals(action)) {
                 processDeleteNotification(intent);
@@ -78,7 +82,9 @@ public class NotificationIntentService extends IntentService {
 
     }
 
-    private void processStartNotification(final int notificationId, Event event, long startTime) {
+    private void processStartNotification(final int notificationId, long areaId, long eventId, long startTime) {
+
+        final Event event = getEventFromIds(areaId, eventId);
 
         final Bitmap icon;
 
@@ -122,7 +128,6 @@ public class NotificationIntentService extends IntentService {
         manager.notify(notificationId, builder.build());
 
         final NotificationCompat.Builder repeatBuilder = new NotificationCompat.Builder(this);
-        final Event repeatEvent = event;
         final long startTimeMillis = startTime;
 
         // Start a background thread to update the time to event
@@ -140,7 +145,7 @@ public class NotificationIntentService extends IntentService {
                             if (difference > 0) {
 
                                 // Update the text and renotify
-                                repeatBuilder.setContentTitle(repeatEvent.getHeader())
+                                repeatBuilder.setContentTitle(event.getHeader())
                                         .setOngoing(true)
                                         .setPriority(NotificationCompat.PRIORITY_HIGH)
                                         .setAutoCancel(false)
@@ -162,7 +167,7 @@ public class NotificationIntentService extends IntentService {
                         }
 
                         // Update the text and renotify
-                        repeatBuilder.setContentTitle(repeatEvent.getHeader())
+                        repeatBuilder.setContentTitle(event.getHeader())
                                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                                 .setOngoing(false)
                                 .setAutoCancel(true)
@@ -174,5 +179,22 @@ public class NotificationIntentService extends IntentService {
                     }
                 }
         ).start();
+    }
+
+    private Event getEventFromIds(long areaId, long eventId){
+
+        // Retrieve itinerary from file
+        FileWriter fileWriter = new FileWriter(getApplicationContext());
+        ArrayList<Event> itinerary = fileWriter.getItineraryFromFile();
+
+        for (Event event : itinerary){
+
+            if ((event.getLocation().getId() == areaId) && (event.getId() == eventId)){
+
+                return event;
+            }
+        }
+
+        return null;
     }
 }

@@ -25,9 +25,9 @@ public final class NotificationServiceStarterReceiver extends BroadcastReceiver 
         ArrayList<Event> itinerary = fileWriter.getItineraryFromFile();
         Configuration config = fileWriter.getConfigFromFile();
 
-        // TODO Retrieve visitor start and end date from file
-        DateTime visitStart = new DateTime(new Date()); //fileWriter.getVisitStartFromFile();
-        DateTime visitEnd = new DateTime(new Date()); //fileWriter.getVisitEndFromFile();
+        // Retrieve visitor start and end date from file
+        DateTime visitStart = fileWriter.getVisitStartDateFromFile();
+        DateTime visitEnd = fileWriter.getVisitEndDateFromFile();
 
         // If notifications enabled
         if (Boolean.valueOf(config.getProperty(Configuration.NOTIFICATIONS_ENABLED))) {
