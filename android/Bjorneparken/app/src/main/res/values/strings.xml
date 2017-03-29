@@ -81,4 +81,5 @@
     <string name="help_tel">+47 32 05 35 10</string>
     <string name="help_email_label">E-mail:</string>
     <string name="help_email">rugg@bjorneparken.no</string>
+    <string name="email_subject">Enquiry</string>
 </resources>

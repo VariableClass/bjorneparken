@@ -32,6 +32,7 @@
             android:textSize="22sp"/>
 
         <RelativeLayout
+            android:id="@+id/help_tel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp">
@@ -56,6 +57,7 @@
         </RelativeLayout>
 
         <RelativeLayout
+            android:id="@+id/help_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="30dp">
