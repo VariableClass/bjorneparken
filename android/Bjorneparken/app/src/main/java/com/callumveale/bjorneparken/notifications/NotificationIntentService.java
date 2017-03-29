@@ -13,6 +13,7 @@ import android.support.v4.content.WakefulBroadcastReceiver;
 
 import com.callumveale.bjorneparken.R;
 import com.callumveale.bjorneparken.activities.HomeActivity;
+import com.callumveale.bjorneparken.file.FileWriter;
 import com.callumveale.bjorneparken.models.Event;
 
 /**
@@ -79,7 +80,19 @@ public class NotificationIntentService extends IntentService {
 
     private void processStartNotification(final int notificationId, Event event, long startTime) {
 
-        final Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.logo_square);
+        final Bitmap icon;
+
+        FileWriter fileWriter = new FileWriter(this);
+
+        if (event.getImageUrl() != null){
+
+            fileWriter.getImageFromFile(event);
+            icon = event.getImage();
+
+        } else {
+
+            icon = BitmapFactory.decodeResource(getResources(), R.drawable.logo_square);
+        }
 
         // Calculate the number of minutes remaining
         long difference = (long)((float)(startTime - System.currentTimeMillis()) / 60000);

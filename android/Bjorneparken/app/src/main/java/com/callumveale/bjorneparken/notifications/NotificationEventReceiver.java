@@ -38,8 +38,12 @@ public class NotificationEventReceiver extends WakefulBroadcastReceiver {
         // Calculate the days between the two calendars
         long daysBetween = TimeUnit.MILLISECONDS.toDays(Math.abs(visitEnd.getTimeInMillis() - visitStart.getTimeInMillis()));
 
+        int dayCount = 1;
+
         // For each day in between (runs once if 0 days difference [same day])
         for (int i = 0; i == daysBetween; i++){
+
+            int eventCount = 0;
 
             // For each event
             for (Event event : events){
@@ -54,13 +58,17 @@ public class NotificationEventReceiver extends WakefulBroadcastReceiver {
                     Calendar startTime = event.getEventStartCalendar(visitStart, i);
 
                     // Retrieve an intent for the event at it's start time
-                    PendingIntent alarmIntent = getStartPendingIntent(context, i, event, startTime);
+                    PendingIntent alarmIntent = getStartPendingIntent(context, dayCount + eventCount, event, startTime);
 
                     // Set an alarm for the specified number of minutes prior to the event
                     startTime.add(Calendar.MINUTE, -WARNING_TIME_MINUTES);
                     alarmManager.set(AlarmManager.RTC_WAKEUP, startTime.getTimeInMillis(), alarmIntent);
                 }
+
+                eventCount++;
             }
+
+            dayCount++;
         }
     }
 
