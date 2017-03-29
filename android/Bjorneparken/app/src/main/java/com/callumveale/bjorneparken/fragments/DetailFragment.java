@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.callumveale.bjorneparken.R;
 import com.callumveale.bjorneparken.models.IModel;
+import com.callumveale.bjorneparken.models.Species;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -195,9 +196,22 @@ public class DetailFragment extends Fragment implements DialogConfirmFragment.On
 
                     } else {
 
-                        DialogConfirmFragment confirmDialog = DialogConfirmFragment.newInstance();
-                        confirmDialog.setUnstarDetailListener(fragment);
-                        confirmDialog.show(getActivity().getSupportFragmentManager(), "DialogConfirmFragment");
+                        // If item is a Species, show confirm dialog
+                        if (mItem.getClass() == Species.class) {
+
+                            DialogConfirmFragment confirmDialog = DialogConfirmFragment.newInstance();
+                            confirmDialog.setUnstarDetailListener(fragment);
+                            confirmDialog.show(getActivity().getSupportFragmentManager(), "DialogConfirmFragment");
+
+                        } else {
+
+                            // Set image to starred
+                            star.setImageResource(R.drawable.star_unselected);
+                            star.setContentDescription(getString(R.string.unstarred));
+
+                            // Perform star action
+                            mListener.onItemStarred(mItem);
+                        }
                     }
                 }
             }
