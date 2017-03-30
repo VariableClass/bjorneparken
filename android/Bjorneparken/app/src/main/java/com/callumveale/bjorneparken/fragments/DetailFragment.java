@@ -192,7 +192,7 @@ public class DetailFragment extends Fragment implements DialogConfirmFragment.On
                         star.setContentDescription(getString(R.string.starred));
 
                         // Perform star action
-                        mListener.onItemStarred(mItem);
+                        mListener.onItemStarred(mItem, fragment);
 
                     } else {
 
@@ -210,7 +210,7 @@ public class DetailFragment extends Fragment implements DialogConfirmFragment.On
                             star.setContentDescription(getString(R.string.unstarred));
 
                             // Perform star action
-                            mListener.onItemStarred(mItem);
+                            mListener.onItemStarred(mItem, fragment);
                         }
                     }
                 }
@@ -221,16 +221,24 @@ public class DetailFragment extends Fragment implements DialogConfirmFragment.On
     }
 
     @Override
-    public void unstar(){
+    public void unstar(boolean visualUnstarOnly){
+
+        visualUnstar();
+
+        if (!visualUnstarOnly) {
+
+            // Perform unstar action
+            mListener.onItemStarred(mItem);
+        }
+    }
+
+    private void visualUnstar(){
 
         ImageView star = (ImageView) getView().findViewById(R.id.detail_star);
 
         // Set image to unstarred
         star.setImageResource(R.drawable.star_unselected);
         star.setContentDescription(getString(R.string.unstarred));
-
-        // Perform unstar action
-        mListener.onItemStarred(mItem);
     }
 
     @Override
@@ -259,6 +267,10 @@ public class DetailFragment extends Fragment implements DialogConfirmFragment.On
     public interface OnItemStarredListener {
 
         void onItemStarred(Parcelable parcelable);
+
+        void onItemStarred(Parcelable parcelable, DialogConfirmFragment.OnUnstarDetailListener listener);
+
+        void onItemStarred(Parcelable parcelable, DialogConfirmFragment.OnUnstarListItemListener listener, int position);
     }
 
     //endregion Interfaces

@@ -126,7 +126,7 @@ public class SpeciesRecyclerViewAdapter extends RecyclerViewAdapter implements D
                     if (mActivity.isStarred(species)) {
 
                         // Show confirmation dialog
-                        DialogConfirmFragment confirmDialog = DialogConfirmFragment.newInstance(position);
+                        DialogConfirmFragment confirmDialog = DialogConfirmFragment.newInstance(R.string.confirm_unstar_species_title, R.string.confirm_unstar_species_message, position);
                         confirmDialog.setUnstarListItemListener(adapter);
                         confirmDialog.show(mActivity.getSupportFragmentManager(), "DialogConfirmFragment");
 
@@ -151,18 +151,25 @@ public class SpeciesRecyclerViewAdapter extends RecyclerViewAdapter implements D
     }
 
     @Override
-    public void unstarItem(int position) {
-
+    public void unstarItem(int position, boolean visualUnstarOnly) {
 
         // Retrieve view holder
         ListItemViewHolder holder = (ListItemViewHolder) mRecyclerView.findViewHolderForAdapterPosition(position);
 
+        visualUnstarItem(holder);
+
+        if (!visualUnstarOnly) {
+
+            // Perform unstar action
+            mItemStarredListener.onItemStarred(holder.mItem);
+        }
+    }
+
+    private void visualUnstarItem(ListItemViewHolder holder){
+
         // Set image to unstarred
         holder.mStarView.setImageResource(R.drawable.star_unselected);
         holder.mStarView.setContentDescription(mActivity.getString(R.string.unstarred));
-
-        // Perform unstar action
-        mItemStarredListener.onItemStarred(holder.mItem);
     }
 
     //endregion RecyclerViewAdapter Overridden Methods

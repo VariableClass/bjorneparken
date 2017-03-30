@@ -25,6 +25,7 @@ import com.callumveale.bjorneparken.config.Configuration;
 import com.callumveale.bjorneparken.file.FileWriter;
 import com.callumveale.bjorneparken.file.ResponseConverter;
 import com.callumveale.bjorneparken.fragments.DetailFragment;
+import com.callumveale.bjorneparken.fragments.DialogConfirmFragment;
 import com.callumveale.bjorneparken.fragments.DialogListFragment;
 import com.callumveale.bjorneparken.fragments.HelpFragment;
 import com.callumveale.bjorneparken.fragments.HomeFragment;
@@ -912,7 +913,12 @@ public class HomeActivity
     }
 
     @Override
-    public void onItemStarred(Parcelable parcelable) {
+    public void onItemStarred(Parcelable parcelable){
+
+        onItemStarred(parcelable, null, null, -1);
+    }
+
+    private void onItemStarred(Parcelable parcelable, DialogConfirmFragment.OnUnstarDetailListener unstarDetailListener, DialogConfirmFragment.OnUnstarListItemListener unstarListItemListener, int position) {
 
         // If star action was against a species
         if (parcelable.getClass() == Species.class){
@@ -923,8 +929,20 @@ public class HomeActivity
         } else if (parcelable.getClass() == Event.class || parcelable.getClass().getSuperclass() == Event.class) {
 
             // Perform event starred action
-            onEventStarred((Event) parcelable);
+            onEventStarred((Event) parcelable, unstarDetailListener, unstarListItemListener, position);
         }
+    }
+
+    @Override
+    public void onItemStarred(Parcelable parcelable, DialogConfirmFragment.OnUnstarListItemListener listener, int position){
+
+        onItemStarred(parcelable, null, listener, position);
+    }
+
+    @Override
+    public void onItemStarred(Parcelable parcelable, DialogConfirmFragment.OnUnstarDetailListener listener){
+
+        onItemStarred(parcelable, listener, null, -1);
     }
 
     private void onSpeciesStarred(Species speciesToStar){
@@ -1038,7 +1056,7 @@ public class HomeActivity
         mFileWriter.writeItineraryToFile(mItinerary);
     }
 
-    private void onEventStarred(Event eventToStar){
+    private void onEventStarred(Event eventToStar, DialogConfirmFragment.OnUnstarDetailListener unstarDetailListener, DialogConfirmFragment.OnUnstarListItemListener unstarListItemListener, int position){
 
         int eventIndex = -1;
         boolean conflict = false;
@@ -1052,14 +1070,12 @@ public class HomeActivity
 
                     eventIndex = mItinerary.indexOf(event);
                     break;
-
-                } else {
-
-                    if (event.conflictsWith(eventToStar)){
-
-                        conflict = true;
-                    }
                 }
+            }
+
+            // Check if event conflicts
+            if (event.conflictsWith(eventToStar)){
+                conflict = true;
             }
         }
 
@@ -1108,7 +1124,21 @@ public class HomeActivity
 
             } else {
 
-                // TODO Perform event conflict action
+                DialogConfirmFragment confirmDialog = confirmDialog = DialogConfirmFragment.newInstance(R.string.event_conflict_title, R.string.event_conflict_message, true);
+
+                if (unstarDetailListener != null){
+
+                    // Show confirmation dialog
+                    confirmDialog.setUnstarDetailListener(unstarDetailListener);
+                }
+                if (unstarListItemListener != null){
+
+                    // Show confirmation dialog
+                    confirmDialog = DialogConfirmFragment.newInstance(R.string.event_conflict_title, R.string.event_conflict_message, position, true);
+                    confirmDialog.setUnstarListItemListener(unstarListItemListener);
+                }
+
+                confirmDialog.show(getSupportFragmentManager(), "DialogConfirmFragment");
             }
 
         }

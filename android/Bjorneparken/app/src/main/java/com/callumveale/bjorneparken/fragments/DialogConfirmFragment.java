@@ -15,13 +15,19 @@ public class DialogConfirmFragment extends DialogFragment {
 
     //region Constants
 
+    public static final String ARG_TITLE = "title";
+    public static final String ARG_MESSAGE = "message";
     public static final String ARG_POSITION = "position";
+    public static final String ARG_VISUAL_UNSTAR = "visual-unstar";
 
     //endregion Constants
 
     //region Properties
 
     private int mPosition;
+    private int mTitle;
+    private int mMessage;
+    private boolean mVisualUnstarOnly;
     private OnUnstarListItemListener mListItemListener;
     private OnUnstarDetailListener mDetailListener;
 
@@ -40,11 +46,48 @@ public class DialogConfirmFragment extends DialogFragment {
         return new DialogConfirmFragment();
     }
 
-    public static DialogConfirmFragment newInstance(int position) {
+    public static DialogConfirmFragment newInstance(int titleResourceId, int messageResourceId, int position, boolean visualUnstarOnly) {
 
         DialogConfirmFragment fragment = new DialogConfirmFragment();
         Bundle args = new Bundle();
+        args.putInt(ARG_TITLE, titleResourceId);
+        args.putInt(ARG_MESSAGE, messageResourceId);
         args.putInt(ARG_POSITION, position);
+        args.putBoolean(ARG_VISUAL_UNSTAR, visualUnstarOnly);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static DialogConfirmFragment newInstance(int titleResourceId, int messageResourceId, int position) {
+
+        DialogConfirmFragment fragment = new DialogConfirmFragment();
+        Bundle args = new Bundle();
+        args.putInt(ARG_TITLE, titleResourceId);
+        args.putInt(ARG_MESSAGE, messageResourceId);
+        args.putInt(ARG_POSITION, position);
+        args.putBoolean(ARG_VISUAL_UNSTAR, false);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static DialogConfirmFragment newInstance(int titleResourceId, int messageResourceId, boolean visualUnstarOnly) {
+
+        DialogConfirmFragment fragment = new DialogConfirmFragment();
+        Bundle args = new Bundle();
+        args.putInt(ARG_TITLE, titleResourceId);
+        args.putInt(ARG_MESSAGE, messageResourceId);
+        args.putBoolean(ARG_VISUAL_UNSTAR, visualUnstarOnly);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static DialogConfirmFragment newInstance(int titleResourceId, int messageResourceId) {
+
+        DialogConfirmFragment fragment = new DialogConfirmFragment();
+        Bundle args = new Bundle();
+        args.putInt(ARG_TITLE, titleResourceId);
+        args.putInt(ARG_MESSAGE, messageResourceId);
+        args.putBoolean(ARG_VISUAL_UNSTAR, false);
         fragment.setArguments(args);
         return fragment;
     }
@@ -56,6 +99,9 @@ public class DialogConfirmFragment extends DialogFragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mPosition = getArguments().getInt(ARG_POSITION);
+            mTitle = getArguments().getInt(ARG_TITLE);
+            mMessage = getArguments().getInt(ARG_MESSAGE);
+            mVisualUnstarOnly = getArguments().getBoolean(ARG_VISUAL_UNSTAR);
         }
     }
 
@@ -63,30 +109,39 @@ public class DialogConfirmFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(R.string.confirm_unstar_species_title)
-                .setMessage(R.string.confirm_unstar_species_message)
-                .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener(){
+
+        builder.setTitle(mTitle)
+                .setMessage(mMessage)
+                .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialogInterface, int i){
+                    public void onClick(DialogInterface dialogInterface, int i) {
                         if (mListItemListener != null) {
 
-                            mListItemListener.unstarItem(mPosition);
+                            mListItemListener.unstarItem(mPosition, mVisualUnstarOnly);
                         }
 
                         if (mDetailListener != null) {
 
-                            mDetailListener.unstar();
+                            mDetailListener.unstar(mVisualUnstarOnly);
                         }
                         dialogInterface.dismiss();
                     }
-                })
-                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.cancel();
-                    }
-                })
-                .create();
+                });
+
+        // If performing a superficial unstar, do not allow cancel
+        if (!mVisualUnstarOnly) {
+
+            builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.cancel();
+                }
+            });
+
+        }
+
+        // Build message
+        builder.create();
 
         return builder.show();
     }
@@ -118,12 +173,12 @@ public class DialogConfirmFragment extends DialogFragment {
 
     public interface OnUnstarListItemListener {
 
-        void unstarItem(int position);
+        void unstarItem(int position, boolean visualUnstarOnly);
     }
 
     public interface OnUnstarDetailListener {
 
-        void unstar();
+        void unstar(boolean visualUnstarOnly);
     }
 
     //endregion Interfaces

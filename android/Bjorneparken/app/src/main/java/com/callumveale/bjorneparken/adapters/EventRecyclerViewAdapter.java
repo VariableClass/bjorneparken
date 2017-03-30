@@ -9,6 +9,7 @@ import android.view.View;
 import com.callumveale.bjorneparken.R;
 import com.callumveale.bjorneparken.activities.HomeActivity;
 import com.callumveale.bjorneparken.fragments.DetailFragment;
+import com.callumveale.bjorneparken.fragments.DialogConfirmFragment;
 import com.callumveale.bjorneparken.fragments.ListFragment.OnListItemSelectionListener;
 import com.callumveale.bjorneparken.models.Event;
 
@@ -18,7 +19,7 @@ import java.util.ArrayList;
  * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
  * specified {@link OnListFragmentInteractionListener}.
  */
-public class EventRecyclerViewAdapter extends RecyclerViewAdapter {
+public class EventRecyclerViewAdapter extends RecyclerViewAdapter implements DialogConfirmFragment.OnUnstarListItemListener {
 
     //region Constants
 
@@ -110,6 +111,8 @@ public class EventRecyclerViewAdapter extends RecyclerViewAdapter {
             }
         });
 
+        final DialogConfirmFragment.OnUnstarListItemListener listener = this;
+
         // Add starred listener
         holder.mStarView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -129,7 +132,8 @@ public class EventRecyclerViewAdapter extends RecyclerViewAdapter {
                         holder.mStarView.setImageResource(R.drawable.star_selected);
                         holder.mStarView.setContentDescription(mActivity.getString(R.string.starred));
                     }
-                    mItemStarredListener.onItemStarred(holder.mItem);
+
+                    mItemStarredListener.onItemStarred(holder.mItem, listener, position);
                 }
             }
         });
@@ -143,6 +147,28 @@ public class EventRecyclerViewAdapter extends RecyclerViewAdapter {
     public String getEmptyText(Activity activity){
 
         return activity.getString(EMPTY_TEXT_RESOURCE);
+    }
+
+    @Override
+    public void unstarItem(int position, boolean visualUnstarOnly) {
+
+        // Retrieve view holder
+        ListItemViewHolder holder = (ListItemViewHolder) mRecyclerView.findViewHolderForAdapterPosition(position);
+
+        visualUnstarItem(holder);
+
+        if (!visualUnstarOnly) {
+
+            // Perform unstar action
+            mItemStarredListener.onItemStarred(holder.mItem);
+        }
+    }
+
+    private void visualUnstarItem(ListItemViewHolder holder){
+
+        // Set image to unstarred
+        holder.mStarView.setImageResource(R.drawable.star_unselected);
+        holder.mStarView.setContentDescription(mActivity.getString(R.string.unstarred));
     }
 
     //endregion IListAdapter Overridden Methods
