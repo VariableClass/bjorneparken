@@ -110,16 +110,18 @@ public class ListFragment extends Fragment {
             // Retrieve adapter class name
             Class className = Class.forName("com.callumveale.bjorneparken.adapters." + mDataType + "RecyclerViewAdapter");
 
+            Context activity = getActivity();
+
             // If class is starrable
             if (isStarrable) {
 
                 // Create a new starrable view adapter
-                viewAdapter = className.getConstructor(HomeActivity.class, ArrayList.class, OnListItemSelectionListener.class, DetailFragment.OnItemStarredListener.class).newInstance(getActivity(), mList, mSelectedListener, mStarredListener);
+                viewAdapter = className.getConstructor(HomeActivity.class, ArrayList.class, OnListItemSelectionListener.class, DetailFragment.OnItemStarredListener.class).newInstance(activity, mList, mSelectedListener, mStarredListener);
 
             } else {
 
                 // Create a new non-starrable view adapter
-                viewAdapter = className.getConstructor(ArrayList.class, OnListItemSelectionListener.class).newInstance(mList, mSelectedListener);
+                viewAdapter = className.getConstructor(HomeActivity.class, ArrayList.class, OnListItemSelectionListener.class).newInstance(activity, mList, mSelectedListener);
             }
 
         } catch (Exception e) {

@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.callumveale.bjorneparken.R;
+import com.callumveale.bjorneparken.models.Amenity;
 import com.callumveale.bjorneparken.models.IModel;
 import com.callumveale.bjorneparken.models.Species;
 
@@ -171,6 +172,14 @@ public class DetailFragment extends Fragment implements DialogConfirmFragment.On
             TextView mSubcaptionView = (TextView) view.findViewById(R.id.detail_subcaption);
             mSubcaptionView.setText(item.getSubcaption());
             mSubcaptionView.setVisibility(View.VISIBLE);
+        }
+
+        if (mItem.getClass() == Amenity.class){
+
+            // Retrieve, set and show subheader text view
+            TextView mSubheaderView = (TextView) view.findViewById(R.id.detail_subheader);
+            mSubheaderView.setText(((Amenity) mItem).getAmenityTypeTranslation(getActivity()));
+            mSubheaderView.setVisibility(View.VISIBLE);
         }
 
         final DetailFragment fragment = this;

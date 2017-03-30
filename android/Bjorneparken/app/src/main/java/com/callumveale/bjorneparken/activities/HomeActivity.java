@@ -49,7 +49,9 @@ import com.callumveale.bjorneparken.requests.RequestsModule;
 import com.google.api.client.util.DateTime;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 
 import none.bjorneparkappen_api.model.MainAreaListResponse;
@@ -388,7 +390,6 @@ public class HomeActivity
 
         ArrayList<Feeding> returnList = new ArrayList<>();
 
-        //TODO Amend backend to add feedings to Species return list
         for (Feeding feeding : mFeedings){
 
             for (Animal animal : ((Enclosure) feeding.getLocation()).getAnimals()){
@@ -400,9 +401,6 @@ public class HomeActivity
                 }
             }
         }
-
-        // Sort feedings by start time
-        Collections.sort(returnList, new Event.EventTimeComparator());
 
         return returnList;
     }
@@ -806,6 +804,17 @@ public class HomeActivity
                 // Retrieve title for page
                 title = mNavigationOptions[1].name;
 
+                // Sort events by starred/time
+                Collections.sort(mItinerary, new Comparator<Event>() {
+
+                    @Override
+                    public int compare(Event event1, Event event2) {
+
+                        Calendar now = Calendar.getInstance();
+                        return event1.getEventStartCalendar(now, 0).compareTo(event2.getEventStartCalendar(now, 0));
+                    }
+                });
+
                 // Retrieve new list fragment, populating from visitor itinerary
                 fragment = ListFragment.newInstance(mItinerary, 1, Event.class.getSimpleName(), true);
                 break;
@@ -813,6 +822,30 @@ public class HomeActivity
             case 2: // If selection is 'Animals'
                 // Retrieve title for page
                 title = mNavigationOptions[2].name;
+
+                // Sort species by starred
+                Collections.sort(mSpecies, new Comparator<Species>(){
+
+                    @Override
+                    public int compare(Species species1, Species species2) {
+
+                        boolean species1Starred = isStarred(species1);
+                        boolean species2Starred = isStarred(species2);
+
+                        if (species1Starred && !species2Starred){
+
+                            return -1;
+
+                        } else if (!species1Starred && species2Starred){
+
+                            return 1;
+
+                        } else {
+
+                            return species1.getCommonName().compareTo(species2.getCommonName());
+                        }
+                    }
+                });
 
                 // Retrieve new list fragment, populating from list of species
                 fragment = ListFragment.newInstance(mSpecies, 1, Species.class.getSimpleName(), true);
@@ -822,6 +855,31 @@ public class HomeActivity
                 // Retrieve title for page
                 title = mNavigationOptions[3].name;
 
+                // Sort events by starred/time
+                Collections.sort(mEvents, new Comparator<Event>() {
+
+                    @Override
+                    public int compare(Event event1, Event event2) {
+
+                        boolean event1Starred = isInItinerary(event1);
+                        boolean event2Starred = isInItinerary(event2);
+
+                        if (event1Starred && !event2Starred) {
+
+                            return -1;
+
+                        } else if (!event1Starred && event2Starred) {
+
+                            return 1;
+
+                        } else {
+
+                            Calendar now = Calendar.getInstance();
+                            return event1.getEventStartCalendar(now, 0).compareTo(event2.getEventStartCalendar(now, 0));
+                        }
+                    }
+                });
+
                 // Retrieve new list fragment, populating from list of events
                 fragment = ListFragment.newInstance(mEvents, 1, Event.class.getSimpleName(), true);
                 break;
@@ -830,6 +888,9 @@ public class HomeActivity
                 // Retrieve title for page
                 title = mNavigationOptions[4].name;
 
+                // Sort attractions
+                Collections.sort(mAttractions, new Amenity.AmenityComparator(this));
+
                 // Retrieve new list fragment, populating from list of attractions
                 fragment = ListFragment.newInstance(mAttractions, 1, Amenity.class.getSimpleName());
                 break;
@@ -837,6 +898,9 @@ public class HomeActivity
             case 5: // If selection is 'Amenities'
                 // Retrieve title for page
                 title = mNavigationOptions[5].name;
+
+                // Sort amenities
+                Collections.sort(mAmenities, new Amenity.AmenityComparator(this));
 
                 // Retrieve new list fragment, populating from list of amenities
                 fragment = ListFragment.newInstance(mAmenities, 1, Amenity.class.getSimpleName());

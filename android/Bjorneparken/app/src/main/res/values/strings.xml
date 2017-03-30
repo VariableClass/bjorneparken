@@ -85,4 +85,14 @@
     <string name="help_email_label">E-mail:</string>
     <string name="help_email">rugg@bjorneparken.no</string>
     <string name="email_subject">Enquiry</string>
+
+    <!-- Amenity Types -->
+    <string name="ATTRACTION">Attraction</string>
+    <string name="BBQ">Barbecue</string>
+    <string name="PLAY_AREA">Play Area</string>
+    <string name="RECEPTION">Reception Area</string>
+    <string name="RESTAURANT">Restaurant</string>
+    <string name="SNACKS">Snacks</string>
+    <string name="WC">Toilets</string>
+
 </resources>

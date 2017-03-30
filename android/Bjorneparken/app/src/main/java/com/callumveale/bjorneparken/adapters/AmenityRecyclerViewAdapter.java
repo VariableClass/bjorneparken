@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.callumveale.bjorneparken.R;
+import com.callumveale.bjorneparken.activities.HomeActivity;
 import com.callumveale.bjorneparken.fragments.ListFragment.OnListItemSelectionListener;
 import com.callumveale.bjorneparken.models.Amenity;
 
@@ -26,8 +27,8 @@ public class AmenityRecyclerViewAdapter extends RecyclerViewAdapter {
 
     //region Constructors
 
-    public AmenityRecyclerViewAdapter(ArrayList<? extends Parcelable> amenities, OnListItemSelectionListener listener) {
-        super(amenities, listener);
+    public AmenityRecyclerViewAdapter(HomeActivity activity, ArrayList<? extends Parcelable> amenities, OnListItemSelectionListener listener) {
+        super(activity, amenities, listener);
     }
 
     //endregion Constructors
@@ -44,6 +45,8 @@ public class AmenityRecyclerViewAdapter extends RecyclerViewAdapter {
         holder.mItem = amenity;
         holder.mHeaderView.setText(amenity.getLabel());
         holder.mBodyView.setText(amenity.getDescription());
+        holder.mSubheadingView.setText((amenity.getAmenityTypeTranslation(mActivity)));
+        holder.mSubheadingView.setVisibility(View.VISIBLE);
 
         Bitmap bitmap = amenity.getImage();
 

@@ -45,8 +45,8 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<ListItemViewHolder> imple
         mItemStarredListener = starredListener;
     }
 
-    RecyclerViewAdapter(ArrayList<? extends Parcelable> items, ListFragment.OnListItemSelectionListener selectedListener){
-        mActivity = null;
+    RecyclerViewAdapter(HomeActivity activity, ArrayList<? extends Parcelable> items, ListFragment.OnListItemSelectionListener selectedListener){
+        mActivity = activity;
         mItems = items;
         mItemSelectedListener = selectedListener;
         mItemStarredListener = null;

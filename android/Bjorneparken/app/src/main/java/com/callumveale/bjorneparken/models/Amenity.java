@@ -1,10 +1,14 @@
 package com.callumveale.bjorneparken.models;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.callumveale.bjorneparken.R;
+
 import java.util.ArrayList;
+import java.util.Comparator;
 
 /**
  * Created by callum on 27/02/2017.
@@ -70,7 +74,15 @@ public class Amenity extends Area implements IModel, Parcelable{
     //region Methods
 
     public String getAmenityType() {
+
         return amenityType;
+    }
+
+    public String getAmenityTypeTranslation(Context context) {
+
+        int resourceId = context.getResources().getIdentifier(amenityType, "string", context.getPackageName());
+
+        return context.getString(resourceId);
     }
 
     public String getDescription() {
@@ -86,7 +98,7 @@ public class Amenity extends Area implements IModel, Parcelable{
 
     @Override
     public String getSubheader() {
-        return null;
+        return getAmenityType();
     }
 
     @Override
@@ -140,4 +152,24 @@ public class Amenity extends Area implements IModel, Parcelable{
     //endregion Parcelable Overridden Methods
 
     //endregion Methods
+
+    //region Comparators
+
+    public static class AmenityComparator implements Comparator<Amenity> {
+
+        private Context mContext;
+
+        public AmenityComparator(Context context){
+
+            mContext = context;
+        }
+
+        @Override
+        public int compare(Amenity amenity1, Amenity amenity2) {
+
+            return amenity1.getAmenityTypeTranslation(mContext).compareTo(amenity2.getAmenityTypeTranslation(mContext));
+        }
+    }
+
+    //endregion Comparators
 }

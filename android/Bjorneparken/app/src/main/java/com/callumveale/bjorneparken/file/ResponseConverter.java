@@ -654,7 +654,6 @@ public class ResponseConverter {
         returnList.addAll(feedings);
 
         // Sort events by time
-        Collections.sort(returnList, new Event.EventTimeComparator());
         return returnList;
     }
 
