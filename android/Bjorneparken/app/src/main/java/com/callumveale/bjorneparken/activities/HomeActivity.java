@@ -804,16 +804,8 @@ public class HomeActivity
                 // Retrieve title for page
                 title = mNavigationOptions[1].name;
 
-                // Sort events by starred/time
-                Collections.sort(mItinerary, new Comparator<Event>() {
-
-                    @Override
-                    public int compare(Event event1, Event event2) {
-
-                        Calendar now = Calendar.getInstance();
-                        return event1.getEventStartCalendar(now, 0).compareTo(event2.getEventStartCalendar(now, 0));
-                    }
-                });
+                // Sort events by time
+                Collections.sort(mItinerary, new Event.EventTimeComparator());
 
                 // Retrieve new list fragment, populating from visitor itinerary
                 fragment = ListFragment.newInstance(mItinerary, 1, Event.class.getSimpleName(), true);
@@ -1068,6 +1060,9 @@ public class HomeActivity
 
             // If there are feedings to show
             if (feedings.size() > 0) {
+
+                // Sort feedings by time
+                Collections.sort(feedings, new Event.EventTimeComparator());
 
                 // Display a dialog box to select them
                 DialogListFragment options = DialogListFragment.newInstance(feedings);

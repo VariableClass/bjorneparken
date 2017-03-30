@@ -208,7 +208,8 @@ public class DetailFragment extends Fragment implements DialogConfirmFragment.On
                         // If item is a Species, show confirm dialog
                         if (mItem.getClass() == Species.class) {
 
-                            DialogConfirmFragment confirmDialog = DialogConfirmFragment.newInstance();
+                            // Show confirmation dialog
+                            DialogConfirmFragment confirmDialog = DialogConfirmFragment.newInstance(R.string.confirm_unstar_species_title, R.string.confirm_unstar_species_message);
                             confirmDialog.setUnstarDetailListener(fragment);
                             confirmDialog.show(getActivity().getSupportFragmentManager(), "DialogConfirmFragment");
 
