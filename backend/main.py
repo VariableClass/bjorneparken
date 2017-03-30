@@ -864,7 +864,7 @@ class SpeciesApi(remote.Service):
         ApiHelper.validate_user(self)
 
         # Validate all required values have been provided
-        if not request.common_name and request.latin and request.description:
+        if not (request.common_name and request.latin and request.description):
             raise endpoints.BadRequestException("Please provided values for 'common_name', 'latin' and 'description'.")
 
         # Attempt to retrieve species
@@ -1069,7 +1069,7 @@ class AnimalsApi(remote.Service):
         ApiHelper.validate_user(self)
 
         # Validate all required values have been provided
-        if not request.name and request.species_id and request.description and request.enclosure_id and request.is_available is not None:
+        if not (request.name and request.species_id and request.description and request.enclosure_id and request.is_available is not None):
             raise endpoints.BadRequestException("Please provided values for 'name', 'species_id', 'description' and 'is_available'.")
 
         # Retrieve species from provided ID
@@ -1406,7 +1406,7 @@ class AreasApi(remote.Service):
         # TODO Check for intersection of any existing areas
 
         # Validate all required values have been provided
-        if not request.label and request.visitor_destination and request.coordinates:
+        if not (request.label and request.visitor_destination and request.coordinates):
             raise endpoints.BadRequestException("Please provided values for 'label', 'visitor_destination' and 'coordinates'.")
 
         # Convert InternationalMessage formats to InternationalText
@@ -1459,7 +1459,7 @@ class AreasApi(remote.Service):
         # TODO Check for intersection of any existing areas
 
         # Validate all required values have been provided
-        if not request.label and request.visitor_destination and request.coordinates and request.description and request.amenity_type:
+        if not (request.label and request.visitor_destination and request.coordinates and request.description and request.amenity_type):
             raise endpoints.BadRequestException("Please provided values for 'label', 'visitor_destination', 'coordinates', 'description' and 'amenity_type'.")
 
 
@@ -1997,7 +1997,7 @@ class EventsApi(remote.Service):
         ApiHelper.validate_user(self)
 
         # Validate all required values have been provided
-        if not request.label and request.description and request.location_id and request.start_time and request.end_time and request.is_active is not None:
+        if not (request.label and request.description and request.location_id and request.start_time and request.end_time and request.is_active is not None):
             raise endpoints.BadRequestException("Please provided values for 'label', 'description', 'location_id', 'start_time', 'end_time' and 'is_active'.")
 
         # Retrieve location from provided ID
@@ -2142,7 +2142,7 @@ class EventsApi(remote.Service):
         ApiHelper.validate_user(self)
 
         # Validate all required values have been provided
-        if not request.label and request.description and request.location_id and request.start_time and request.end_time and request.is_active is not None:
+        if not (request.label and request.description and request.location_id and request.start_time and request.end_time and request.is_active is not None):
             raise endpoints.BadRequestException("Please provided values for 'label', 'description', 'location_id', 'start_time', 'end_time' and 'is_active'.")
 
         # Retrieve location from provided ID
