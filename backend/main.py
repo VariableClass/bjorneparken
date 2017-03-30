@@ -1712,6 +1712,8 @@ class AreasApi(remote.Service):
                 raise endpoints.BadRequestException("No AmenityType found by the name '" + request.amenity_type +
                                                     "'. Amenities may be any of the following: " + string_amenity_types)
 
+            amenity.amenity_type = request.amenity_type
+
         # If value for image provided:
         if request.image:
             amenity.image = Image.upload(str(amenity.key.id()), request.image)
