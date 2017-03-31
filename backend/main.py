@@ -76,6 +76,7 @@ class SpeciesTranslationResponse(messages.Message):
     common_name = messages.MessageField(InternationalMessage, 2, repeated=True)
     latin = messages.StringField(3)
     description = messages.MessageField(InternationalMessage, 4, repeated=True)
+    image = messages.StringField(5)
 
 class SpeciesTranslationListResponse(messages.Message):
     species = messages.MessageField(SpeciesTranslationResponse, 1, repeated=True)
@@ -164,6 +165,7 @@ class EnclosureTranslationResponse(messages.Message):
     visitor_destination = messages.StringField(3)
     coordinates = messages.StringField(4, repeated=True)
     animals = messages.MessageField(AnimalTranslationResponse, 5, repeated=True)
+    image = messages.StringField(6)
 
 class AmenityTranslationResponse(messages.Message):
     id = messages.IntegerField(1)
@@ -172,6 +174,7 @@ class AmenityTranslationResponse(messages.Message):
     coordinates = messages.StringField(4, repeated=True)
     description = messages.MessageField(InternationalMessage, 5, repeated=True)
     amenity_type = messages.StringField(6)
+    image = messages.StringField(7)
 
 class AreaTranslationListResponse(messages.Message):
     enclosures = messages.MessageField(EnclosureTranslationResponse, 1, repeated=True)
@@ -254,6 +257,7 @@ class EventTranslationResponse(messages.Message):
     start_time = messages.StringField(5)
     end_time = messages.StringField(6)
     is_active = messages.BooleanField(7)
+    image = messages.StringField(8)
 
 class FeedingTranslationResponse(messages.Message):
     id = messages.IntegerField(1)
@@ -264,6 +268,7 @@ class FeedingTranslationResponse(messages.Message):
     end_time = messages.StringField(6)
     is_active = messages.BooleanField(7)
     keeper = messages.MessageField(KeeperTranslationResponse, 8)
+    image = messages.StringField(9)
 
 class EventTranslationListResponse(messages.Message):
     events = messages.MessageField(EventTranslationResponse, 1, repeated=True)
@@ -461,11 +466,18 @@ class ApiHelper():
             translation = InternationalMessage(text=description_translation.text, language_code=description_translation.language_code)
             species_description_translations.append(translation)
 
+        image = None
+
+        # If species has an image
+        if species.image:
+            image = species.image.get()
+
         return SpeciesTranslationResponse(
             id=species.key.id(),
             common_name=species_common_name_translations,
             latin=species.latin,
-            description=species_description_translations)
+            description=species_description_translations,
+            image=image)
 
     @staticmethod
     def get_animal_response(animal, language_code):
@@ -576,12 +588,19 @@ class ApiHelper():
             animal_response = ApiHelper.get_animal_response_with_translations(animal)
             animals.append(animal_response)
 
+        image = None
+
+        # If area has an image
+        if area.image:
+            image = area.image.get()
+
         return EnclosureTranslationResponse(
             id=area.key.id(),
             label=area_label_translations,
             visitor_destination=str(area.visitor_destination.lon) + ", " + str(area.visitor_destination.lat),
             coordinates=coordinates,
-            animals=animals)
+            animals=animals,
+            image=image)
 
     @staticmethod
     def get_amenity_response(area, language_code):
@@ -637,13 +656,20 @@ class ApiHelper():
         for coordinate in area.coordinates:
             coordinates.append(str(coordinate.lon) + ", " + str(coordinate.lat))
 
+        image = None
+
+        # If area has an image
+        if area.image:
+            image = area.image.get()
+
         return AmenityTranslationResponse(
             id=area.key.id(),
             label=area_label_translations,
             visitor_destination=str(area.visitor_destination.lon) + ", " + str(area.visitor_destination.lat),
             coordinates=coordinates,
             description=area_description_translations,
-            amenity_type=area.amenity_type)
+            amenity_type=area.amenity_type,
+            image=image)
 
     @staticmethod
     def get_keeper_response(keeper, language_code):
@@ -718,6 +744,12 @@ class ApiHelper():
         # Retrieve location
         location = ApiHelper.get_amenity_response_with_translations(event.key.parent().get())
 
+        image = None
+
+        # If event has an image
+        if event.image:
+            image = event.image.get()
+
         return EventTranslationResponse(
             id=event.key.id(),
             label=event_label_translations,
@@ -725,7 +757,8 @@ class ApiHelper():
             location=location,
             start_time=event.start_time,
             end_time=event.end_time,
-            is_active=event.is_active)
+            is_active=event.is_active,
+            image=image)
 
     @staticmethod
     def get_feeding_response(feeding, language_code):
@@ -811,6 +844,12 @@ class ApiHelper():
 
         keeper_response = ApiHelper.get_keeper_response_with_translations(keeper)
 
+        image = None
+
+        # If event has an image
+        if feeding.image:
+            image = feeding.image.get()
+
         return FeedingTranslationResponse(
             id=feeding.key.id(),
             label=feeding_label_translations,
@@ -819,7 +858,8 @@ class ApiHelper():
             start_time=feeding.start_time,
             end_time=feeding.end_time,
             is_active=feeding.is_active,
-            keeper=keeper_response)
+            keeper=keeper_response,
+            image=image)
 # [END ApiHelper]
 
 # [START Species API]
