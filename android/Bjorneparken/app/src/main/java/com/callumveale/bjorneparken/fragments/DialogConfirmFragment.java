@@ -25,8 +25,10 @@ public class DialogConfirmFragment extends DialogFragment {
     //region Properties
 
     private int mPosition;
-    private int mTitle;
-    private int mMessage;
+    private int mTitleResourceId;
+    private int mMessageResourceId;
+    private String mTitle;
+    private String mMessage;
     private boolean mVisualUnstarOnly;
     private OnUnstarListItemListener mListItemListener;
     private OnUnstarDetailListener mDetailListener;
@@ -92,6 +94,29 @@ public class DialogConfirmFragment extends DialogFragment {
         return fragment;
     }
 
+    public static DialogConfirmFragment newInstance(String title, String message, int position) {
+
+        DialogConfirmFragment fragment = new DialogConfirmFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_TITLE, title);
+        args.putString(ARG_MESSAGE, message);
+        args.putInt(ARG_POSITION, position);
+        args.putBoolean(ARG_VISUAL_UNSTAR, false);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static DialogConfirmFragment newInstance(String title, String message) {
+
+        DialogConfirmFragment fragment = new DialogConfirmFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_TITLE, title);
+        args.putString(ARG_MESSAGE, message);
+        args.putBoolean(ARG_VISUAL_UNSTAR, false);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     //region Fragment Overridden Methods
 
     @Override
@@ -99,8 +124,19 @@ public class DialogConfirmFragment extends DialogFragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mPosition = getArguments().getInt(ARG_POSITION);
-            mTitle = getArguments().getInt(ARG_TITLE);
-            mMessage = getArguments().getInt(ARG_MESSAGE);
+
+            // If string title is null, retrieve resource IDs
+            if (getArguments().getString(ARG_TITLE) == null) {
+
+                mTitleResourceId = getArguments().getInt(ARG_TITLE);
+                mMessageResourceId = getArguments().getInt(ARG_MESSAGE);
+
+            } else {
+
+                mTitle = getArguments().getString(ARG_TITLE);
+                mMessage = getArguments().getString(ARG_MESSAGE);
+            }
+
             mVisualUnstarOnly = getArguments().getBoolean(ARG_VISUAL_UNSTAR);
         }
     }
@@ -110,9 +146,17 @@ public class DialogConfirmFragment extends DialogFragment {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
-        builder.setTitle(mTitle)
-                .setMessage(mMessage)
-                .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+        if (mTitle == null) {
+
+            builder.setTitle(mTitleResourceId)
+                    .setMessage(mMessageResourceId);
+        } else {
+
+            builder.setTitle(mTitle)
+                    .setMessage(mMessage);
+        }
+
+        builder.setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         if (mListItemListener != null) {

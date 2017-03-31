@@ -45,10 +45,17 @@
     <string name="confirm_unstar_species_message">Unstarring an animal will remove all feedings for animals of this type from your itinerary.</string>
     <string name="event_conflict_title">Event Conflict</string>
     <string name="event_conflict_message">The event you have selected conflicts with a previously starred event. To star this event, first remove any conflicting events from your itinerary.</string>
+    <string name="no_feedings_title">No Feedings Available</string>
+    <string name="no_feedings_message" formatted="false">There aren\'t currently any scheduled feedings for the %1s, however you can still find them in the following places; %2s.</string>
+    <string name="species_unavailable_title">%1s Not Currently Available</string>
+    <string name="species_unavailable_message">This animal isn\'t currently available to see in our park.</string>
 
     <!-- Notification -->
     <string name="event_warning">In %1$d minutes</string>
     <string name="event_now">Now</string>
+
+    <!-- Detail Fragment -->
+    <string name="keeper">Keeper</string>
 
     <!-- My Visit Fragment -->
     <string name="empty_itinerary">You don\'t currently have any favourites. Go to the \'Animals\' tab to favourite some feedings, or the \'Events\' tab to browse our events!</string>
@@ -90,7 +97,7 @@
     <string name="ATTRACTION">Attraction</string>
     <string name="BBQ">Barbecue</string>
     <string name="PLAY_AREA">Play Area</string>
-    <string name="RECEPTION">Reception Area</string>
+    <string name="RECEPTION">Reception Building</string>
     <string name="RESTAURANT">Restaurant</string>
     <string name="SNACKS">Snacks</string>
     <string name="WC">Toilets</string>

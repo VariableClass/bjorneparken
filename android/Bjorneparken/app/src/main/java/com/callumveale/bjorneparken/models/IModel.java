@@ -1,5 +1,6 @@
 package com.callumveale.bjorneparken.models;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 
 /**
@@ -18,7 +19,11 @@ public interface IModel {
 
     String getCaption();
 
-    String getSubcaption();
+    String getSubcaption(Context context);
+
+    String getListTitle(Context context);
+
+    String[] getList();
 
     String getImageUrl();
 

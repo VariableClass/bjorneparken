@@ -5,20 +5,16 @@ import android.os.AsyncTask;
 import com.callumveale.bjorneparken.activities.HomeActivity;
 
 import java.io.IOException;
+import java.util.List;
 
 import none.bjorneparkappen_api.BjorneparkappenApi;
+import none.bjorneparkappen_api.model.MainAmenityResponse;
 import none.bjorneparkappen_api.model.MainAreaListResponse;
 
 /**
  * Created by callum on 27/02/2017.
  */
-public class GetAllAttractionsTask extends AsyncTask<Void, Void, MainAreaListResponse> {
-
-    //region Constants
-
-    private static final String ATTRACTION = "ATTRACTION";
-
-    //endregion Constants
+public class GetAllAreasTask extends AsyncTask<Void, Void, MainAreaListResponse> {
 
     //region Properties
 
@@ -30,7 +26,7 @@ public class GetAllAttractionsTask extends AsyncTask<Void, Void, MainAreaListRes
 
     //region Constructors
 
-    public GetAllAttractionsTask(BjorneparkappenApi.Builder builder, HomeActivity activity, String language) {
+    public GetAllAreasTask(BjorneparkappenApi.Builder builder, HomeActivity activity, String language) {
 
         mBuilder = builder;
         mActivity = activity;
@@ -52,25 +48,25 @@ public class GetAllAttractionsTask extends AsyncTask<Void, Void, MainAreaListRes
     @Override
     protected MainAreaListResponse doInBackground(Void... params) {
 
-        MainAreaListResponse attractionsResponse = new MainAreaListResponse();
+        MainAreaListResponse areasResponse = new MainAreaListResponse();
 
         try {
 
-            attractionsResponse = mBuilder.build().areas().amenities().type(ATTRACTION, mLanguage).setKey(RequestsModule.API_KEY).execute();
+            areasResponse = mBuilder.build().areas().all(mLanguage).setKey(RequestsModule.API_KEY).execute();
 
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return attractionsResponse;
+        return areasResponse;
     }
 
     @Override
-    protected void onPostExecute(MainAreaListResponse attractionsResponse) {
+    protected void onPostExecute(MainAreaListResponse areasResponse) {
 
-        if (attractionsResponse != null) {
+        if (areasResponse != null) {
 
-            mActivity.saveAttractions(attractionsResponse);
+            mActivity.saveAreas(areasResponse);
         }
         mActivity.updateProgress(true);
     }

@@ -42,10 +42,17 @@
     <string name="confirm_unstar_species_message">Avstjerne et dyr vil fjerne alle fôringene for dette dyret i dagsplanen din.</string>
     <string name="event_conflict_title">Begivenhetskonflikt</string>
     <string name="event_conflict_message">Begivenheten du har valgt krasjer med en begivenhet du allerede har stjernet. For å stjerne denne begivenheten må du først fjerne begivenheten som skjer samtidig fra dagsplanen din.</string>
+    <string name="no_feedings_title">Ingen fôring tilgjengelig</string>
+    <string name="no_feedings_message" formatted="false">Det er ingen oppsatt fôring for %1s, men du kan fortstatt finne dem i følgene innhegninger; %2s.</string>
+    <string name="species_unavailable_title">%1s ikke tilgjengelig akkurat nå</string>
+    <string name="species_unavailable_message">Dette dyret kan du ikke se i parken vår akkurat nå.</string>
 
     <!-- Notification -->
     <string name="event_warning">Om %1$d minutter</string>
     <string name="event_now">Nå</string>
+
+    <!-- Detail Fragment -->
+    <string name="keeper">Dyrepasser</string>
 
     <!-- My Visit Fragment -->
     <string name="empty_itinerary">Du har ingen favoritter for øyeblikket. Gå til \'Dyr\'-fanen for å velge noen favorittfôringer, eller til \'Begivenheter\'-fanen for å ser på våre begivenheter!</string>
@@ -80,4 +87,14 @@
     <string name="help_tel_label">Telefon:</string>
     <string name="help_email_label">E-post:</string>
     <string name="email_subject">Forespørsel</string>
+
+    <!-- Amenity Types -->
+    <string name="ATTRACTION">Attraksjoner</string>
+    <string name="BBQ">Grillplass</string>
+    <string name="PLAY_AREA">Lekeplass</string>
+    <string name="RECEPTION">Resepsjonbygning</string>
+    <string name="RESTAURANT">Restaurant</string>
+    <string name="SNACKS">Snacks</string>
+    <string name="WC">Toaletter</string>
+
 </resources>

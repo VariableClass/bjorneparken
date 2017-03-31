@@ -6,6 +6,8 @@ import android.graphics.BitmapFactory;
 
 import com.callumveale.bjorneparken.config.Configuration;
 import com.callumveale.bjorneparken.models.Amenity;
+import com.callumveale.bjorneparken.models.Animal;
+import com.callumveale.bjorneparken.models.Area;
 import com.callumveale.bjorneparken.models.Event;
 import com.callumveale.bjorneparken.models.Feeding;
 import com.callumveale.bjorneparken.models.IModel;
@@ -30,6 +32,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.ArrayList;
 
+import none.bjorneparkappen_api.model.MainAnimalListResponse;
 import none.bjorneparkappen_api.model.MainAreaListResponse;
 import none.bjorneparkappen_api.model.MainEventListResponse;
 import none.bjorneparkappen_api.model.MainSpeciesListResponse;
@@ -42,8 +45,7 @@ public class FileWriter {
 
     //region Constants
 
-    private static final String AMENITIES_FILE = "amenities";
-    private static final String ATTRACTIONS_FILE = "attractions";
+    private static final String AREAS_FILE = "areas";
     private static final String CONFIG_FILE = "config";
     private static final String EVENTS_FILE = "events";
     private static final String FEEDINGS_FILE = "feedings";
@@ -476,23 +478,21 @@ public class FileWriter {
 
     //region Areas
 
-    //region Amenities
+    public void writeAreasToFile(MainAreaListResponse areasJson){
 
-    public void writeAmenitiesToFile(MainAreaListResponse amenitiesJson){
-
-        writeJsonToFile(amenitiesJson, AMENITIES_FILE);
+        writeJsonToFile(areasJson, AREAS_FILE);
     }
 
-    public ArrayList<Amenity> getAmenitiesFromFile(){
+    public ArrayList<Area> getAreasFromFile(){
 
-        MainAreaListResponse amenities = new MainAreaListResponse();
+        MainAreaListResponse areas = new MainAreaListResponse();
 
         try {
-            InputStream inputStream = mContext.openFileInput(AMENITIES_FILE);
+            InputStream inputStream = mContext.openFileInput(AREAS_FILE);
 
             if (inputStream != null) {
 
-                amenities = new JacksonFactory().fromInputStream(inputStream, MainAreaListResponse.class);
+                areas = new JacksonFactory().fromInputStream(inputStream, MainAreaListResponse.class);
                 inputStream.close();
             }
         }
@@ -502,37 +502,8 @@ public class FileWriter {
             ioException.printStackTrace();
         }
 
-        return ResponseConverter.convertAmenityListResponse(amenities);
+        return ResponseConverter.convertAreaListResponse(areas);
     }
-
-    public void writeAttractionsToFile(MainAreaListResponse attractionsJson){
-
-        writeJsonToFile(attractionsJson, ATTRACTIONS_FILE);
-    }
-
-    public ArrayList<Amenity> getAttractionsFromFile(){
-
-        MainAreaListResponse attractions = new MainAreaListResponse();
-
-        try {
-            InputStream inputStream = mContext.openFileInput(ATTRACTIONS_FILE);
-
-            if (inputStream != null) {
-
-                attractions = new JacksonFactory().fromInputStream(inputStream, MainAreaListResponse.class);
-                inputStream.close();
-            }
-        }
-        catch (FileNotFoundException fileNotFoundException) {
-            fileNotFoundException.printStackTrace();
-        } catch (IOException ioException) {
-            ioException.printStackTrace();
-        }
-
-        return ResponseConverter.convertAmenityListResponse(attractions);
-    }
-
-    //endregion Amenities
 
     //endregion Areas
 

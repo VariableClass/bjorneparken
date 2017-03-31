@@ -1,5 +1,6 @@
 package com.callumveale.bjorneparken.models;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -106,7 +107,17 @@ public class Species implements IModel, Parcelable{
     }
 
     @Override
-    public String getSubcaption() {
+    public String getSubcaption(Context context) {
+        return null;
+    }
+
+    @Override
+    public String getListTitle(Context context) {
+        return null;
+    }
+
+    @Override
+    public String[] getList() {
         return null;
     }
 

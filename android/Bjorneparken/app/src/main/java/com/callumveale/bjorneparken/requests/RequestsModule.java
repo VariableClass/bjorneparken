@@ -74,16 +74,10 @@ public class RequestsModule {
 
     //region GET Requests
 
-    public void getAllAmenities(){
+    public void getAllAreas(){
 
-        GetAllAmenitiesTask getAllAmenities = new GetAllAmenitiesTask(mBuilder, mActivity, mLanguage);
-        getAllAmenities.execute();
-    }
-
-    public void getAllAttractions(){
-
-        GetAllAttractionsTask getAllAttractions = new GetAllAttractionsTask(mBuilder, mActivity, mLanguage);
-        getAllAttractions.execute();
+        GetAllAreasTask getAllAreas = new GetAllAreasTask(mBuilder, mActivity, mLanguage);
+        getAllAreas.execute();
     }
 
     public void getAllSpecies(){

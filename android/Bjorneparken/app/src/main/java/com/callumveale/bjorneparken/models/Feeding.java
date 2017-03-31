@@ -1,8 +1,13 @@
 package com.callumveale.bjorneparken.models;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import com.callumveale.bjorneparken.R;
+
+import java.util.ArrayList;
 
 /**
  * Created by callum on 27/02/2017.
@@ -79,8 +84,30 @@ public class Feeding extends Event implements IModel, Parcelable{
     //region IModel Overridden Methods
 
     @Override
-    public String getSubcaption(){
-        return this.keeper.getName();
+    public String getSubcaption(Context context){
+
+        return context.getString(R.string.keeper) + ": " + keeper.getName();
+    }
+
+    @Override
+    public String getListTitle(Context context){
+
+        return context.getString(R.string.animals);
+    }
+
+    @Override
+    public String[] getList(){
+
+        ArrayList<Animal> animals = ((Enclosure) getLocation()).getAnimals();
+
+        String[] animalNames = new String[animals.size()];
+
+        for (int i = 0; i < animals.size(); i++){
+
+            animalNames[i] = animals.get(i).getName();
+        }
+
+        return animalNames;
     }
 
     //endregion IModel Overridden Methods

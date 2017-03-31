@@ -11,6 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.callumveale.bjorneparken.R;
@@ -106,12 +108,33 @@ public class DetailFragment extends Fragment implements DialogConfirmFragment.On
 
         Bitmap bitmap = item.getImage();
 
+        LinearLayout mDescriptionPanel = (LinearLayout) view.findViewById(R.id.detail_description_panel);
+        TextView mCaptionView;
+        TextView mSubcaptionView;
+
         // Set image
         if (bitmap != null){
 
+            // Show the image panel
+            LinearLayout imagePanel = (LinearLayout) view.findViewById(R.id.detail_image_panel);
+            imagePanel.setVisibility(View.VISIBLE);
+
+            // Align description view to right of image panel
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)mDescriptionPanel.getLayoutParams();
+            params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+            params.addRule(RelativeLayout.RIGHT_OF, R.id.detail_image_panel);
+            mDescriptionPanel.setLayoutParams(params);
+
             ImageView imageView = (ImageView) view.findViewById(R.id.detail_image);
             imageView.setImageBitmap(bitmap);
-            imageView.setVisibility(View.VISIBLE);
+
+            mCaptionView = (TextView) view.findViewById(R.id.detail_caption_image);
+            mSubcaptionView = (TextView) view.findViewById(R.id.detail_subcaption_image);
+
+        } else {
+
+            mCaptionView = (TextView) view.findViewById(R.id.detail_caption);
+            mSubcaptionView = (TextView) view.findViewById(R.id.detail_subcaption);
         }
 
         final ImageView star = (ImageView) view.findViewById(R.id.detail_star);
@@ -150,9 +173,19 @@ public class DetailFragment extends Fragment implements DialogConfirmFragment.On
         // If item has a subheader
         if (item.getSubheader() != null){
 
-            // Retrieve, set and show subheader text view
+            // Retrieve and set subheader text view
             TextView mSubheaderView = (TextView) view.findViewById(R.id.detail_subheader);
-            mSubheaderView.setText(item.getSubheader());
+
+            if (mItem.getClass() == Amenity.class){
+
+                mSubheaderView.setText(((Amenity) mItem).getAmenityTypeTranslation(getActivity()));
+
+            } else {
+
+                mSubheaderView.setText(item.getSubheader());
+            }
+
+            // Show subheader text view
             mSubheaderView.setVisibility(View.VISIBLE);
         }
 
@@ -160,26 +193,38 @@ public class DetailFragment extends Fragment implements DialogConfirmFragment.On
         if (item.getCaption() != null){
 
             // Retrieve, set and show caption text view
-            TextView mCaptionView = (TextView) view.findViewById(R.id.detail_caption);
             mCaptionView.setText(item.getCaption());
             mCaptionView.setVisibility(View.VISIBLE);
         }
 
         // If item has a subcaption
-        if (item.getSubcaption() != null){
+        if (item.getSubcaption(getContext()) != null){
 
             // Retrieve, set and show subcaption text view
-            TextView mSubcaptionView = (TextView) view.findViewById(R.id.detail_subcaption);
-            mSubcaptionView.setText(item.getSubcaption());
+            mSubcaptionView.setText(item.getSubcaption(getContext()));
             mSubcaptionView.setVisibility(View.VISIBLE);
         }
 
-        if (mItem.getClass() == Amenity.class){
+        // If item has a list
+        if (item.getList() != null){
 
-            // Retrieve, set and show subheader text view
-            TextView mSubheaderView = (TextView) view.findViewById(R.id.detail_subheader);
-            mSubheaderView.setText(((Amenity) mItem).getAmenityTypeTranslation(getActivity()));
-            mSubheaderView.setVisibility(View.VISIBLE);
+            // Retrieve, set and show list title text view
+            TextView mListTitleView = (TextView) view.findViewById(R.id.detail_list_title);
+            mListTitleView.setText(item.getListTitle(getContext()));
+            mListTitleView.setVisibility(View.VISIBLE);
+
+            // Retrieve, set and show list text view
+            String listString = "";
+
+            for (String listItem : item.getList()){
+
+                listString += listItem + "\n";
+            }
+
+
+            TextView mListView = (TextView) view.findViewById(R.id.detail_list);
+            mListView.setText(listString);
+            mListView.setVisibility(View.VISIBLE);
         }
 
         final DetailFragment fragment = this;

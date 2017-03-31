@@ -107,7 +107,17 @@ public class Amenity extends Area implements IModel, Parcelable{
     }
 
     @Override
-    public String getSubcaption() {
+    public String getSubcaption(Context context) {
+        return null;
+    }
+
+    @Override
+    public String getListTitle(Context context) {
+        return null;
+    }
+
+    @Override
+    public String[] getList() {
         return null;
     }
 

@@ -35,6 +35,7 @@ import com.callumveale.bjorneparken.fragments.SettingsFragment;
 import com.callumveale.bjorneparken.fragments.SocialFragment;
 import com.callumveale.bjorneparken.models.Amenity;
 import com.callumveale.bjorneparken.models.Animal;
+import com.callumveale.bjorneparken.models.Area;
 import com.callumveale.bjorneparken.models.Enclosure;
 import com.callumveale.bjorneparken.models.Event;
 import com.callumveale.bjorneparken.models.Feeding;
@@ -54,6 +55,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 
+import none.bjorneparkappen_api.model.MainAnimalListResponse;
 import none.bjorneparkappen_api.model.MainAreaListResponse;
 import none.bjorneparkappen_api.model.MainEventListResponse;
 import none.bjorneparkappen_api.model.MainSpeciesListResponse;
@@ -128,8 +130,7 @@ public class HomeActivity
     private boolean mStarredSpeciesUpdated;
 
     // Park Data
-    private ArrayList<Amenity> mAmenities;
-    private ArrayList<Amenity> mAttractions;
+    private ArrayList<Area> mAreas;
     private ArrayList<Feeding> mFeedings;
     private ArrayList<Species> mSpecies;
     private ArrayList<Event> mEvents;
@@ -321,22 +322,13 @@ public class HomeActivity
 
     public void getParkDataFromFile(){
 
-        // Attempt to retrieve amenities from file
-        mAmenities = mFileWriter.getAmenitiesFromFile();
+        // Attempt to retrieve areas from file
+        mAreas = mFileWriter.getAreasFromFile();
 
-        // Retrieve images for any amenity which has them
-        for (Amenity amenity : mAmenities){
+        // Retrieve images for any area which has them
+        for (Area area : mAreas){
 
-            getImage(amenity);
-        }
-
-        // Attempt to retrieve attractions from file
-        mAttractions = mFileWriter.getAttractionsFromFile();
-
-        // Retrieve images for any attraction which has them
-        for (Amenity attraction: mAttractions){
-
-            getImage(attraction);
+            getImage((IModel) area);
         }
 
         // Attempt to retrieve events from file
@@ -398,6 +390,86 @@ public class HomeActivity
 
                     returnList.add(feeding);
                     break;
+                }
+            }
+        }
+
+        return returnList;
+    }
+
+    private ArrayList<Enclosure> getEnclosuresFromAreas(){
+
+        ArrayList<Enclosure> returnList = new ArrayList<>();
+
+        for (Area area : mAreas){
+
+            if (area instanceof Enclosure){
+
+                returnList.add((Enclosure) area);
+            }
+        }
+
+        return returnList;
+    }
+
+    private ArrayList<Enclosure> getEnclosuresForSpecies(Species species){
+
+        ArrayList<Enclosure> returnList = new ArrayList<>();
+
+        // Fetch all enclosures
+        ArrayList<Enclosure> allEnclosures = getEnclosuresFromAreas();
+
+        // For each enclosure, check whether it contains the requested species
+        for (Enclosure enclosure : allEnclosures){
+
+            for (Species speciesInst : enclosure.getSpecies()){
+
+                if (species.getId() == speciesInst.getId()){
+
+                    returnList.add(enclosure);
+                    break;
+                }
+            }
+        }
+
+        return returnList;
+    }
+
+    private ArrayList<Amenity> getAmenitiesFromAreas(){
+
+        ArrayList<Amenity> returnList = new ArrayList<>();
+
+        for (Area area : mAreas){
+
+            if (area instanceof Amenity){
+
+                Amenity amenity = (Amenity) area;
+
+                // If amenity is not an attraction
+                if (!(amenity.getAmenityType().equals("ATTRACTION"))) {
+
+                    returnList.add((Amenity) area);
+                }
+            }
+        }
+
+        return returnList;
+    }
+
+    private ArrayList<Amenity> getAttractionsFromAreas(){
+
+        ArrayList<Amenity> returnList = new ArrayList<>();
+
+        for (Area area : mAreas){
+
+            if (area instanceof Amenity){
+
+                Amenity amenity = (Amenity) area;
+
+                // If amenity is an attraction
+                if (amenity.getAmenityType().equals("ATTRACTION")) {
+
+                    returnList.add((Amenity) area);
                 }
             }
         }
@@ -552,11 +624,8 @@ public class HomeActivity
 
     public void getParkDataFromServer(){
 
-        // Fetch amenities
-        mRequester.getAllAmenities();
-
-        // Fetch attractions
-        mRequester.getAllAttractions();
+        // Fetch areas
+        mRequester.getAllAreas();
 
         // Fetch events
         mRequester.getAllEvents();
@@ -572,33 +641,18 @@ public class HomeActivity
 
     //region Park Data Callbacks
 
-    public void saveAmenities(MainAreaListResponse amenities){
+    public void saveAreas(MainAreaListResponse areas){
 
         // Cache response
-        mAmenities = ResponseConverter.convertAmenityListResponse(amenities);
+        mAreas = ResponseConverter.convertAreaListResponse(areas);
 
         // Write response to file
-        mFileWriter.writeAmenitiesToFile(amenities);
+        mFileWriter.writeAreasToFile(areas);
 
-        // Retrieve images for any amenities which have them
-        for (Amenity amenity : mAmenities){
+        // Retrieve images for any areas which have them
+        for (Area area : mAreas){
 
-            getImage(amenity);
-        }
-    }
-
-    public void saveAttractions(MainAreaListResponse attractions){
-
-        // Cache response
-        mAttractions = ResponseConverter.convertAmenityListResponse(attractions);
-
-        // Write response to file
-        mFileWriter.writeAttractionsToFile(attractions);
-
-        // Retrieve images for any attractions which have them
-        for (Amenity attraction : mAttractions){
-
-            getImage(attraction);
+            getImage((IModel) area);
         }
     }
 
@@ -880,22 +934,28 @@ public class HomeActivity
                 // Retrieve title for page
                 title = mNavigationOptions[4].name;
 
+                // Retrieve attractions from list of areas
+                ArrayList<Amenity> attractions = getAttractionsFromAreas();
+
                 // Sort attractions
-                Collections.sort(mAttractions, new Amenity.AmenityComparator(this));
+                Collections.sort(attractions, new Amenity.AmenityComparator(this));
 
                 // Retrieve new list fragment, populating from list of attractions
-                fragment = ListFragment.newInstance(mAttractions, 1, Amenity.class.getSimpleName());
+                fragment = ListFragment.newInstance(attractions, 1, Amenity.class.getSimpleName());
                 break;
 
             case 5: // If selection is 'Amenities'
                 // Retrieve title for page
                 title = mNavigationOptions[5].name;
 
+                // Retrieve amenities from list of areas
+                ArrayList<Amenity> amenities = getAmenitiesFromAreas();
+
                 // Sort amenities
-                Collections.sort(mAmenities, new Amenity.AmenityComparator(this));
+                Collections.sort(amenities, new Amenity.AmenityComparator(this));
 
                 // Retrieve new list fragment, populating from list of amenities
-                fragment = ListFragment.newInstance(mAmenities, 1, Amenity.class.getSimpleName());
+                fragment = ListFragment.newInstance(amenities, 1, Amenity.class.getSimpleName());
                 break;
 
             case 6: // If selection is 'Map'
@@ -980,7 +1040,7 @@ public class HomeActivity
         if (parcelable.getClass() == Species.class){
 
             // Perform species starred action
-            onSpeciesStarred((Species) parcelable);
+            onSpeciesStarred((Species) parcelable, unstarDetailListener, unstarListItemListener, position);
 
         } else if (parcelable.getClass() == Event.class || parcelable.getClass().getSuperclass() == Event.class) {
 
@@ -1001,7 +1061,7 @@ public class HomeActivity
         onItemStarred(parcelable, listener, null, -1);
     }
 
-    private void onSpeciesStarred(Species speciesToStar){
+    private void onSpeciesStarred(Species speciesToStar, DialogConfirmFragment.OnUnstarDetailListener unstarDetailListener, DialogConfirmFragment.OnUnstarListItemListener unstarListItemListener, int position){
 
         int speciesIndex = -1;
 
@@ -1067,6 +1127,51 @@ public class HomeActivity
                 // Display a dialog box to select them
                 DialogListFragment options = DialogListFragment.newInstance(feedings);
                 options.show(getSupportFragmentManager(), "DialogListFragment");
+
+            } else {
+
+                String dialogTitle;
+                String dialogMessage;
+
+                // Retrieve list of enclosures with species
+                ArrayList<Enclosure> enclosuresWithSpecies = getEnclosuresForSpecies(speciesToStar);
+
+                if (enclosuresWithSpecies.size() > 0){
+
+                    // Build up string representation of enclosures containing the species
+                    StringBuilder strBuilder = new StringBuilder();
+
+                    for (int i = 0; i < enclosuresWithSpecies.size(); i++){
+
+                        // Add enclosure label to string representation
+                        strBuilder.append(enclosuresWithSpecies.get(i).getLabel());
+                    }
+
+                    dialogTitle = getString(R.string.no_feedings_title);
+                    dialogMessage = String.format(getString(R.string.no_feedings_message), speciesToStar.getCommonName(), strBuilder.toString());
+
+                } else {
+
+
+                    dialogTitle = String.format(getString(R.string.species_unavailable_title), speciesToStar.getCommonName());
+                    dialogMessage = getString(R.string.species_unavailable_message);
+                }
+
+                DialogConfirmFragment noFeedings = DialogConfirmFragment.newInstance(dialogTitle, dialogMessage);
+
+                if (unstarDetailListener != null){
+
+                    // Show confirmation dialog
+                    noFeedings.setUnstarDetailListener(unstarDetailListener);
+                }
+                if (unstarListItemListener != null){
+
+                    // Show confirmation dialog
+                    noFeedings = DialogConfirmFragment.newInstance(dialogTitle, dialogMessage, position);
+                    noFeedings.setUnstarListItemListener(unstarListItemListener);
+                }
+
+                noFeedings.show(getSupportFragmentManager(), "DialogConfirmFragment");
             }
 
             // If the server is available
@@ -1183,7 +1288,7 @@ public class HomeActivity
 
             } else {
 
-                DialogConfirmFragment confirmDialog = confirmDialog = DialogConfirmFragment.newInstance(R.string.event_conflict_title, R.string.event_conflict_message, true);
+                DialogConfirmFragment confirmDialog = DialogConfirmFragment.newInstance(R.string.event_conflict_title, R.string.event_conflict_message, true);
 
                 if (unstarDetailListener != null){
 

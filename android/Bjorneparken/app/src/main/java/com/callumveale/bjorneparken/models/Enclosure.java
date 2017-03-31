@@ -1,5 +1,6 @@
 package com.callumveale.bjorneparken.models;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -67,6 +68,31 @@ public class Enclosure extends Area implements IModel, Parcelable {
 
     //region Methods
 
+    public ArrayList<Species> getSpecies(){
+
+        ArrayList<Species> species = new ArrayList<>();
+
+        for (Animal animal : animals){
+
+            boolean speciesAlreadyOnList = false;
+
+            for (Species speciesInst : species){
+
+                if (animal.getSpecies().getId() == speciesInst.getId()){
+
+                    speciesAlreadyOnList = true;
+                }
+            }
+
+            if (!speciesAlreadyOnList){
+
+                species.add(animal.getSpecies());
+            }
+        }
+
+        return species;
+    }
+
     public ArrayList<Animal> getAnimals() {
         return animals;
     }
@@ -94,7 +120,17 @@ public class Enclosure extends Area implements IModel, Parcelable {
     }
 
     @Override
-    public String getSubcaption() {
+    public String getSubcaption(Context context) {
+        return null;
+    }
+
+    @Override
+    public String getListTitle(Context context) {
+        return null;
+    }
+
+    @Override
+    public String[] getList() {
         return null;
     }
 
