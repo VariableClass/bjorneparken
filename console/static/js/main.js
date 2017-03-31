@@ -2819,7 +2819,7 @@ bjørneparkappen.adminconsole.events.addToTable = function(event){
     checkbox.checked = event.is_active;
     checkbox.onclick = function(){
 
-        event.is_available = !event.is_available;
+        event.is_active = !event.is_active;
         bjørneparkappen.adminconsole.api.updateEvent(event);
     };
     activeCell.appendChild(checkbox);
