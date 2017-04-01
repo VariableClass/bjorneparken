@@ -2262,6 +2262,7 @@ bjørneparkappen.adminconsole.areas.detail.loadCreatePage = function(){
     areaDetailConfirm.onclick = function(){
 
         areaDetailArea.visitor_destination = areaVisitorDestinationInput.value;
+        areaDetailArea.coordinates = ["1, 1"];
 
         if (bjørneparkappen.adminconsole.areas.detail.validate()){
 
