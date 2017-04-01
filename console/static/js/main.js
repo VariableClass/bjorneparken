@@ -52,6 +52,9 @@ var activeApiCalls = 0;
 // Puts the application UI into a wait state
 bjørneparkappen.adminconsole.startWait = function(){
 
+    // Disable navbar
+    bjørneparkappen.adminconsole.navigation.disableAllNavItems();
+
     // Increase the number of active API calls
     activeApiCalls += 1;
 
@@ -66,6 +69,9 @@ bjørneparkappen.adminconsole.endWait = function(){
     if (activeApiCalls <= 0){
 
         loadingText.style.display = HIDDEN;
+
+        // Re-enable navbar
+        bjørneparkappen.adminconsole.navigation.enableAllNavItems();
     }
 };
 
@@ -84,6 +90,32 @@ bjørneparkappen.adminconsole.navigation.deselectAllNavItems = function(){
     for (var i = 0; i < activeNavItems.length; i++) {
        activeNavItems[i].classList.remove(ACTIVE);
     }
+};
+
+// Disables all nav items
+bjørneparkappen.adminconsole.navigation.disableAllNavItems = function(){
+
+    homeNav.style.pointerEvents = 'none';
+    speciesNav.style.pointerEvents = 'none';
+    areasNav.style.pointerEvents = 'none';
+    animalsNav.style.pointerEvents = 'none';
+    eventsNav.style.pointerEvents = 'none';
+    keepersNav.style.pointerEvents = 'none';
+    userNav.style.pointerEvents = 'none';
+    signoutNav.style.pointerEvents = 'none';
+};
+
+// Enables all nav items
+bjørneparkappen.adminconsole.navigation.enableAllNavItems = function(){
+
+    homeNav.style.pointerEvents = '';
+    speciesNav.style.pointerEvents = '';
+    areasNav.style.pointerEvents = '';
+    animalsNav.style.pointerEvents = '';
+    eventsNav.style.pointerEvents = '';
+    keepersNav.style.pointerEvents = '';
+    userNav.style.pointerEvents = '';
+    signoutNav.style.pointerEvents = '';
 };
 
 // Selects a single nav item
