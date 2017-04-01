@@ -1,4 +1,5 @@
 import crud
+import datetime
 import endpoints
 import re
 from google.appengine.ext import ndb
@@ -34,6 +35,9 @@ class Image(ndb.Model):
 
         # Validate mime type
         if Image.is_valid_mime_type(mime_type):
+
+            # Append timestamp to ID to force retrieval of new image by serving URL
+            image_id = image_id + "-" + str(datetime.datetime.now())
 
             # Create image metadata
             image = Image(name=image_id, mime_type=mime_type)

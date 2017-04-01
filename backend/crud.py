@@ -22,7 +22,7 @@ def upload_image_file(image, name, mime_type):
                         'w',
                         content_type=mime_type,
                         retry_params=write_retry_params,
-                        options={'x-goog-acl': 'public-read'})
+                        options={'x-goog-acl': 'public-read', 'cache-control': 'private, max-age=0, no-cache'})
 
     # Write the image file to cloud storage
     gcs_file.write(image)

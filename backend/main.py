@@ -905,7 +905,7 @@ class SpeciesApi(remote.Service):
 
         # Validate all required values have been provided
         if not (request.common_name and request.latin and request.description):
-            raise endpoints.BadRequestException("Please provided values for 'common_name', 'latin' and 'description'.")
+            raise endpoints.BadRequestException("Please provide values for 'common_name', 'latin' and 'description'.")
 
         # Attempt to retrieve species
         pre_existing = Species.get_by_latin_name(request.latin)
@@ -979,6 +979,11 @@ class SpeciesApi(remote.Service):
 
         # If value for image provided:
         if request.image:
+
+            # Delete current image
+            species.image.delete()
+
+            # Upload new image
             species.image = Image.upload(str(species.key.id()), request.image)
 
         # Write changes
@@ -1110,7 +1115,7 @@ class AnimalsApi(remote.Service):
 
         # Validate all required values have been provided
         if not (request.name and request.species_id and request.description and request.enclosure_id and request.is_available is not None):
-            raise endpoints.BadRequestException("Please provided values for 'name', 'species_id', 'description' and 'is_available'.")
+            raise endpoints.BadRequestException("Please provide values for 'name', 'species_id', 'description' and 'is_available'.")
 
         # Retrieve species from provided ID
         species = ndb.Key(Species, request.species_id).get()
@@ -1447,7 +1452,7 @@ class AreasApi(remote.Service):
 
         # Validate all required values have been provided
         if not (request.label and request.visitor_destination and request.coordinates):
-            raise endpoints.BadRequestException("Please provided values for 'label', 'visitor_destination' and 'coordinates'.")
+            raise endpoints.BadRequestException("Please provide values for 'label', 'visitor_destination' and 'coordinates'.")
 
         # Convert InternationalMessage formats to InternationalText
         label = ApiHelper.convert_i18n_messages_to_i18n_texts(international_messages=request.label)
@@ -1464,8 +1469,11 @@ class AreasApi(remote.Service):
 
         # Convert coordinates into usable format
         for coordinate_string in request.coordinates:
-            coordinate_array = coordinate_string.split(", ")
-            coordinates.append(ndb.GeoPt(coordinate_array[0], coordinate_array[1]))
+            try:
+                coordinate_array = coordinate_string.split(", ")
+                coordinates.append(ndb.GeoPt(coordinate_array[0], coordinate_array[1]))
+            except:
+                raise endpoints.BadRequestException("Co-ordinates must be in the form 'X-value, Y-value'")
 
         # Create new enclosure
         enclosure = Enclosure(label=label,
@@ -1500,7 +1508,7 @@ class AreasApi(remote.Service):
 
         # Validate all required values have been provided
         if not (request.label and request.visitor_destination and request.coordinates and request.description and request.amenity_type):
-            raise endpoints.BadRequestException("Please provided values for 'label', 'visitor_destination', 'coordinates', 'description' and 'amenity_type'.")
+            raise endpoints.BadRequestException("Please provide values for 'label', 'visitor_destination', 'coordinates', 'description' and 'amenity_type'.")
 
 
         # Convert InternationalMessage formats to InternationalText
@@ -1519,8 +1527,11 @@ class AreasApi(remote.Service):
 
         # Convert coordinates into usable format
         for coordinate_string in request.coordinates:
-            coordinate_array = coordinate_string.split(", ")
-            coordinates.append(ndb.GeoPt(coordinate_array[0], coordinate_array[1]))
+            try:
+                coordinate_array = coordinate_string.split(", ")
+                coordinates.append(ndb.GeoPt(coordinate_array[0], coordinate_array[1]))
+            except:
+                raise endpoints.BadRequestException("Co-ordinates must be in the form 'X-value, Y-value'")
 
         # Validate AmenityType is existing AmenityType
         if not Amenity.AmenityType.validate(request.amenity_type):
@@ -1605,11 +1616,18 @@ class AreasApi(remote.Service):
 
             # Convert coordinates into usable format
             for coordinate_string in request.coordinates:
-                coordinate_array = coordinate_string.split(", ")
-                coordinates.append(ndb.GeoPt(coordinate_array[0], coordinate_array[1]))
+                try:
+                    coordinate_array = coordinate_string.split(", ")
+                    coordinates.append(ndb.GeoPt(coordinate_array[0], coordinate_array[1]))
+                except:
+                    raise endpoints.BadRequestException("Co-ordinates must be in the form 'X-value, Y-value'")
 
         # If value for image provided:
         if request.image:
+            # Delete current image
+            enclosure.image.delete()
+
+            # Upload new image
             enclosure.image = Image.upload(str(enclosure.key.id()), request.image)
 
         # Write changes
@@ -1726,8 +1744,11 @@ class AreasApi(remote.Service):
 
             # Convert coordinates into usable format
             for coordinate_string in request.coordinates:
-                coordinate_array = coordinate_string.split(", ")
-                coordinates.append(ndb.GeoPt(coordinate_array[0], coordinate_array[1]))
+                try:
+                    coordinate_array = coordinate_string.split(", ")
+                    coordinates.append(ndb.GeoPt(coordinate_array[0], coordinate_array[1]))
+                except:
+                    raise endpoints.BadRequestException("Co-ordinates must be in the form 'X-value, Y-value'")
 
         # If values for description provided
         if request.description:
@@ -1756,6 +1777,10 @@ class AreasApi(remote.Service):
 
         # If value for image provided:
         if request.image:
+            # Delete current image
+            amenity.image.delete()
+
+            # Upload new image
             amenity.image = Image.upload(str(amenity.key.id()), request.image)
 
         # Write changes
@@ -2038,7 +2063,7 @@ class EventsApi(remote.Service):
 
         # Validate all required values have been provided
         if not (request.label and request.description and request.location_id and request.start_time and request.end_time and request.is_active is not None):
-            raise endpoints.BadRequestException("Please provided values for 'label', 'description', 'location_id', 'start_time', 'end_time' and 'is_active'.")
+            raise endpoints.BadRequestException("Please provide values for 'label', 'description', 'location_id', 'start_time', 'end_time' and 'is_active'.")
 
         # Retrieve location from provided ID
         location = Area.get_by_id(request.location_id)
@@ -2148,6 +2173,11 @@ class EventsApi(remote.Service):
 
         # If value for image provided:
         if request.image:
+
+            # Delete current image
+            event.image.delete()
+
+            # Upload new image
             event.image = Image.upload(str(event.key.parent().id()) + "-" + str(event.key.id()), request.image)
 
         # Check if value for is_active provided
@@ -2183,7 +2213,7 @@ class EventsApi(remote.Service):
 
         # Validate all required values have been provided
         if not (request.label and request.description and request.location_id and request.start_time and request.end_time and request.is_active is not None):
-            raise endpoints.BadRequestException("Please provided values for 'label', 'description', 'location_id', 'start_time', 'end_time' and 'is_active'.")
+            raise endpoints.BadRequestException("Please provide values for 'label', 'description', 'location_id', 'start_time', 'end_time' and 'is_active'.")
 
         # Retrieve location from provided ID
         location = Area.get_by_id(request.location_id)
@@ -2313,6 +2343,10 @@ class EventsApi(remote.Service):
 
         # If value for image provided:
         if request.image:
+            # Delete current image
+            feeding.image.delete()
+
+            # Upload new image
             feeding.image = Image.upload(str(feeding.key.parent().id()) + "-" + str(feeding.key.id()), request.image)
 
         # Check if value for is_active provided
@@ -2499,7 +2533,7 @@ class KeepersApi(remote.Service):
 
         # Validate all required values have been provided
         if not request.name and request.bio:
-            raise endpoints.BadRequestException("Please provided values for 'name' and 'bio'.")
+            raise endpoints.BadRequestException("Please provide values for 'name' and 'bio'.")
 
 
         # Convert InternationalMessage formats to InternationalText
@@ -2650,7 +2684,7 @@ class VisitorsApi(remote.Service):
 
         # Validate all required values have been provided
         if not request.visit_start and request.visit_end:
-            raise endpoints.BadRequestException("Please provided values for 'visit_start' and 'visit_end'.")
+            raise endpoints.BadRequestException("Please provide values for 'visit_start' and 'visit_end'.")
 
         # Validate duration of visit is correct and less than 1 week
         if (request.visit_end - request.visit_start).total_seconds() < 0 or (request.visit_end - request.visit_start).total_seconds() > 604800:
