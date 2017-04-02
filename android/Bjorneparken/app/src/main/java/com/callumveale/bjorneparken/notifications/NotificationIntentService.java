@@ -107,13 +107,13 @@ public class NotificationIntentService extends IntentService {
         builder.setContentTitle(event.getHeader())
                 .setOngoing(true)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setAutoCancel(false)
+                .setAutoCancel(true)
                 .setColor(getApplication().getResources().getColor(R.color.primary))
                 .setSmallIcon(R.drawable.notification_icon)
                 .setLargeIcon(icon)
                 .setDefaults(NotificationCompat.DEFAULT_SOUND | NotificationCompat.FLAG_SHOW_LIGHTS)
                 .setLights(0xffc0cb, 1000, 1000)
-                .setVibrate(new long[] { 0, 100, 30, 100, 200, 500 })
+                .setVibrate(new long[]{0, 100, 30, 100, 200, 500})
                 .setContentText(String.format(getString(R.string.event_warning), difference));
 
         final PendingIntent pendingIntent = PendingIntent.getActivity(this,
@@ -125,46 +125,56 @@ public class NotificationIntentService extends IntentService {
 
         final NotificationManager manager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        manager.notify(notificationId, builder.build());
+        // If the event starts within the minute or has started
+        if (difference < 1 && difference > -5) {
 
-        final long startTimeMillis = startTime;
+            // Send now notification
+            builder.setOngoing(false)
+                    .setContentText(getString(R.string.event_now));
+            manager.notify(notificationId, builder.build());
 
-        // Start a background thread to update the time to event
-        new Thread(
-                new Runnable() {
-                    @Override
-                    public void run() {
+        } else {
 
-                        // Whilst the event has not started
-                        while (System.currentTimeMillis() < startTimeMillis){
+            final long startTimeMillis = startTime;
 
-                            // Calculate the number of minutes remaining
-                            long difference = (long)((float)(startTimeMillis - System.currentTimeMillis()) / 60000);
+            // Start a background thread to update the time to event
+            new Thread(
+                    new Runnable() {
+                        @Override
+                        public void run() {
 
-                            if (difference > 0) {
+                            // Whilst the event has not started
+                            while (System.currentTimeMillis() < startTimeMillis) {
 
-                                // Update the text and renotify
-                                builder.setVibrate(new long[] { 0, 0, 0 })
-                                        .setContentText(String.format(getString(R.string.event_warning), difference));
-                                manager.notify(notificationId, builder.build());
+                                // Calculate the number of minutes remaining
+                                long difference = (long) ((float) (startTimeMillis - System.currentTimeMillis()) / 60000);
 
-                                try {
-                                    // Wait 1 minute
-                                    Thread.sleep(60000);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
+                                if (difference > 0) {
+
+                                    // Update the text and re-notify
+                                    builder.setVibrate(new long[]{0, 0, 0})
+                                            .setDefaults(0)
+                                            .setContentText(String.format(getString(R.string.event_warning), difference));
+                                    manager.notify(notificationId, builder.build());
+
+                                    try {
+                                        // Wait 1 minute
+                                        Thread.sleep(60000);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
                                 }
                             }
-                        }
 
-                        // Update the text and renotify
-                        builder.setOngoing(false)
-                                .setAutoCancel(true)
-                                .setContentText(getString(R.string.event_now));
-                        manager.notify(notificationId, builder.build());
+                            // Update the text and renotify
+                            builder.setOngoing(false)
+                                    .setAutoCancel(true)
+                                    .setContentText(getString(R.string.event_now));
+                            manager.notify(notificationId, builder.build());
+                        }
                     }
-                }
-        ).start();
+            ).start();
+        }
     }
 
     private Event getEventFromIds(long areaId, long eventId){

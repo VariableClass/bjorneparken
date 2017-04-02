@@ -43,7 +43,7 @@ public class NotificationEventReceiver extends WakefulBroadcastReceiver {
         // Calculate the days between the two calendars
         long daysBetween = TimeUnit.MILLISECONDS.toDays(Math.abs(visitEnd.getTimeInMillis() - visitStart.getTimeInMillis()));
 
-        int eventCount = 1;
+        int alarmCount = 1;
 
         // For each day in between (runs once if 0 days difference [same day])
         for (int i = 0; i == daysBetween; i++){
@@ -58,7 +58,9 @@ public class NotificationEventReceiver extends WakefulBroadcastReceiver {
                 if (System.currentTimeMillis() < startTime.getTimeInMillis() + 300000) {
 
                     // If event currently has notification
-                    for (Notification notification : notifications){
+                    for (int j = notifications.size() - 1; j >- 0; j--){
+
+                        Notification notification = notifications.get(j);
 
                         if ((notification.getAreaId() == event.getLocation().getId()) && (notification.getEventId() == event.getId())) {
 
@@ -70,23 +72,37 @@ public class NotificationEventReceiver extends WakefulBroadcastReceiver {
 
                             // Remove notification from list
                             notifications.remove(notification);
-                            break;
                         }
                     }
 
                     // Create new notification and add it to the list of notifications
-                    Notification notification = new Notification(eventCount, event.getLocation().getId(), event.getId(), startTime.getTimeInMillis());
-                    notifications.add(notification);
+                    Notification startTimeNotification = new Notification(alarmCount, event.getLocation().getId(), event.getId(), startTime.getTimeInMillis());
+                    notifications.add(startTimeNotification);
 
                     // Retrieve an intent for the event at it's start time
-                    PendingIntent alarmIntent = getStartPendingIntent(context, notification.getNotificationId(), notification.getAreaId(), notification.getEventId(), notification.getStartTime());
+                    PendingIntent startAlarmIntent = getStartPendingIntent(context, startTimeNotification.getNotificationId(), startTimeNotification.getAreaId(), startTimeNotification.getEventId(), startTimeNotification.getStartTime());
 
-                    // Set an alarm for the specified number of minutes prior to the event
+                    // Set an alarm for the event start time
+                    alarmManager.set(AlarmManager.RTC_WAKEUP, startTime.getTimeInMillis(), startAlarmIntent);
+
+                    // Increase alarm count
+                    alarmCount++;
+
+                    // Create new notification and add it to the list of notifications
+                    Notification advanceNotification = new Notification(alarmCount, event.getLocation().getId(), event.getId(), startTime.getTimeInMillis());
+                    notifications.add(advanceNotification);
+
+                    // Retrieve an intent for the event at it's start time
+                    PendingIntent advanceAlarmIntent = getStartPendingIntent(context, advanceNotification.getNotificationId(), advanceNotification.getAreaId(), advanceNotification.getEventId(), advanceNotification.getStartTime());
+
+                    // Subtract 15 minutes from the event start time
                     startTime.add(Calendar.MINUTE, -WARNING_TIME_MINUTES);
-                    alarmManager.set(AlarmManager.RTC_WAKEUP, startTime.getTimeInMillis(), alarmIntent);
+
+                    // Set an alarm for the event in advance of it's start time
+                    alarmManager.set(AlarmManager.RTC_WAKEUP, startTime.getTimeInMillis(), advanceAlarmIntent);
                 }
 
-                eventCount++;
+                alarmCount++;
             }
         }
 
