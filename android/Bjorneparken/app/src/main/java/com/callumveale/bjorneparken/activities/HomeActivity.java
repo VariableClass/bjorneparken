@@ -755,6 +755,12 @@ public class HomeActivity
             // Create notification service
             NotificationEventReceiver.setupAlarm(getApplicationContext(), mItinerary, mVisitStart, mVisitEnd);
         }
+
+        // If currently on the home page, refresh it
+        if (currentNavigationDrawerIndex == 0){
+
+            navigateToPosition(0);
+        }
     }
 
     public void saveStarredSpecies(MainSpeciesListResponse starredSpeciesResponse){
@@ -834,14 +840,6 @@ public class HomeActivity
     }
 
     public void navigateToPosition(int position){
-
-        // If we are currently on that page
-        if (position == currentNavigationDrawerIndex){
-
-            // Close the drawer
-            mDrawerLayout.closeDrawer(mDrawerList);
-            return;
-        }
 
         // Set new drawer index
         currentNavigationDrawerIndex = position;
