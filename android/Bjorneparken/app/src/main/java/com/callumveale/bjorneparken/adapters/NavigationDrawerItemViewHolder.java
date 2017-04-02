@@ -2,6 +2,7 @@ package com.callumveale.bjorneparken.adapters;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.callumveale.bjorneparken.R;
@@ -15,6 +16,7 @@ class NavigationDrawerItemViewHolder extends RecyclerView.ViewHolder {
     //region Properties
 
     final View mView;
+    final ImageView mImageView;
     final TextView mNameView;
     NavigationDrawerItem mItem;
 
@@ -26,6 +28,7 @@ class NavigationDrawerItemViewHolder extends RecyclerView.ViewHolder {
         super(view);
         mView = view;
         mNameView = (TextView) view.findViewById(R.id.drawer_itemName);
+        mImageView = (ImageView) view.findViewById(R.id.drawer_icon);
     }
 
     //endregion Constructors

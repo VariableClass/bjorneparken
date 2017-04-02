@@ -187,20 +187,7 @@ public class HomeActivity
         // Build navigation drawer
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
-        String[] options = {
-                getString(R.string.home),
-                getString(R.string.my_visit),
-                getString(R.string.animals),
-                getString(R.string.events),
-                getString(R.string.attractions),
-                getString(R.string.amenities),
-                getString(R.string.park_map),
-                getString(R.string.restaurant_menu),
-                getString(R.string.social),
-                getString(R.string.settings),
-                getString(R.string.help)};
-
-        mNavigationOptions = NavigationDrawerItem.build(options);
+        mNavigationOptions = NavigationDrawerItem.build(this);
 
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, mToolbar, R.string.drawer_open, R.string.drawer_close) {
 

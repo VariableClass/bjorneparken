@@ -1,5 +1,6 @@
 package com.callumveale.bjorneparken.adapters;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +16,7 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
 
     private NavigationDrawerItem mItems[];
     private final INavigationDrawerListener mListener;
+    private Context mContext;
 
     //endregion Properties
 
@@ -23,6 +25,7 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
     public NavigationDrawerAdapter(NavigationDrawerItem[] items, INavigationDrawerListener listener) {
         mItems = items;
         mListener = listener;
+        mContext = (Context) listener;
     }
 
     //endregion Constructors
@@ -46,7 +49,10 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
         holder.mItem = mItems[position];
 
         // Set label
-        holder.mNameView.setText(mItems[position].name);
+        holder.mNameView.setText(holder.mItem.name);
+
+        // Set icon
+        holder.mImageView.setImageResource(holder.mItem.icon);
 
         // Add selected listener
         holder.mView.setOnClickListener(new View.OnClickListener() {
