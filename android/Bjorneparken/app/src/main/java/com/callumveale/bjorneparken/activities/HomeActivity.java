@@ -804,6 +804,8 @@ public class HomeActivity
             // Create fragment
             getSupportFragmentManager().beginTransaction().add(R.id.content_frame, fragment).addToBackStack(null).commitAllowingStateLoss();
         }
+
+        getSupportFragmentManager().executePendingTransactions();
     }
 
     public void updateProgress(boolean complete) {
@@ -1331,6 +1333,7 @@ public class HomeActivity
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == INITIALISE_DATES && resultCode == Activity.RESULT_OK){
 
@@ -1401,8 +1404,13 @@ public class HomeActivity
 
         } else if (item.getItemId() == R.id.action_share){
 
-            SocialFragment social = new SocialFragment();
-            social.takePhoto(SocialFragment.OTHER);
+            navigateToPosition(8);
+            Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.content_frame);
+
+            if (fragment.getClass() == SocialFragment.class) {
+
+                ((SocialFragment) fragment).takePhoto(SocialFragment.OTHER);
+            }
         }
 
         return super.onOptionsItemSelected(item);

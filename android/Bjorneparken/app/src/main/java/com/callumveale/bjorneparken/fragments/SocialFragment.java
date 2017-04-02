@@ -1,13 +1,17 @@
 package com.callumveale.bjorneparken.fragments;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
 import android.view.LayoutInflater;
@@ -28,6 +32,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -47,6 +52,9 @@ public class SocialFragment extends Fragment {
     public static final int TWITTER = 2;
     public static final int INSTAGRAM = 3;
     public static final int OTHER = 4;
+
+    private static final String TWITTER_PACKAGE = "com.twitter";
+    private static final String INSTAGRAM_PACKAGE = "com.instagram";
 
     //endregion Constants
 
@@ -181,26 +189,45 @@ public class SocialFragment extends Fragment {
             }
             // Continue only if the File was successfully created
             if (photoFile != null) {
-                Uri photoURI = FileProvider.getUriForFile(getContext(),
-                        "com.callumveale.bjorneparken",
-                        photoFile);
+                Uri photoURI = Uri.fromFile(photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 startActivityForResult(takePictureIntent, requestCode);
             }
         }
     }
 
+    // Storage Permissions
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static String[] PERMISSIONS_STORAGE = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
+
+    public void verifyStoragePermissions() {
+        // Check if we have write permission
+        int permission = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(
+                    getActivity(),
+                    PERMISSIONS_STORAGE,
+                    REQUEST_EXTERNAL_STORAGE
+            );
+        }
+    }
+
+
     private File createImageFile() throws IOException {
+
+        // Check storage permissions are have been granted
+        verifyStoragePermissions();
 
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
+        File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        File image = new File(storageDir, imageFileName + ".jpg");
 
         // Save a file: path for use with ACTION_VIEW intents
         mCurrentPhotoPath = image.getAbsolutePath();
@@ -228,11 +255,11 @@ public class SocialFragment extends Fragment {
                         break;
 
                     case TWITTER:
-                        shareToTwitter(photo);
+                        shareToTwitter();
                         break;
 
                     case INSTAGRAM:
-                        shareToOther();
+                        shareToInstagram();
                         break;
 
                     case OTHER:
@@ -270,8 +297,33 @@ public class SocialFragment extends Fragment {
         }
     }
 
-    private void shareToTwitter(Bitmap photo){
+    private void shareToTwitter(){
 
+        shareToSpecificApp(TWITTER_PACKAGE);
+    }
+
+    private void shareToInstagram(){
+
+        shareToSpecificApp(INSTAGRAM_PACKAGE);
+    }
+
+    private void shareToSpecificApp(String appPackage){
+
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("image/jpeg");
+        intent.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + mCurrentPhotoPath));
+
+        // Narrow down to official Twitter app, if available:
+        List<ResolveInfo> matches = getActivity().getPackageManager().queryIntentActivities(intent, 0);
+        for (ResolveInfo info : matches) {
+
+            if (info.activityInfo.packageName.toLowerCase().startsWith(appPackage)) {
+
+                intent.setPackage(info.activityInfo.packageName);
+            }
+        }
+
+        startActivity(intent);
     }
 
     private void shareToOther(){
