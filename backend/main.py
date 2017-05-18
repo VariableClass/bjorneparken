@@ -980,8 +980,11 @@ class SpeciesApi(remote.Service):
         # If value for image provided:
         if request.image:
 
-            # Delete current image
-            species.image.delete()
+            # If species currently has an image
+            if species.image:
+
+                # Delete current image
+                species.image.delete()
 
             # Upload new image
             species.image = Image.upload(str(species.key.id()), request.image)
@@ -1624,8 +1627,12 @@ class AreasApi(remote.Service):
 
         # If value for image provided:
         if request.image:
-            # Delete current image
-            enclosure.image.delete()
+
+            # If enclosure currently has image
+            if enclosure.image:
+
+                # Delete current image
+                enclosure.image.delete()
 
             # Upload new image
             enclosure.image = Image.upload(str(enclosure.key.id()), request.image)
@@ -1777,8 +1784,12 @@ class AreasApi(remote.Service):
 
         # If value for image provided:
         if request.image:
-            # Delete current image
-            amenity.image.delete()
+
+            # If amenity currently has image
+            if amenity.image:
+
+                # Delete current image
+                amenity.image.delete()
 
             # Upload new image
             amenity.image = Image.upload(str(amenity.key.id()), request.image)
@@ -2174,8 +2185,11 @@ class EventsApi(remote.Service):
         # If value for image provided:
         if request.image:
 
-            # Delete current image
-            event.image.delete()
+            # If event currently has image
+            if event.image:
+
+                # Delete current image
+                event.image.delete()
 
             # Upload new image
             event.image = Image.upload(str(event.key.parent().id()) + "-" + str(event.key.id()), request.image)
