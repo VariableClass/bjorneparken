@@ -2649,6 +2649,7 @@ bjørneparkappen.adminconsole.animals.detail.loadCreatePage = function(){
     animalDetailConfirm.onclick = function(){
 
         animalDetailAnimal.name = animalNameInput.value;
+        animalDetailAnimal.species_id = animalSpeciesInput.value;
         animalDetailAnimal.enclosure_id = animalEnclosureInput.value;
         animalDetailAnimal.is_available = animalAvailableInput.checked;
 
