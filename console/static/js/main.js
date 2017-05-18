@@ -1986,9 +1986,19 @@ bjørneparkappen.adminconsole.species.detail.validate = function(){
 
     } else if (speciesDetailSpecies.description.length < speciesDescriptionLanguageInput.length) {
 
-        alert("Please enter all translations for the speces' description.");
+        alert("Please enter all translations for the species' description.");
 
     } else {
+
+        if (speciesDetailSpecies.image) {
+
+            // If image is not base64, do not upload it
+            if (speciesDetailSpecies.image.substring(0, 11).localeCompare("data:image/") !== 0){
+
+                // Remove the key
+                delete speciesDetailSpecies.image;
+            }
+        }
 
         valid = true;
     }
@@ -2406,6 +2416,16 @@ bjørneparkappen.adminconsole.areas.detail.validate = function(){
         }
 
     } else {
+
+        if (areaDetailArea.image) {
+
+            // If image is not base64, do not upload it
+            if (areaDetailArea.image.substring(0, 11).localeCompare("data:image/") !== 0){
+
+                // Remove the key
+                delete areaDetailArea.image;
+            }
+        }
 
         valid = true;
     }
@@ -3248,6 +3268,16 @@ bjørneparkappen.adminconsole.events.detail.validate = function(){
         alert("Please enter all translations for the event description.");
 
     } else {
+
+        if (eventDetailEvent.image) {
+
+            // If image is not base64, do not upload it
+            if (eventDetailEvent.image.substring(0, 11).localeCompare("data:image/") !== 0){
+
+                // Remove the key
+                delete eventDetailEvent.image;
+            }
+        }
 
         valid = true;
     }
