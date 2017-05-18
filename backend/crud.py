@@ -75,11 +75,19 @@ def get_serving_url(filename):
     # Create a blobstore style filename
     blobstore_filename = '/gs/' + bucket_name + '/' + str(filename)
 
-    # Create a blob key from which to build a serving URL
-    blob_key = blobstore.create_gs_key(blobstore_filename)
+    try:
 
-    # Return a public serving URL
-    return images.get_serving_url(blob_key=blob_key)
+        # Create a blob key from which to build a serving URL
+        blob_key = blobstore.create_gs_key(blobstore_filename)
+
+        # Return a public serving URL
+        serving_url = images.get_serving_url(blob_key=blob_key)
+
+        return serving_url
+
+    except images.ObjectNotFoundError:
+
+        return ''
 
 
 # Retrieve default bucket
