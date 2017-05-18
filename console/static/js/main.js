@@ -1326,7 +1326,7 @@ bjørneparkappen.adminconsole.api.deleteAnimal = function(animal){
         var xhr = new XMLHttpRequest();
 
         // Open new DELETE request
-        xhr.open('DELETE', BASE_URL + "animals/delete?animal_id=" + animal.id + "&species_id=" + animal.species.id + "key=" + API_KEY);
+        xhr.open('DELETE', BASE_URL + "animals/delete?animal_id=" + animal.id + "&species_id=" + animal.species.id + "&key=" + API_KEY);
 
         // Set authorisation header using Firebase token
         xhr.setRequestHeader('Authorization', 'Bearer ' + idToken);
