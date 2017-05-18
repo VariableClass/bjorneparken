@@ -189,7 +189,9 @@ public class SocialFragment extends Fragment {
             }
             // Continue only if the File was successfully created
             if (photoFile != null) {
-                Uri photoURI = Uri.fromFile(photoFile);
+                    Uri photoURI = FileProvider.getUriForFile(getContext(),
+                            "com.callumveale.bjorneparken.fileprovider",
+                            photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 startActivityForResult(takePictureIntent, requestCode);
             }
@@ -225,8 +227,8 @@ public class SocialFragment extends Fragment {
 
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        String imageFileName = "JPEG_" + timeStamp;
+        File storageDir = getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = new File(storageDir, imageFileName + ".jpg");
 
         // Save a file: path for use with ACTION_VIEW intents
@@ -309,9 +311,11 @@ public class SocialFragment extends Fragment {
 
     private void shareToSpecificApp(String appPackage){
 
+
+
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("image/jpeg");
-        intent.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + mCurrentPhotoPath));
+        intent.putExtra(Intent.EXTRA_STREAM, getPublicUri());
 
         // Narrow down to official Twitter app, if available:
         List<ResolveInfo> matches = getActivity().getPackageManager().queryIntentActivities(intent, 0);
@@ -330,8 +334,16 @@ public class SocialFragment extends Fragment {
 
         Intent shareToOther = new Intent(Intent.ACTION_SEND);
         shareToOther.setType("image/jpeg");
-        shareToOther.putExtra(Intent.EXTRA_STREAM, Uri.parse(mCurrentPhotoPath));
+        shareToOther.putExtra(Intent.EXTRA_STREAM, getPublicUri());
         startActivity(Intent.createChooser(shareToOther, getString(R.string.share_photo)));
+    }
+
+    private Uri getPublicUri(){
+
+        File newFile = new File(mCurrentPhotoPath);
+        Uri publicUri = FileProvider.getUriForFile(getContext(), "com.callumveale.bjorneparken.fileprovider", newFile);
+
+        return publicUri;
     }
 
     //endregion Methods
