@@ -55,7 +55,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 
-import none.bjorneparkappen_api.model.MainAnimalListResponse;
 import none.bjorneparkappen_api.model.MainAreaListResponse;
 import none.bjorneparkappen_api.model.MainEventListResponse;
 import none.bjorneparkappen_api.model.MainSpeciesListResponse;
@@ -315,7 +314,7 @@ public class HomeActivity
         // Retrieve images for any area which has them
         for (Area area : mAreas){
 
-            getImage((IModel) area);
+            getImageFromFile((IModel) area);
         }
 
         // Attempt to retrieve events from file
@@ -324,7 +323,7 @@ public class HomeActivity
         // Retrieve images for any event which has them
         for (Event event : mEvents){
 
-            getImage(event);
+            getImageFromFile(event);
         }
 
         // Attempt to retrieve feedings from file
@@ -333,7 +332,7 @@ public class HomeActivity
         // Retrieve images for any species which have them
         for (Feeding feeding : mFeedings){
 
-            getImage(feeding);
+            getImageFromFile(feeding);
         }
 
         // Attempt to retrieve species from file
@@ -342,7 +341,7 @@ public class HomeActivity
         // Retrieve images for any species which has them
         for (Species speciesInst : mSpecies){
 
-            getImage(speciesInst);
+            getImageFromFile(speciesInst);
         }
     }
 
@@ -358,7 +357,7 @@ public class HomeActivity
         // Retrieve images for any species which has them
         for (Event event : mItinerary){
 
-            getImage(event);
+            getImageFromFile(event);
         }
 
         // Attempt to retrieve visitor starred species from file
@@ -639,7 +638,7 @@ public class HomeActivity
         // Retrieve images for any areas which have them
         for (Area area : mAreas){
 
-            getImage((IModel) area);
+            getImageFromServer((IModel) area);
         }
     }
 
@@ -654,7 +653,7 @@ public class HomeActivity
         // Retrieve images for any events which have them
         for (Event event : mEvents){
 
-            getImage(event);
+            getImageFromServer(event);
         }
     }
 
@@ -669,7 +668,7 @@ public class HomeActivity
         // Retrieve images for any feedings which have them
         for (Feeding feeding : mFeedings){
 
-            getImage(feeding);
+            getImageFromServer(feeding);
         }
     }
 
@@ -681,29 +680,14 @@ public class HomeActivity
         // Retrieve images for any species which have them
         for (Species speciesInst : mSpecies){
 
-            getImage(speciesInst);
+            getImageFromServer(speciesInst);
         }
 
         // Write response to file
         mFileWriter.writeSpeciesToFile(species);
     }
 
-    private void getImage(IModel item){
-
-        // Check if item has an image
-        if (item.getImageUrl() == null) {
-
-            return;
-        }
-
-        // Attempt to read image from file
-        mFileWriter.getImageFromFile(item);
-
-        // Check if image has been retrieved
-        if (item.getImage() != null) {
-
-            return;
-        }
+    private void getImageFromServer(IModel item){
 
         // Check if server is available
         if (!mServerAvailable) {
@@ -713,6 +697,18 @@ public class HomeActivity
 
         // Retrieve image from server
         mRequester.getImage(item);
+    }
+
+    private void getImageFromFile(IModel item){
+
+        // Check if item has an image
+        if (item.getImageUrl() == null) {
+
+            return;
+        }
+
+        // Attempt to read image from file
+        mFileWriter.getImageFromFile(item);
     }
 
     //endregion Park Data Callbacks
@@ -727,7 +723,7 @@ public class HomeActivity
         // Retrieve images for items
         for (Event event : mItinerary){
 
-            getImage(event);
+            getImageFromServer(event);
         }
 
         // Clear synchronisation flag
@@ -758,7 +754,7 @@ public class HomeActivity
         // Retrieve images for items
         for (Species species : mStarredSpecies){
 
-            getImage(species);
+            getImageFromServer(species);
         }
 
         // Clear synchronisation flag
