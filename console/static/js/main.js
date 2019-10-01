@@ -8,6 +8,7 @@
 // Base REST API request URL
 const BASE_URL = "https://api-dot-bjorneparkappen.appspot.com/_ah/api/bjorneparkappen_api/v1.0/";
 
+// EDIT 01/10/2019: A lesson in how not to do it! Left here as a reminder that we all improve...
 // API key
 const API_KEY = "AIzaSyCuD2dk_XFcn512V5JxAZbFlAK9dgNlQ9c";
 

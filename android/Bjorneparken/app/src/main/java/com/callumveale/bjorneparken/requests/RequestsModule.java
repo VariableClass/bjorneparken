@@ -26,7 +26,7 @@ public class RequestsModule {
     private static final String ROOT_URL = "https://" + HOST + "/_ah/api/";
 
     //region Request Constants
-
+    // EDIT 01/10/2019: A lesson in how not to do it! Left here as a reminder that we all improve...
     static final String API_KEY = "AIzaSyCuD2dk_XFcn512V5JxAZbFlAK9dgNlQ9c";
 
     static final String EVENT_ID = "event_id";
